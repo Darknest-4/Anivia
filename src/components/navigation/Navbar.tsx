@@ -101,7 +101,7 @@ export function Navbar({ transparent, onOpenMenu }: NavbarProps) {
             <UserMenu />
           </div>
           <Link to={isGuest ? '/login' : '/profile'} aria-label={isGuest ? 'Sign in' : 'Profile'} className="rounded-full lg:hidden">
-            <Avatar name={user.displayName} hue={user.avatarHue} size="sm" className="ring-line-strong" />
+            <Avatar name={user.displayName} hue={user.avatarHue} src={user.avatarUrl} size="sm" className="ring-line-strong" />
           </Link>
           <button
             type="button"

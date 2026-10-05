@@ -77,8 +77,10 @@ export function createRequestQueue({ minInterval, perMinute, retries = 3, cacheT
         () => run<T>(input, init, maxRetries),
         () => run<T>(input, init, maxRetries),
       )) as Promise<T>
-      cache.set(key, { at: Date.now(), value })
-      value.catch(() => cache.delete(key))
+      if (cacheTtl > 0) {
+        cache.set(key, { at: Date.now(), value })
+        value.catch(() => cache.delete(key))
+      }
       return value
     },
   }

@@ -167,7 +167,7 @@ All variables are optional. Copy `.env.example` to `.env.local` to override them
 | `VITE_API_BASE_URL` | *(empty)* | Base URL of **your** API, used by the `api` providers. With `api` selected but no URL, the demo catalog is used. |
 | `VITE_VIDEO_PROVIDER` | `mock` | `mock` or `api` (uses `ApiVideoProvider` when a base URL is set). |
 | `VITE_MOCK_LATENCY` | `350` | Artificial latency (ms) of mock providers so loading states are visible. Use `0` to disable. |
-| `VITE_SITE_URL` | `https://anivia.example.com` | Public URL used for canonical and Open Graph tags. |
+| `VITE_SITE_URL` | `https://anivia.animehub.hu` | Public URL used for canonical and Open Graph tags. |
 
 > Variables prefixed with `VITE_` are embedded in the client bundle. **Never put secrets in them.**
 
@@ -351,6 +351,16 @@ Security model: every table uses **Row Level Security** — users can only read 
 - **Self-service account deletion** via the `delete_my_account()` RPC — no service-role key needed in the frontend.
 - **Notifications** are derived from the watchlist and live airing data (new episode, airing within 24 h, premieres within 14 days), with optional browser notifications.
 - **AniList import**: Settings → Content → *Import from AniList* copies a public AniList list (statuses, scores, favorites) by username — no login or API key required.
+
+### AniList account connection
+
+Settings → **Connections** (or *Continue with AniList* on the sign-in page) connects an AniList account via OAuth **implicit grant** — only the public client id (`VITE_ANILIST_CLIENT_ID`) is used; the client secret is never needed in the browser. The token is kept in this browser only.
+
+- **Two-way sync** (`services/anilistAccount/sync.ts`): list & statuses, scores (`scoreRaw`, format-independent), episode progress from finished episodes, and favourites. Changes are diffed against a snapshot of the last sync, so edits are sent once and never echo back; the newest change wins on conflicts. Each part can be toggled.
+- AniList's own **airing / related-media notifications** appear in the bell; *Mark all as read* also clears the AniList badge.
+- Works without an ANIVIA account; with one, Supabase sync keeps running alongside.
+- Requires the AniList data source (AniList ids). Authenticated requests always bypass the shared edge cache (the Worker rejects them).
+- Set the client's redirect URL on AniList to your exact site origin, e.g. `https://anivia.animehub.hu`.
 
 ### Cloudflare Worker (`worker/index.ts`)
 

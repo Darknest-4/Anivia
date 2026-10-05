@@ -15,7 +15,7 @@ export function LibrarySidebar() {
   return (
     <aside className="sticky top-[calc(var(--header-h)+1.5rem)] hidden h-fit w-60 shrink-0 lg:block" aria-label="Library">
       <div className="flex items-center gap-3 rounded-2xl border border-line bg-surface p-3">
-        <Avatar name={user.displayName} hue={user.avatarHue} />
+        <Avatar name={user.displayName} hue={user.avatarHue} src={user.avatarUrl} />
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-fg">{user.displayName}</p>
           {isGuest ? (

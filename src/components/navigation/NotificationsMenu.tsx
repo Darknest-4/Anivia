@@ -1,11 +1,11 @@
-import { Bell, BellOff, CalendarClock, PlayCircle, Sparkles } from 'lucide-react'
+import { Bell, BellOff, CalendarClock, Link2, PlayCircle, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Popover } from '@/components/ui'
 import { useNotifications, type AppNotification } from '@/hooks/useNotifications'
 import { cn } from '@/lib/cn'
 import { formatRelative } from '@/lib/format'
 
-const ICONS: Record<AppNotification['kind'], typeof Bell> = { episode: PlayCircle, soon: CalendarClock, premiere: Sparkles }
+const ICONS: Record<AppNotification['kind'], typeof Bell> = { episode: PlayCircle, soon: CalendarClock, premiere: Sparkles, related: Link2 }
 
 /** Notification center driven by the user's watchlist and live airing data. */
 export function NotificationsMenu() {

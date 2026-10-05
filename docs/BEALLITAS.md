@@ -29,8 +29,17 @@ A Supabase beépített levelezője óránként csak néhány e-mailt enged, ezé
 ## 3. Bejelentkezési címek — kötelező
 
 Supabase → **Authentication → URL Configuration**:
-- *Site URL*: az éles címed (pl. `https://anivia.a-te-domained.hu`)
-- *Redirect URLs*: `https://anivia.a-te-domained.hu/**`, `https://*.workers.dev/**` (ha azt használod), `http://localhost:5173/**`
+- *Site URL*: `https://anivia.animehub.hu`
+- *Redirect URLs*: `https://anivia.animehub.hu/**`, `https://*.workers.dev/**` (ha azt használod), `http://localhost:5173/**`
+
+## 3b. AniList-összekötés — kötelező a „Continue with AniList”-hez
+
+AniList → **Settings → Developer → Anivia** kliens:
+- **Redirect URL**: `https://anivia.animehub.hu` (a `https://` előtaggal együtt, végén perjel nélkül). Pontosan ennek kell lennie, különben az AniList hibát ad.
+- A **Client ID (52829)** már be van állítva a kódban. A **Secret-et ne add meg sehol** — a böngészős belépés (implicit grant) nem használja, és ha a weboldalba kerülne, bárki visszaélhetne vele.
+- Helyi fejlesztéshez hozz létre egy második AniList klienst `http://localhost:5173` redirecttel, és az ID-ját írd a `.env.local` fájlba: `VITE_ANILIST_CLIENT_ID=...`
+
+Mit tud: belépés AniList-fiókkal (ANIVIA-fiók nélkül is), kétirányú szinkron (lista + státuszok, pontszámok, megnézett részek, kedvencek), az AniList saját értesítései a csengőben. A token csak az adott böngészőben tárolódik, nem kerül az adatbázisba. A szinkron az AniList adatforrással működik (ez az alapértelmezett).
 
 ## 4. Google / Discord / GitHub belépés — opcionális
 

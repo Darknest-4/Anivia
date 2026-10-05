@@ -8,11 +8,16 @@ export const config = {
   appName: 'ANIVIA',
   tagline: 'Discover. Watch. Remember.',
   shortTagline: 'Your anime universe.',
-  siteUrl: (env.VITE_SITE_URL as string | undefined) ?? 'https://anivia.example.com',
+  siteUrl: (env.VITE_SITE_URL as string | undefined) ?? 'https://anivia.animehub.hu',
   apiBaseUrl: (env.VITE_API_BASE_URL as string | undefined) ?? '',
   /** Catalog data source: AniList (+ Jikan episode titles), Jikan only, your own REST API, or local demo data. */
   animeProvider: ((env.VITE_ANIME_PROVIDER as string | undefined) || 'anilist') as 'anilist' | 'jikan' | 'api' | 'mock',
   anilistUrl: (env.VITE_ANILIST_URL as string | undefined) || 'https://graphql.anilist.co',
+  /**
+   * AniList API client (https://anilist.co/settings/developer). Only the PUBLIC client id is used —
+   * the browser flow is the implicit grant, so the client secret must never be added here.
+   */
+  anilistClientId: (env.VITE_ANILIST_CLIENT_ID as string | undefined) ?? '52829',
   /** Same-origin edge cache (Cloudflare Worker in worker/index.ts). Auto-detected; set to '' to disable. */
   anilistProxy: (env.VITE_ANILIST_PROXY as string | undefined) ?? (env.PROD ? '/api/anilist' : ''),
   jikanUrl: (env.VITE_JIKAN_URL as string | undefined) || 'https://api.jikan.moe/v4',

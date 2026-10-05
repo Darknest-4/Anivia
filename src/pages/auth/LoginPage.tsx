@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { AuthHeading, isEmail, PasswordInput, SocialButtons } from '@/components/auth/AuthBits'
+import { AniListButton } from '@/components/auth/AniListButton'
 import { DemoNotice } from '@/components/common/DemoNotice'
 import { Button, Field, Input } from '@/components/ui'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
@@ -47,6 +48,7 @@ export default function LoginPage() {
   return (
     <div className="animate-fade-up">
       <AuthHeading title="Welcome back" description="Sign in to sync your watchlist, history and settings across devices." />
+      <AniListButton returnTo={next} className="mb-3" />
       <SocialButtons />
       <form onSubmit={submit} noValidate className="space-y-4">
         {errors.form && (

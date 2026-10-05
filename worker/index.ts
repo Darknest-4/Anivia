@@ -39,6 +39,8 @@ async function proxyAniList(request: Request, ctx: Ctx, origin: string) {
   const from = request.headers.get('origin')
   if (from && from !== origin) return json({ error: 'Forbidden' }, 403)
 
+  // Never cache personal (authenticated) requests — those go straight to AniList.
+  if (request.headers.has('authorization')) return json({ error: 'Authenticated requests are not proxied' }, 400)
   const body = await request.text()
   if (body.length > MAX_BODY) return json({ error: 'Query too large' }, 413)
   try {

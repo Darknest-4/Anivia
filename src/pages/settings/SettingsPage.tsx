@@ -1,4 +1,4 @@
-import { Bell, Gauge, Globe, LayoutGrid, MonitorPlay, Palette, RotateCcw, Shield, Trash2, UserRound } from 'lucide-react'
+import { Bell, Gauge, Link2, Globe, LayoutGrid, MonitorPlay, Palette, RotateCcw, Shield, Trash2, UserRound } from 'lucide-react'
 import { useRef, useState, type FormEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Card, Row } from './parts'
@@ -6,6 +6,7 @@ import { AccountSettings } from './sections/AccountSettings'
 import { BrowserNotifications } from './sections/BrowserNotifications'
 import { PrivacySettings } from './sections/PrivacySettings'
 import { AppearanceExtras } from './sections/AppearanceExtras'
+import { ConnectionsSettings } from './sections/ConnectionsSettings'
 import { ContentSettings } from './sections/ContentSettings'
 import { PerformanceSettings } from './sections/PerformanceSettings'
 import { useAuth } from '@/providers/AuthProvider'
@@ -23,7 +24,7 @@ import { storage } from '@/services/storage'
 import { favoritesStore, historyService, historyStore, preferencesStore, recentSearchesService, recentSearchesStore, seedDemoLibrary, seededStore, watchlistStore } from '@/services/user'
 import type { Preferences, VideoQuality } from '@/types'
 
-type Section = 'appearance' | 'content' | 'playback' | 'performance' | 'notifications' | 'privacy' | 'language' | 'account'
+type Section = 'appearance' | 'content' | 'playback' | 'performance' | 'notifications' | 'privacy' | 'language' | 'connections' | 'account'
 
 const sections: { value: Section; label: string; icon: typeof Palette; description: string }[] = [
   { value: 'appearance', label: 'Appearance', icon: Palette, description: 'Theme and motion preferences.' },
@@ -33,6 +34,7 @@ const sections: { value: Section; label: string; icon: typeof Palette; descripti
   { value: 'notifications', label: 'Notifications', icon: Bell, description: 'Choose what we notify you about.' },
   { value: 'privacy', label: 'Privacy', icon: Shield, description: 'Control your data and visibility.' },
   { value: 'language', label: 'Language', icon: Globe, description: 'Interface and audio languages.' },
+  { value: 'connections', label: 'Connections', icon: Link2, description: 'AniList sync.' },
   { value: 'account', label: 'Account', icon: UserRound, description: 'Profile details and plan.' },
 ]
 
@@ -149,6 +151,7 @@ export default function SettingsPage() {
           )}
 
           {section === 'content' && <ContentSettings prefs={prefs} set={set} />}
+          {section === 'connections' && <ConnectionsSettings />}
           {section === 'performance' && <PerformanceSettings prefs={prefs} set={set} />}
 
           {section === 'playback' && (

@@ -2,6 +2,7 @@ import { MailCheck } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { AuthHeading, isEmail, PasswordInput, SocialButtons, StrengthMeter } from '@/components/auth/AuthBits'
+import { AniListButton } from '@/components/auth/AniListButton'
 import { Button, Checkbox, Field, Input } from '@/components/ui'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useAuth } from '@/providers/AuthProvider'
@@ -71,6 +72,7 @@ export default function RegisterPage() {
   return (
     <div className="animate-fade-up">
       <AuthHeading title="Create your account" description="Join free — your watchlist and history follow you on every device." />
+      <AniListButton label="Use my AniList account" returnTo={next} className="mb-3" />
       <SocialButtons />
       <form onSubmit={submit} noValidate className="space-y-4">
         {errors.form && (
