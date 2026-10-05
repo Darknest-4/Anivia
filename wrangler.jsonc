@@ -1,0 +1,12 @@
+{
+  // Cloudflare Workers static-assets deployment for the ANIVIA SPA.
+  // Build: `npm run build` → deploy: `npx wrangler deploy`
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "anivia",
+  "compatibility_date": "2025-10-01",
+  "assets": {
+    "directory": "./dist",
+    // Serve index.html for client-side routes such as /anime/123 or /browse.
+    "not_found_handling": "single-page-application"
+  }
+}

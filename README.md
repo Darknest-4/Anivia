@@ -471,7 +471,8 @@ A small demo library is seeded on first visit only when the demo catalog (`mock`
 
 `npm run build` produces a static SPA in `dist/`. Configure your host to **rewrite all routes to `index.html`**:
 
-- **Netlify** — `public/_redirects` is included (`/*  /index.html  200`)
+- **Cloudflare Workers** — `wrangler.jsonc` is included (static assets from `dist/` with SPA fallback). In the Cloudflare dashboard use build command `npm run build` and deploy command `npx wrangler deploy`, or run both locally.
+- **Netlify** — `netlify.toml` is included (build + SPA redirect)
 - **Vercel** — `vercel.json` with the SPA rewrite is included
 - **Nginx** — `location / { try_files $uri /index.html; }`
 - **Apache** — `FallbackResource /index.html`
