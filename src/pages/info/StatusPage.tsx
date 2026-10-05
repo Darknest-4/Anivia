@@ -52,7 +52,8 @@ const CHECKS: Check[] = [
       const res = await timedFetch(`${config.anilistProxy}/health`)
       const ct = res.headers.get('content-type') ?? ''
       if (!ct.includes('json')) throw new Error(`Worker not deployed (got ${ct || 'no content-type'}) — the app falls back to AniList directly`)
-      return `OK — ${await res.text()}`
+      const j = (await res.json()) as { ok: boolean; reason?: string }
+      return j.ok ? 'OK — Worker can reach AniList, edge cache in use' : `SKIP — AniList refuses the Worker (${j.reason ?? 'blocked'}); the app talks to AniList directly`
     },
   },
   {
@@ -60,6 +61,8 @@ const CHECKS: Check[] = [
     label: 'Edge cache → AniList',
     run: async () => {
       if (!config.anilistProxy) return 'SKIP — disabled in this build'
+      const h = await timedFetch(`${config.anilistProxy}/health`).then((r) => r.json() as Promise<{ ok?: boolean }>).catch(() => ({ ok: false }))
+      if (!h.ok) return 'SKIP — edge cache not in use (see above)'
       const res = await timedFetch(config.anilistProxy, { method: 'POST', headers: { 'content-type': 'application/json' }, body: SIMPLE })
       if (!res.ok) throw new Error(await describe(res))
       return `OK — cache ${res.headers.get('x-anivia-cache') ?? '?'}`

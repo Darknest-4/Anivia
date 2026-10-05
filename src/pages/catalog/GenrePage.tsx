@@ -27,7 +27,7 @@ export default function GenrePage() {
     <div className="container-app">
       <PageHeader
         crumbs={[{ label: 'Home', to: '/' }, { label: 'Genres', to: '/genres' }, { label: genre.name }]}
-        eyebrow={`${genre.animeCount ?? 0} titles`}
+        eyebrow={genre.animeCount !== undefined ? `${genre.animeCount} titles` : 'Genre'}
         title={
           <span className="inline-flex items-center gap-3">
             <span className="h-3 w-3 rounded-full" style={{ background: `hsl(${genre.hue} 85% 60%)` }} aria-hidden />

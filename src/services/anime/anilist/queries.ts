@@ -119,12 +119,3 @@ export const SUGGESTIONS = `
     studios: Page(perPage: 3) { studios(search: $search, sort: SEARCH_MATCH) { id name favourites isAnimationStudio } }
   }
 `
-
-/** One request that counts titles per genre using aliases. */
-export function genreCountsQuery(entries: { alias: string; genre?: string; tag?: string }[]) {
-  const parts = entries.map(
-    (e) =>
-      `${e.alias}: Page(perPage: 1) { pageInfo { total } media(type: ANIME, isAdult: false, ${e.genre ? `genre: ${JSON.stringify(e.genre)}` : `tag: ${JSON.stringify(e.tag)}`}) { id } }`,
-  )
-  return `query { ${parts.join('\n')} }`
-}

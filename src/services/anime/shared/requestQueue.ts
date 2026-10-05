@@ -10,6 +10,8 @@ interface QueueOptions {
   retries?: number
   /** Response cache lifetime (ms). */
   cacheTtl?: number
+  /** Abort a single request after this many ms. */
+  timeout?: number
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
@@ -19,7 +21,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
  * Public anime APIs (Jikan, AniList) enforce strict per-IP limits, so every request
  * goes through one queue and identical requests are de-duplicated.
  */
-export function createRequestQueue({ minInterval, perMinute, retries = 3, cacheTtl = 5 * 60_000 }: QueueOptions) {
+export function createRequestQueue({ minInterval, perMinute, retries = 3, cacheTtl = 5 * 60_000, timeout = 12_000 }: QueueOptions) {
   const cache = new Map<string, { at: number; value: Promise<unknown> }>()
   const sent: number[] = []
   let chain: Promise<unknown> = Promise.resolve()
@@ -58,14 +60,20 @@ export function createRequestQueue({ minInterval, perMinute, retries = 3, cacheT
       await waitForSlot()
       let res: Response
       try {
-        res = await fetch(input, init)
+        const ctrl = new AbortController()
+        const timer = setTimeout(() => ctrl.abort(), timeout)
+        try {
+          res = await fetch(input, { ...init, signal: ctrl.signal })
+        } finally {
+          clearTimeout(timer)
+        }
       } catch (err) {
         // Network errors and server errors get one quick retry; only rate limits are retried patiently.
         if (attempt < Math.min(1, maxRetries)) {
           await sleep(800 * (attempt + 1))
           continue
         }
-        const message = err instanceof Error ? err.message : 'Network error'
+        const message = err instanceof Error && err.name === 'AbortError' ? `Timed out after ${timeout / 1000}s` : err instanceof Error ? err.message : 'Network error'
         trip(message)
         reportProviderError(input, message)
         throw new ProviderError(message)

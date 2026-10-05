@@ -267,12 +267,9 @@ export class AniListAnimeProvider implements AnimeProvider {
     }
   }
 
+  /** Genre list is static (no request) — counting titles per genre was the slowest AniList call. */
   async getGenres(): Promise<Genre[]> {
-    const entries = anilistBrowsableGenres.map((g, i) => ({ alias: `g${i}`, genre: g.anilist, tag: g.anilistTag, slug: g.slug }))
-    const data = await this.gql<Record<string, { pageInfo: { total: number } }>>(Q.genreCountsQuery(entries))
-    return entries
-      .map((e) => ({ ...genreFromName(e.genre ?? e.tag ?? e.slug, data[e.alias]?.pageInfo.total), slug: e.slug }))
-      .sort((a, b) => (b.animeCount ?? 0) - (a.animeCount ?? 0))
+    return anilistBrowsableGenres.map((g) => ({ ...genreFromName(g.anilist ?? g.anilistTag ?? g.slug), slug: g.slug }))
   }
 
   async getGenre(slug: string) {
@@ -313,7 +310,11 @@ export class AniListAnimeProvider implements AnimeProvider {
     const mal = data.Media.idMal
     if (mal && this.episodeSource) {
       try {
-        const jikan = await this.episodeSource.episodeHints(String(mal))
+        // Jikan is often slow; never let it hold the episode list for more than 4 seconds.
+        const jikan = await Promise.race([
+          this.episodeSource.episodeHints(String(mal), 2),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Jikan timeout')), 4000)),
+        ])
         for (const [n, hint] of jikan) hints.set(n, { ...hint, ...hints.get(n), title: hints.get(n)?.title ?? hint.title })
       } catch {
         /* Jikan is optional enrichment — fall back to generic titles. */

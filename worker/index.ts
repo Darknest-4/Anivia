@@ -120,10 +120,36 @@ async function withMeta(request: Request, env: Env, ctx: Ctx, id: string, origin
     .transform(page)
 }
 
+/**
+ * Reports whether the Worker can actually reach AniList (AniList sometimes blocks shared
+ * cloud egress IPs). Cached for 10 minutes; the app only uses the proxy when this is ok.
+ */
+async function health(ctx: Ctx, origin: string) {
+  const key = new Request(`${origin}/__anilist-health`)
+  const hit = await caches.default.match(key)
+  if (hit) return new Response(hit.body, { headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } })
+  let ok = false
+  let reason = ''
+  try {
+    const res = await fetch(ANILIST, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', accept: 'application/json', 'user-agent': 'ANIVIA edge cache (+https://anivia.animehub.hu)' },
+      body: JSON.stringify({ query: '{ SiteStatistics { anime(perPage: 1) { nodes { count } } } }' }),
+    })
+    ok = res.ok && (res.headers.get('content-type') ?? '').includes('json')
+    if (!ok) reason = `upstream ${res.status}`
+  } catch (e) {
+    reason = e instanceof Error ? e.message : 'unreachable'
+  }
+  const body = JSON.stringify(ok ? { ok: true } : { ok: false, reason })
+  ctx.waitUntil(caches.default.put(key, new Response(body, { headers: { 'content-type': 'application/json', 'cache-control': 'public, max-age=600' } })))
+  return new Response(body, { headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } })
+}
+
 export default {
   async fetch(request: Request, env: Env, ctx: Ctx): Promise<Response> {
     const url = new URL(request.url)
-    if (url.pathname === '/api/anilist/health') return json({ ok: true }, 200, { 'cache-control': 'public, max-age=3600' })
+    if (url.pathname === '/api/anilist/health') return health(ctx, url.origin)
     if (url.pathname === '/api/anilist') return proxyAniList(request, ctx, url.origin)
     const detail = /^\/anime\/(\d+)\/?$/.exec(url.pathname)
     if (detail && request.method === 'GET') return withMeta(request, env, ctx, detail[1], url.origin)

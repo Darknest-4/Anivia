@@ -71,7 +71,7 @@ export function SearchAutocomplete({
     if (!data) return []
     return [
       ...data.anime.map((a) => ({ id: `a-${a.id}`, group: 'Anime', label: a.title, sublabel: `${a.type} · ${a.year ?? 'TBA'} · ${a.genres.slice(0, 2).map((g) => g.name).join(', ')}`, to: `/anime/${a.id}`, image: a.poster })),
-      ...data.genres.map((g) => ({ id: `g-${g.id}`, group: 'Genres', label: g.name, sublabel: `${g.animeCount ?? 0} titles`, to: `/genres/${g.slug}`, icon: <Hash className="h-4 w-4" /> })),
+      ...data.genres.map((g) => ({ id: `g-${g.id}`, group: 'Genres', label: g.name, sublabel: g.animeCount !== undefined ? `${g.animeCount} titles` : 'Genre', to: `/genres/${g.slug}`, icon: <Hash className="h-4 w-4" /> })),
       ...data.characters.map((c) => ({ id: `c-${c.id}`, group: 'Characters', label: c.name, sublabel: c.role, to: `/character/${c.id}`, image: c.image, icon: <User className="h-4 w-4" /> })),
       ...data.studios.map((s) => ({ id: `s-${s.id}`, group: 'Studios', label: s.name, sublabel: [s.country, s.animeCount !== undefined ? `${s.animeCount} titles` : 'Studio'].filter(Boolean).join(' · '), to: `/studio/${s.id}`, icon: <Building2 className="h-4 w-4" /> })),
     ]
