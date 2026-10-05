@@ -3,25 +3,30 @@ import { useState, type FormEvent } from 'react'
 import { Button, Dialog, Textarea } from '@/components/ui'
 import { cn } from '@/lib/cn'
 import { useToast } from '@/providers/ToastProvider'
+import { backend } from '@/services/backend'
 
 const reasons = ['Wrong information', 'Playback issue', 'Subtitle problem', 'Missing episode', 'Inappropriate content', 'Other']
 
-/** UI-only report form. Submit sends nothing — connect it to your support/API endpoint. */
+/** Content/playback issue report, stored in the Supabase `reports` table. */
 export function ReportDialog({ open, onClose, subject }: { open: boolean; onClose: () => void; subject: string }) {
   const [reason, setReason] = useState(reasons[0])
   const [details, setDetails] = useState('')
   const [sending, setSending] = useState(false)
   const toast = useToast()
 
-  const submit = (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault()
     setSending(true)
-    window.setTimeout(() => {
-      setSending(false)
+    try {
+      await backend.sendReport({ subject, reason, details: details.trim(), page_url: window.location.pathname + window.location.search })
       setDetails('')
       onClose()
       toast({ title: 'Report submitted', description: 'Thanks! Our team will review it shortly.' })
-    }, 700)
+    } catch (err) {
+      toast({ title: 'Report not sent', description: (err as Error).message, variant: 'error' })
+    } finally {
+      setSending(false)
+    }
   }
 
   return (

@@ -23,6 +23,7 @@ const EpisodesPage = lazy(() => import('@/pages/anime/EpisodesPage'))
 const WatchlistPage = lazy(() => import('@/pages/profile/WatchlistPage'))
 const HistoryPage = lazy(() => import('@/pages/profile/HistoryPage'))
 const ProfilePage = lazy(() => import('@/pages/profile/ProfilePage'))
+const PublicProfilePage = lazy(() => import('@/pages/profile/PublicProfilePage'))
 const SettingsPage = lazy(() => import('@/pages/settings/SettingsPage'))
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
 const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'))
@@ -57,6 +58,7 @@ export const routes: RouteObject[] = [
           { path: 'character/:id', element: <CharacterPage /> },
           { path: 'studios', element: <StudiosPage /> },
           { path: 'studio/:id', element: <StudioPage /> },
+          { path: 'u/:username', element: <PublicProfilePage /> },
           {
             element: <LibraryLayout />,
             children: [

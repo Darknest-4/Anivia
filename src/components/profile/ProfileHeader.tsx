@@ -15,9 +15,11 @@ export function ProfileHeader({ user, banner, onShare }: { user: User; banner?: 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-2xl font-bold text-fg sm:text-3xl">{user.displayName}</h1>
-            <Badge variant="accent" size="md">
+            {user.plan !== 'free' && (
+              <Badge variant="accent" size="md">
               {user.plan.toUpperCase()}
             </Badge>
+            )}
           </div>
           <p className="text-sm text-fg-subtle">@{user.username}</p>
           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-fg-muted">

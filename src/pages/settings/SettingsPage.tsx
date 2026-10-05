@@ -3,6 +3,8 @@ import { useRef, useState, type FormEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Card, Row } from './parts'
 import { AccountSettings } from './sections/AccountSettings'
+import { BrowserNotifications } from './sections/BrowserNotifications'
+import { PrivacySettings } from './sections/PrivacySettings'
 import { AppearanceExtras } from './sections/AppearanceExtras'
 import { ContentSettings } from './sections/ContentSettings'
 import { PerformanceSettings } from './sections/PerformanceSettings'
@@ -190,30 +192,23 @@ export default function SettingsPage() {
           )}
 
           {section === 'notifications' && (
-            <Card title="Notifications" description="Demo preferences — wire them to your push / email service.">
+            <Card title="Notifications" description="Alerts are generated from your watchlist and live airing data — see the bell icon.">
               <Row>
-                <Switch label="Release reminders" description="Get reminded before shows on your watchlist premiere." checked={prefs.notifyReleases} onChange={(v) => set('notifyReleases', v)} />
+                <Switch label="New episodes" description="When a new episode of a show you’re watching or planning is out." checked={prefs.notifyNewEpisodes} onChange={(v) => set('notifyNewEpisodes', v)} />
               </Row>
               <Row>
-                <Switch label="New episodes" description="Know as soon as a new episode is available." checked={prefs.notifyNewEpisodes} onChange={(v) => set('notifyNewEpisodes', v)} />
+                <Switch label="Airing reminders & premieres" description="Episodes airing within 24 hours and premieres within two weeks." checked={prefs.notifyReleases} onChange={(v) => set('notifyReleases', v)} />
               </Row>
               <Row>
-                <Switch label="Announcements" description="Product news, new seasons and special events." checked={prefs.notifyAnnouncements} onChange={(v) => set('notifyAnnouncements', v)} />
+                <BrowserNotifications />
               </Row>
             </Card>
           )}
 
           {section === 'privacy' && (
             <>
-              <Card title="Privacy">
-                <Row>
-                  <Switch label="Private profile" description="Hide your profile and lists from other users." checked={prefs.privateProfile} onChange={(v) => set('privateProfile', v)} />
-                </Row>
-                <Row>
-                  <Switch label="Show watch history on profile" checked={prefs.showHistory} onChange={(v) => set('showHistory', v)} />
-                </Row>
-              </Card>
-              <Card title="Your data" description="ANIVIA stores library data locally in your browser. No personal information is collected.">
+              <PrivacySettings />
+              <Card title="Your data" description="Your library is stored in this browser and — when you’re signed in — in your account.">
                 <Row>
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>

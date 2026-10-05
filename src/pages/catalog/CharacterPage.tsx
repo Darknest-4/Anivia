@@ -1,11 +1,11 @@
 import { Heart, Mic, Ruler, Shield, Sparkle } from 'lucide-react'
-import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { AnimeCardHorizontal, CharacterCard } from '@/components/anime'
 import { Breadcrumbs } from '@/components/common/PageHeader'
 import { Badge, Button, ErrorState, Skeleton } from '@/components/ui'
 import { useAnime, useCharacter, useCharacters } from '@/hooks/queries'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
+import { useFavoriteCharacters } from '@/hooks/useUserData'
 import { formatCompact } from '@/lib/format'
 import { useToast } from '@/providers/ToastProvider'
 import NotFoundPage from '@/pages/info/NotFoundPage'
@@ -15,7 +15,8 @@ export default function CharacterPage() {
   const { data: character, isLoading, isError, refetch } = useCharacter(id)
   const anime = useAnime(character?.animeId)
   const castmates = useCharacters({ animeId: character?.animeId })
-  const [liked, setLiked] = useState(false)
+  const favs = useFavoriteCharacters()
+  const liked = character ? favs.isFavorite(character.id) : false
   const toast = useToast()
   useDocumentMeta({ title: character?.name ?? 'Character', description: character?.description, type: 'profile' })
 
@@ -54,7 +55,7 @@ export default function CharacterPage() {
             className="mt-4 w-full"
             leftIcon={<Heart className={liked ? 'h-4 w-4 fill-current' : 'h-4 w-4'} />}
             onClick={() => {
-              setLiked((l) => !l)
+              favs.toggle(character.id)
               toast({ title: liked ? 'Removed from favorites' : 'Added to favorite characters', description: character.name, icon: Heart })
             }}
             aria-pressed={liked}

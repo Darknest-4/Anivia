@@ -13,6 +13,8 @@ export interface Profile {
   bio: string
   avatar_hue: number
   created_at: string
+  is_public?: boolean
+  show_history?: boolean
 }
 
 type AuthStatus = 'disabled' | 'loading' | 'signed-out' | 'signed-in'
@@ -31,7 +33,7 @@ interface AuthContextValue {
   sendPasswordReset: (email: string) => Promise<void>
   updatePassword: (password: string) => Promise<void>
   updateEmail: (email: string) => Promise<void>
-  updateProfile: (patch: Partial<Pick<Profile, 'username' | 'display_name' | 'bio' | 'avatar_hue'>>) => Promise<void>
+  updateProfile: (patch: Partial<Pick<Profile, 'username' | 'display_name' | 'bio' | 'avatar_hue' | 'is_public' | 'show_history'>>) => Promise<void>
   signOut: (everywhere?: boolean) => Promise<void>
 }
 

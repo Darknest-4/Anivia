@@ -343,6 +343,28 @@ ANIVIA ships with real authentication and library sync through [Supabase](https:
 
 Security model: every table uses **Row Level Security** — users can only read and write their own rows. The publishable key is designed to be public. **Never** put the database password or an `sb_secret_…` key into frontend code or a `VITE_` variable: anything in the bundle is visible to every visitor and would give full access to your database.
 
+### More backend features (Supabase, migration `0002`)
+
+- **Contact form & issue reports** are stored in `contact_messages` / `reports` (insert-only via RLS, flood-limited, honeypot on the form). Read them in the Supabase Table Editor.
+- **Your score** (1–10 per title) and **favorite characters** sync with the account.
+- **Public profiles** at `/u/<username>` — opt-in in Settings → Privacy; history visibility is configurable. Served through the `public_profile()` RPC, which never exposes email or private data.
+- **Self-service account deletion** via the `delete_my_account()` RPC — no service-role key needed in the frontend.
+- **Notifications** are derived from the watchlist and live airing data (new episode, airing within 24 h, premieres within 14 days), with optional browser notifications.
+- **AniList import**: Settings → Content → *Import from AniList* copies a public AniList list (statuses, scores, favorites) by username — no login or API key required.
+
+### Cloudflare Worker (`worker/index.ts`)
+
+- `/api/anilist` — edge-cached AniList proxy (5 min, shared by all visitors). The app detects it automatically in production builds and falls back to AniList directly if it's missing or failing.
+- `/anime/:id` — injects Open Graph / Twitter tags (title, synopsis, image) so shared links render rich previews.
+
+### Installable app (PWA)
+
+`public/manifest.webmanifest` + `public/sw.js`: installable on phones and desktops, offline app shell, cached poster images (max 300). Registered in production builds only.
+
+### Quality
+
+`npm test` runs Vitest unit tests (filters, text cleaning, AniList batching incl. injection safety and fallback, notifications). `.github/workflows/ci.yml` runs typecheck, tests, build and a Worker dry-run on every push. A Hungarian deployment checklist lives in `docs/BEALLITAS.md`.
+
 ## 14. AnimeProvider integration
 
 The full contract is in `src/services/anime/AnimeProvider.ts`:

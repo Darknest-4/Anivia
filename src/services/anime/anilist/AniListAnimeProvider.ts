@@ -52,22 +52,68 @@ export class AniListAnimeProvider implements AnimeProvider {
   readonly features = { languageFilter: false }
   // AniList allows ~90 requests/minute; batching keeps real usage far below that.
   private queue = createRequestQueue({ minInterval: 150, perMinute: 75 })
+  private endpointPromise: Promise<string> | null = null
+
+  /**
+   * Uses the edge-cached Worker proxy (`/api/anilist`) when the site is deployed with it,
+   * otherwise talks to AniList directly. Detected once per session.
+   */
+  private endpoint() {
+    const proxy = config.anilistProxy
+    if (!proxy) return Promise.resolve(this.directEndpoint)
+    this.endpointPromise ??= (async () => {
+      const key = 'anivia:anilist-proxy'
+      try {
+        const known = sessionStorage.getItem(key)
+        if (known) return known === 'yes' ? proxy : this.directEndpoint
+      } catch {
+        /* storage unavailable */
+      }
+      let ok = false
+      try {
+        const res = await fetch(`${proxy}/health`, { headers: { accept: 'application/json' } })
+        ok = res.ok && ((await res.json()) as { ok?: boolean }).ok === true
+      } catch {
+        ok = false
+      }
+      try {
+        sessionStorage.setItem(key, ok ? 'yes' : 'no')
+      } catch {
+        /* ignore */
+      }
+      return ok ? proxy : this.directEndpoint
+    })()
+    return this.endpointPromise
+  }
+
   private batchPage = createPageBatcher((query) => this.gql<Record<string, PageResult>>(query))
   private episodeSource: JikanAnimeProvider | null
 
   constructor(
-    private readonly endpoint = config.anilistUrl,
+    private readonly directEndpoint = config.anilistUrl,
     episodeSource: JikanAnimeProvider | null = new JikanAnimeProvider(),
   ) {
     this.episodeSource = episodeSource
   }
 
   private async gql<T>(query: string, variables: Record<string, unknown> = {}): Promise<T> {
-    const res = await this.queue.request<{ data: T; errors?: { message: string }[] } | null>(this.endpoint, {
+    const endpoint = await this.endpoint()
+    const init: RequestInit = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({ query, variables }),
-    })
+    }
+    let res: { data: T; errors?: { message: string }[] } | null
+    try {
+      // Through the proxy, fail fast so the direct fallback below kicks in quickly.
+      res = await this.queue.request(endpoint, init, undefined, endpoint === this.directEndpoint ? undefined : 1)
+    } catch (err) {
+      // If the edge proxy itself fails, go straight to AniList for the rest of the session.
+      const status = (err as { status?: number }).status
+      if (endpoint === this.directEndpoint || (status !== undefined && status < 500)) throw err
+      this.endpointPromise = Promise.resolve(this.directEndpoint)
+      res = await this.queue.request(this.directEndpoint, init)
+    }
     // AniList answers unknown ids with HTTP 404; callers treat a missing root field as "not found".
     if (!res) return {} as T
     if (res.errors?.length && !res.data) throw new Error(res.errors[0].message)

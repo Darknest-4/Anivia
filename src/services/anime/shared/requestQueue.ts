@@ -38,20 +38,20 @@ export function createRequestQueue({ minInterval, perMinute, retries = 3, cacheT
     sent.push(last)
   }
 
-  async function run<T>(input: string, init?: RequestInit): Promise<T> {
+  async function run<T>(input: string, init?: RequestInit, maxRetries = retries): Promise<T> {
     for (let attempt = 0; ; attempt++) {
       await waitForSlot()
       let res: Response
       try {
         res = await fetch(input, init)
       } catch (err) {
-        if (attempt < retries) {
+        if (attempt < maxRetries) {
           await sleep(800 * (attempt + 1))
           continue
         }
         throw new ProviderError(err instanceof Error ? err.message : 'Network error')
       }
-      if ((res.status === 429 || res.status >= 500) && attempt < retries) {
+      if ((res.status === 429 || res.status >= 500) && attempt < maxRetries) {
         const retryAfter = Number(res.headers.get('Retry-After'))
         await sleep(Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 1200 * (attempt + 1))
         continue
@@ -70,12 +70,12 @@ export function createRequestQueue({ minInterval, perMinute, retries = 3, cacheT
 
   return {
     /** Queued, cached request. `key` defaults to the URL (+ body for POST). */
-    request<T>(input: string, init?: RequestInit, key = `${input}|${init?.body ?? ''}`): Promise<T> {
+    request<T>(input: string, init?: RequestInit, key = `${input}|${init?.body ?? ''}`, maxRetries = retries): Promise<T> {
       const hit = cache.get(key)
       if (hit && Date.now() - hit.at < cacheTtl) return hit.value as Promise<T>
       const value = (chain = chain.then(
-        () => run<T>(input, init),
-        () => run<T>(input, init),
+        () => run<T>(input, init, maxRetries),
+        () => run<T>(input, init, maxRetries),
       )) as Promise<T>
       cache.set(key, { at: Date.now(), value })
       value.catch(() => cache.delete(key))

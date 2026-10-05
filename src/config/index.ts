@@ -13,10 +13,25 @@ export const config = {
   /** Catalog data source: AniList (+ Jikan episode titles), Jikan only, your own REST API, or local demo data. */
   animeProvider: ((env.VITE_ANIME_PROVIDER as string | undefined) || 'anilist') as 'anilist' | 'jikan' | 'api' | 'mock',
   anilistUrl: (env.VITE_ANILIST_URL as string | undefined) || 'https://graphql.anilist.co',
+  /** Same-origin edge cache (Cloudflare Worker in worker/index.ts). Auto-detected; set to '' to disable. */
+  anilistProxy: (env.VITE_ANILIST_PROXY as string | undefined) ?? (env.PROD ? '/api/anilist' : ''),
   jikanUrl: (env.VITE_JIKAN_URL as string | undefined) || 'https://api.jikan.moe/v4',
   videoProvider: ((env.VITE_VIDEO_PROVIDER as string | undefined) ?? 'mock') as 'mock' | 'api',
   mockLatency: Number(env.VITE_MOCK_LATENCY ?? 350),
   storagePrefix: 'anivia:',
+  /** Show pricing / upgrade UI. Off by default — enable once you connect a payment provider. */
+  enablePricing: (env.VITE_ENABLE_PRICING as string | undefined) === 'true',
+  /** Public support address shown on the contact page (optional). */
+  supportEmail: (env.VITE_SUPPORT_EMAIL as string | undefined) ?? '',
+  /** Social links in the footer — empty values are hidden. */
+  social: {
+    discord: (env.VITE_SOCIAL_DISCORD as string | undefined) ?? '',
+    x: (env.VITE_SOCIAL_X as string | undefined) ?? '',
+    instagram: (env.VITE_SOCIAL_INSTAGRAM as string | undefined) ?? '',
+    website: (env.VITE_SOCIAL_WEBSITE as string | undefined) ?? '',
+  },
+  /** Cloudflare Web Analytics beacon token (optional, cookie-free). */
+  cfAnalyticsToken: (env.VITE_CF_ANALYTICS_TOKEN as string | undefined) ?? '',
   /**
    * Supabase project used for accounts and library sync. Only the project URL and the
    * *publishable* key belong in frontend code — never the database password or a secret key.

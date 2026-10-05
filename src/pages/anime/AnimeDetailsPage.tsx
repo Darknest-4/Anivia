@@ -6,6 +6,7 @@ import {
   AnimeInfoPanel,
   DetailsSkeleton,
   FavoriteButton,
+  MyRating,
   ReportDialog,
   ShareDialog,
   StatusBadge,
@@ -136,6 +137,7 @@ export default function AnimeDetailsPage() {
           </div>
         </div>
         <aside className="space-y-6">
+          <MyRating animeId={anime.id} title={anime.title} />
           <WatchLinks links={anime.watchLinks} />
           <AnimeInfoPanel anime={anime} />
         </aside>

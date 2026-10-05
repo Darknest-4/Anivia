@@ -1,5 +1,6 @@
 import { BellRing, Bookmark, MonitorSmartphone, Sparkles } from 'lucide-react'
 import { ButtonLink } from '@/components/ui'
+import { config } from '@/config'
 
 const perks = [
   { icon: Bookmark, title: 'Smart watchlist', body: 'Track status, favorites and progress.' },
@@ -29,9 +30,11 @@ export function JoinBanner() {
               <ButtonLink to="/register" size="lg">
                 Create free account
               </ButtonLink>
-              <ButtonLink to="/pricing" size="lg" variant="outline">
+              {config.enablePricing && (
+                <ButtonLink to="/pricing" size="lg" variant="outline">
                 See plans
               </ButtonLink>
+              )}
             </div>
           </div>
           <ul className="grid gap-3 sm:grid-cols-2">

@@ -1,15 +1,16 @@
-import { Headphones, Mail, MessageSquare, Send } from 'lucide-react'
+import { Headphones, Mail, Send } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { PageHeader } from '@/components/common/PageHeader'
 import { isEmail } from '@/components/auth/AuthBits'
 import { Button, Field, Input, Select, Textarea } from '@/components/ui'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useToast } from '@/providers/ToastProvider'
+import { backend } from '@/services/backend'
+import { config } from '@/config'
 
 const channels = [
-  { icon: Headphones, title: 'Help center', body: 'Guides for playback, accounts and devices.', meta: 'Available 24/7' },
-  { icon: MessageSquare, title: 'Community', body: 'Talk episodes and theories with other fans.', meta: 'Placeholder link' },
-  { icon: Mail, title: 'Email', body: 'support@anivia.example.com', meta: 'Replies within 1 business day' },
+  { icon: Headphones, title: 'Send us a message', body: 'Questions, bug reports or feedback — use the form and we’ll get back to you by email.', meta: 'Messages go straight to our inbox' },
+  ...(config.supportEmail ? [{ icon: Mail, title: 'Email', body: config.supportEmail, meta: 'Replies within 1 business day' }] : []),
 ]
 
 export default function ContactPage() {
@@ -18,8 +19,9 @@ export default function ContactPage() {
   const [form, setForm] = useState({ name: '', email: '', topic: 'general', message: '' })
   const [errors, setErrors] = useState<Record<string, string | undefined>>({})
   const [loading, setLoading] = useState(false)
+  const [honeypot, setHoneypot] = useState('')
 
-  const submit = (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault()
     const next = {
       name: form.name.trim() ? undefined : 'Please enter your name.',
@@ -28,12 +30,18 @@ export default function ContactPage() {
     }
     setErrors(next)
     if (Object.values(next).some(Boolean)) return
+    // Honeypot: bots fill hidden fields, people don't.
+    if (honeypot) return
     setLoading(true)
-    window.setTimeout(() => {
-      setLoading(false)
+    try {
+      await backend.sendContact({ name: form.name.trim(), email: form.email.trim(), topic: form.topic, message: form.message.trim() })
       setForm({ name: '', email: '', topic: 'general', message: '' })
-      toast({ title: 'Message sent', description: 'Demo only — connect this form to your support inbox.' })
-    }, 800)
+      toast({ title: 'Message sent', description: 'Thanks — we’ll reply to your email soon.' })
+    } catch (err) {
+      toast({ title: 'Message not sent', description: (err as Error).message, variant: 'error' })
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -82,6 +90,7 @@ export default function ContactPage() {
           <Field label="Message" error={errors.message}>
             {(p) => <Textarea {...p} rows={6} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="How can we help?" />}
           </Field>
+          <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden value={honeypot} onChange={(e) => setHoneypot(e.target.value)} className="hidden" />
           <Button type="submit" size="lg" loading={loading} leftIcon={<Send className="h-4 w-4" />}>
             Send message
           </Button>

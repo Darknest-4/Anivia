@@ -1,10 +1,13 @@
-import { Cloud, KeyRound, LogIn, LogOut, Mail } from 'lucide-react'
+import { Cloud, KeyRound, LogIn, LogOut, Mail, Trash2 } from 'lucide-react'
 import { useEffect, useState, type FormEvent } from 'react'
 import { PasswordInput } from '@/components/auth/AuthBits'
-import { Avatar, Button, ButtonLink, Field, Input, Textarea } from '@/components/ui'
+import { Avatar, Button, ButtonLink, Dialog, Field, Input, Textarea } from '@/components/ui'
 import { formatDate } from '@/lib/format'
 import { useAuth } from '@/providers/AuthProvider'
 import { useToast } from '@/providers/ToastProvider'
+import { backend } from '@/services/backend'
+import { favoriteCharactersStore, favoritesStore, historyStore, ratingsStore, watchlistStore } from '@/services/user'
+import { useNavigate } from 'react-router-dom'
 import { Card, Row } from '../parts'
 
 const syncText = { idle: 'Waiting…', syncing: 'Syncing now…', synced: 'Everything is up to date', error: 'Last sync failed — will retry on the next change' } as const
@@ -18,6 +21,9 @@ export function AccountSettings() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [busy, setBusy] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const [confirmText, setConfirmText] = useState('')
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (auth.profile)
@@ -162,6 +168,54 @@ export function AccountSettings() {
           </Button>
         </div>
       </section>
+
+      <section className="rounded-2xl border border-danger/30 bg-danger/[0.04] p-5">
+        <h2 className="text-base font-semibold text-fg">Delete account</h2>
+        <p className="mt-1 text-[13px] text-fg-subtle">Permanently deletes your account, profile and synced library. This cannot be undone.</p>
+        <Button className="mt-4" variant="danger" leftIcon={<Trash2 className="h-4 w-4" />} onClick={() => setDeleting(true)}>
+          Delete my account
+        </Button>
+      </section>
+
+      <Dialog
+        open={deleting}
+        onClose={() => {
+          setDeleting(false)
+          setConfirmText('')
+        }}
+        size="sm"
+        icon={<Trash2 className="h-5 w-5" />}
+        title="Delete your account?"
+        description={`This permanently deletes ${auth.email ?? 'your account'} and everything synced to it.`}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setDeleting(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              disabled={confirmText !== 'DELETE'}
+              loading={busy === 'delete'}
+              onClick={() =>
+                void attempt(
+                  'delete',
+                  async () => {
+                    await backend.deleteMyAccount()
+                    ;[watchlistStore, historyStore, favoritesStore, ratingsStore, favoriteCharactersStore].forEach((st) => st.reset())
+                    setDeleting(false)
+                    navigate('/', { replace: true })
+                  },
+                  'Your account was deleted',
+                )
+              }
+            >
+              Delete forever
+            </Button>
+          </>
+        }
+      >
+        <Field label='Type "DELETE" to confirm'>{(p) => <Input {...p} value={confirmText} onChange={(e) => setConfirmText(e.target.value)} autoComplete="off" />}</Field>
+      </Dialog>
     </>
   )
 }

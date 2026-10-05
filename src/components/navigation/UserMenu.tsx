@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Avatar, ButtonLink, Popover, Skeleton } from '@/components/ui'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { useToast } from '@/providers/ToastProvider'
+import { config } from '@/config'
 import { libraryNav } from './navItems'
 
 const syncLabel = { idle: 'Sync idle', syncing: 'Syncing…', synced: 'Library synced', error: 'Sync failed — retrying' } as const
@@ -59,10 +60,12 @@ export function UserMenu() {
                 {item.label}
               </Link>
             ))}
-            <Link to="/pricing" onClick={close} className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-semibold text-accent-soft hover:bg-surface-3">
+            {config.enablePricing && (
+              <Link to="/pricing" onClick={close} className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-semibold text-accent-soft hover:bg-surface-3">
               <Sparkles className="h-4 w-4" />
               Upgrade to Pro
             </Link>
+            )}
           </nav>
           <div className="h-px bg-line" />
           {signedIn ? (

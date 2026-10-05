@@ -4,7 +4,7 @@ import { NavLink, useLocation } from 'react-router-dom'
 import { ButtonLink, Drawer, Logo } from '@/components/ui'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { cn } from '@/lib/cn'
-import { discoverNav, libraryNav, primaryNav, upgradeNav, type NavItem } from './navItems'
+import { discoverNav, libraryNavWithUpgrade, primaryNav, type NavItem } from './navItems'
 import { ThemeSegmented } from './ThemeToggle'
 
 function Section({ title, items }: { title: string; items: NavItem[] }) {
@@ -75,7 +75,7 @@ export function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => 
         <p className="mt-2 text-xs text-fg-subtle">Discover. Watch. Remember.</p>
       </div>
       <Section title="Discover" items={[...primaryNav, ...discoverNav]} />
-      <Section title="Library" items={[...libraryNav, upgradeNav]} />
+      <Section title="Library" items={libraryNavWithUpgrade} />
       <div className="px-6 py-4">
         <p className="eyebrow pb-2">Appearance</p>
         <ThemeSegmented />

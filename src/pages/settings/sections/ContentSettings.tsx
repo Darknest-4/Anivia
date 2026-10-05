@@ -6,6 +6,7 @@ import { activeDataSource, DATA_SOURCE_KEY, type DataSource } from '@/services/a
 import { storage } from '@/services/storage'
 import type { Preferences, SortOption } from '@/types'
 import { Card, Choice, Row } from '../parts'
+import { ImportSettings } from './ImportSettings'
 
 type Set = <K extends keyof Preferences>(key: K, value: Preferences[K]) => void
 
@@ -47,6 +48,8 @@ export function ContentSettings({ prefs, set }: { prefs: Preferences; set: Set }
           </div>
         </Row>
       </Card>
+
+      <ImportSettings />
 
       <Card title="Titles & scores">
         <Row>

@@ -1,3 +1,4 @@
+import { config } from '@/config'
 import {
   Bookmark,
   CalendarDays,
@@ -52,3 +53,5 @@ export const mobileTabs: NavItem[] = [
 ]
 
 export const upgradeNav: NavItem = { to: '/pricing', label: 'Upgrade', icon: Sparkles }
+/** Library links plus “Upgrade” when pricing is enabled. */
+export const libraryNavWithUpgrade: NavItem[] = config.enablePricing ? [...libraryNav, upgradeNav] : libraryNav

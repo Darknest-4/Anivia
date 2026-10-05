@@ -1,0 +1,23 @@
+{
+  "name": "ANIVIA — Discover. Watch. Remember.",
+  "short_name": "ANIVIA",
+  "description": "Discover trending anime, follow weekly schedules and keep your watchlist in sync.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b0b10",
+  "theme_color": "#0b0b10",
+  "categories": ["entertainment", "lifestyle"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "shortcuts": [
+    { "name": "Schedule", "url": "/schedule" },
+    { "name": "Watchlist", "url": "/watchlist" },
+    { "name": "Search", "url": "/search" }
+  ]
+}

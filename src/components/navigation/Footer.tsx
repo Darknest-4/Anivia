@@ -1,4 +1,5 @@
-import { AtSign, Globe, Mail, MessageCircle, Rss } from 'lucide-react'
+import { AtSign, Camera, Globe, Mail, MessageCircle } from 'lucide-react'
+import { config } from '@/config'
 import { Link } from 'react-router-dom'
 import { Logo } from '@/components/ui'
 import { useProviderInfo } from '@/hooks/queries'
@@ -21,7 +22,7 @@ const columns = [
       { to: '/history', label: 'History' },
       { to: '/characters', label: 'Characters' },
       { to: '/studios', label: 'Studios' },
-      { to: '/pricing', label: 'Pricing' },
+      ...(config.enablePricing ? [{ to: '/pricing', label: 'Pricing' }] : []),
     ],
   },
   {
@@ -44,12 +45,12 @@ const columns = [
 ]
 
 const socials = [
-  { label: 'Community', icon: MessageCircle },
-  { label: 'Website', icon: Globe },
-  { label: 'Social', icon: AtSign },
-  { label: 'Newsletter', icon: Mail },
-  { label: 'RSS feed', icon: Rss },
-]
+  { label: 'Discord', icon: MessageCircle, href: config.social.discord },
+  { label: 'X / Twitter', icon: AtSign, href: config.social.x },
+  { label: 'Instagram', icon: Camera, href: config.social.instagram },
+  { label: 'Website', icon: Globe, href: config.social.website },
+  { label: 'Email', icon: Mail, href: config.supportEmail ? `mailto:${config.supportEmail}` : '' },
+].filter((s) => s.href)
 
 export function Footer() {
   const source = useProviderInfo()
@@ -63,20 +64,21 @@ export function Footer() {
             <p className="mt-2 text-sm leading-relaxed text-fg-muted">
               Your anime universe — trending series, weekly schedules and a library that remembers where you left off.
             </p>
-            <ul className="mt-6 flex gap-2" aria-label="Social links">
+            {socials.length > 0 && <ul className="mt-6 flex gap-2" aria-label="Social links">
               {socials.map((s) => (
                 <li key={s.label}>
                   <a
-                    href="#"
-                    onClick={(e) => e.preventDefault()}
-                    aria-label={`${s.label} (placeholder link)`}
+                    href={s.href}
+                    target={s.href.startsWith('mailto:') ? undefined : '_blank'}
+                    rel="noopener noreferrer"
+                    aria-label={s.label}
                     className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-surface-2 text-fg-muted transition-colors hover:border-line-strong hover:text-fg"
                   >
                     <s.icon className="h-[18px] w-[18px]" />
                   </a>
                 </li>
               ))}
-            </ul>
+            </ul>}
           </div>
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
             {columns.map((col) => (

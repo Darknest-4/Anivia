@@ -3,7 +3,7 @@ import { Avatar } from '@/components/ui'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { useHistory, useWatchlist } from '@/hooks/useUserData'
 import { cn } from '@/lib/cn'
-import { discoverNav, libraryNav, upgradeNav } from './navItems'
+import { discoverNav, libraryNavWithUpgrade } from './navItems'
 
 /** Desktop sidebar for the personal library area (watchlist, history, profile, settings). */
 export function LibrarySidebar() {
@@ -29,7 +29,7 @@ export function LibrarySidebar() {
       </div>
       <nav className="mt-4 space-y-6">
         {[
-          { title: 'Library', items: [...libraryNav, upgradeNav] },
+          { title: 'Library', items: libraryNavWithUpgrade },
           { title: 'Discover', items: discoverNav },
         ].map((section) => (
           <div key={section.title}>

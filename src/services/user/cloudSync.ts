@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Preferences, WatchlistItem, WatchProgress } from '@/types'
-import { defaultPreferences, favoritesStore, historyStore, preferencesStore, watchlistStore } from './stores'
+import { defaultPreferences, favoriteCharactersStore, favoritesStore, historyStore, preferencesStore, ratingsStore, watchlistStore } from './stores'
 
 interface LibraryRow {
   user_id: string
@@ -8,6 +8,8 @@ interface LibraryRow {
   history: WatchProgress[]
   favorites: string[]
   preferences: Partial<Preferences>
+  ratings: Record<string, number>
+  favorite_characters: string[]
   updated_at?: string
 }
 
@@ -42,6 +44,8 @@ export function startCloudSync(client: SupabaseClient, userId: string, onStatus:
     history: historyStore.get().slice(0, HISTORY_LIMIT),
     favorites: favoritesStore.get(),
     preferences: preferencesStore.get(),
+    ratings: ratingsStore.get(),
+    favorite_characters: favoriteCharactersStore.get(),
   })
 
   async function push() {
@@ -68,6 +72,8 @@ export function startCloudSync(client: SupabaseClient, userId: string, onStatus:
             .slice(0, HISTORY_LIMIT),
         )
         favoritesStore.set([...new Set([...favoritesStore.get(), ...(data.favorites ?? [])])])
+        favoriteCharactersStore.set([...new Set([...favoriteCharactersStore.get(), ...(data.favorite_characters ?? [])])])
+        ratingsStore.set({ ...(data.ratings ?? {}), ...ratingsStore.get() })
         if (preferRemotePrefs && data.preferences && Object.keys(data.preferences).length) {
           preferencesStore.set({ ...defaultPreferences, ...preferencesStore.get(), ...data.preferences })
         }
@@ -84,7 +90,7 @@ export function startCloudSync(client: SupabaseClient, userId: string, onStatus:
     timer = window.setTimeout(push, 1200)
   }
 
-  const unsubs = [watchlistStore, historyStore, favoritesStore, preferencesStore].map((s) => s.subscribe(schedule))
+  const unsubs = [watchlistStore, historyStore, favoritesStore, preferencesStore, ratingsStore, favoriteCharactersStore].map((s) => s.subscribe(schedule))
   const onVisible = () => document.visibilityState === 'visible' && pull(false)
   document.addEventListener('visibilitychange', onVisible)
 
