@@ -6,6 +6,7 @@ import { cn } from '@/lib/cn'
 import { useToast } from '@/providers/ToastProvider'
 import { WATCHLIST_STATUSES, watchlistService, watchlistStatusLabel } from '@/services/user'
 import type { Anime } from '@/types'
+import { AddToWatchlistDialog } from './AddToWatchlistDialog'
 
 function stop(e: MouseEvent) {
   e.preventDefault()
@@ -70,7 +71,7 @@ export function FavoriteButton({ anime, className, size = 'sm' }: { anime: Pick<
 }
 
 interface WatchlistButtonProps {
-  anime: Pick<Anime, 'id' | 'title'>
+  anime: Pick<Anime, 'id' | 'title' | 'poster'>
   variant?: ButtonVariant
   size?: ButtonSize
   className?: string
@@ -81,21 +82,16 @@ export function WatchlistButton({ anime, variant = 'secondary', size = 'lg', cla
   const entry = useWatchlistEntry(anime.id)
   const toast = useToast()
   const [confirm, setConfirm] = useState(false)
+  const [adding, setAdding] = useState(false)
 
   if (!entry) {
     return (
-      <Button
-        variant={variant}
-        size={size}
-        className={className}
-        leftIcon={<BookmarkPlus className="h-[18px] w-[18px]" />}
-        onClick={() => {
-          watchlistService.add(anime.id)
-          toast({ title: 'Added to watchlist', description: `${anime.title} · Plan to Watch` })
-        }}
-      >
-        Add to Watchlist
-      </Button>
+      <>
+        <Button variant={variant} size={size} className={className} leftIcon={<BookmarkPlus className="h-[18px] w-[18px]" />} onClick={() => setAdding(true)}>
+          Add to Watchlist
+        </Button>
+        <AddToWatchlistDialog anime={anime} open={adding} onClose={() => setAdding(false)} />
+      </>
     )
   }
 

@@ -52,7 +52,7 @@ export function Navbar({ transparent, onOpenMenu }: NavbarProps) {
               end={item.end}
               className={({ isActive }) =>
                 cn(
-                  'relative rounded-lg px-3 py-2 text-sm font-semibold transition-colors',
+                  'relative rounded-lg px-2.5 py-2 text-sm font-semibold transition-colors xl:px-3',
                   isActive
                     ? cn(solid ? 'text-fg' : 'text-white', 'after:absolute after:inset-x-3 after:-bottom-[13px] after:h-0.5 after:rounded-full after:bg-accent')
                     : solid
@@ -67,7 +67,7 @@ export function Navbar({ transparent, onOpenMenu }: NavbarProps) {
           <NavLink
             to="/watchlist"
             className={({ isActive }) =>
-              cn('rounded-lg px-3 py-2 text-sm font-semibold transition-colors', isActive ? (solid ? 'text-fg' : 'text-white') : solid ? 'text-fg-muted hover:text-fg' : 'text-white/75 hover:text-white')
+              cn('rounded-lg px-2.5 py-2 text-sm font-semibold transition-colors xl:px-3', isActive ? (solid ? 'text-fg' : 'text-white') : solid ? 'text-fg-muted hover:text-fg' : 'text-white/75 hover:text-white')
             }
           >
             Watchlist
@@ -75,11 +75,11 @@ export function Navbar({ transparent, onOpenMenu }: NavbarProps) {
         </nav>
 
         <div className="ml-auto flex items-center gap-1 sm:gap-1.5">
-          {pathname !== '/search' && <SearchAutocomplete className="hidden w-[220px] lg:block xl:w-[300px]" showShortcut />}
+          {pathname !== '/search' && <SearchAutocomplete className="hidden xl:block xl:w-[260px] 2xl:w-[300px]" showShortcut />}
           <Link
             to="/search"
             aria-label="Search"
-            className={cn('inline-flex h-10 w-10 items-center justify-center rounded-lg transition-colors lg:hidden', solid ? 'text-fg-muted hover:bg-surface-3 hover:text-fg' : 'text-white hover:bg-white/10')}
+            className={cn('inline-flex h-10 w-10 items-center justify-center rounded-lg transition-colors xl:hidden', solid ? 'text-fg-muted hover:bg-surface-3 hover:text-fg' : 'text-white hover:bg-white/10')}
           >
             <Search className="h-5 w-5" />
           </Link>

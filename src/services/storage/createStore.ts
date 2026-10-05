@@ -11,16 +11,18 @@ export interface PersistentStore<T> {
 /**
  * Minimal observable store persisted to localStorage.
  * Works with React's `useSyncExternalStore` and syncs across browser tabs.
+ * `hydrate` lets a store repair or migrate stored values (e.g. merge new default keys).
  */
-export function createPersistentStore<T>(key: string, initial: T): PersistentStore<T> {
-  let state = storage.get<T>(key, initial)
+export function createPersistentStore<T>(key: string, initial: T, hydrate: (stored: T) => T = (v) => v): PersistentStore<T> {
+  const read = () => hydrate(storage.get<T>(key, initial))
+  let state = read()
   const listeners = new Set<() => void>()
   const emit = () => listeners.forEach((l) => l())
 
   if (typeof window !== 'undefined') {
     window.addEventListener('storage', (event) => {
       if (event.key === `${config.storagePrefix}${key}`) {
-        state = storage.get<T>(key, initial)
+        state = read()
         emit()
       }
     })

@@ -1,6 +1,8 @@
 import { Code2, Database, Layers, MonitorSmartphone, Palette, PlayCircle, Search, ShieldCheck } from 'lucide-react'
 import { PageHeader } from '@/components/common/PageHeader'
-import { ButtonLink } from '@/components/ui'
+import { ButtonLink, ErrorState } from '@/components/ui'
+import { config } from '@/config'
+import { isMockProvider } from '@/services/anime'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 
 const features = [
@@ -43,6 +45,19 @@ export default function AboutPage() {
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-fg-muted">
           ANIVIA is frontend-only. It ships with fictional demo data and a simulated player so every screen works out of the box. Implement the provider interfaces to connect your legitimate backend — see the README for step-by-step guides.
         </p>
+        {isMockProvider ? (
+          <ErrorState
+            variant="no-api"
+            className="mt-8 py-10 sm:py-12"
+            description={
+              config.animeProvider === 'api'
+                ? 'VITE_ANIME_PROVIDER is set to "api" but VITE_API_BASE_URL is empty — falling back to the built-in mock provider.'
+                : 'This demo is running on MockAnimeProvider with fictional data. Set VITE_API_BASE_URL and register your AnimeProvider to load live data.'
+            }
+          />
+        ) : (
+          <p className="mt-8 rounded-xl border border-success/30 bg-success/10 px-4 py-3 text-sm text-fg-muted">Connected to {config.apiBaseUrl}</p>
+        )}
         <ul className="mt-8 grid gap-4 md:grid-cols-2">
           {dev.map((d) => (
             <li key={d.title} className="flex gap-4 rounded-2xl border border-line bg-surface-2/60 p-4">

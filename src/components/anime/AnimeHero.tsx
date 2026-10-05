@@ -57,7 +57,7 @@ export function AnimeHero({ items }: { items: Anime[] }) {
         <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-bg/80 to-transparent" />
       </div>
 
-      <div className="container-app flex min-h-[640px] flex-col justify-end pb-10 pt-[calc(var(--header-h)+2rem)] md:h-[82vh] md:max-h-[880px] md:min-h-[600px] md:justify-center md:pb-24">
+      <div className="container-app flex min-h-[640px] flex-col justify-end pb-10 pt-[calc(var(--header-h)+2rem)] md:h-[72vh] md:max-h-[880px] md:min-h-[600px] lg:h-[82vh] md:justify-center md:pb-24">
         <div key={anime.id} className="max-w-2xl animate-fade-up text-center md:text-left">
           <div className="flex flex-wrap items-center justify-center gap-2 md:justify-start">
             <Badge variant="solid" size="md">

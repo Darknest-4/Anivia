@@ -32,13 +32,14 @@ export function UpcomingCard({ anime, className }: { anime: Anime; className?: s
         </h3>
         <p className="mt-1 line-clamp-2 text-[13px] leading-relaxed text-fg-muted">{anime.description}</p>
         <div className="mt-auto flex items-center justify-between gap-2 pt-3">
-          <div className="hidden gap-1.5 xs:flex">
+          <div className="hidden min-w-0 gap-1.5 overflow-hidden xs:flex">
             {anime.genres.slice(0, 2).map((g) => (
               <AnimeGenreBadge key={g.id} genre={g} className="px-2 py-0.5 text-2xs" />
             ))}
           </div>
           <Button
             size="sm"
+            className="shrink-0"
             variant={entry ? 'secondary' : 'outline'}
             leftIcon={<BellRing className="h-3.5 w-3.5" />}
             onClick={() => {
