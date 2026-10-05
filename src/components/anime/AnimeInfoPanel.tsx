@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { cn } from '@/lib/cn'
-import { formatCompact, formatDate, formatRating, seasonLabel, statusLabel } from '@/lib/format'
+import { formatCompact, formatDate, formatRating, scoresHidden, seasonLabel, statusLabel } from '@/lib/format'
 import type { Anime } from '@/types'
 
 /** Structured "Information" sidebar listing all key metadata fields. */
@@ -49,7 +49,7 @@ export function AnimeInfoPanel({ anime, className }: { anime: Anime; className?:
       </span>,
     ],
     ['Age rating', anime.ageRating ?? '—'],
-    ['Score', anime.rating ? `${formatRating(anime.rating)} (${formatCompact(anime.ratingCount ?? 0)} votes)` : 'Not yet rated'],
+    ...(scoresHidden() ? [] : [['Score', anime.rating ? `${formatRating(anime.rating)} (${formatCompact(anime.ratingCount ?? 0)} votes)` : 'Not yet rated'] as [string, React.ReactNode]]),
     ['Popularity', `${formatCompact(anime.popularity)} members`],
     ...(anime.languages.length ? [['Audio', anime.languages.join(', ')] as [string, React.ReactNode]] : []),
     ...(anime.quality ? [['Quality', anime.quality] as [string, React.ReactNode]] : []),

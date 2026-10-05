@@ -1,7 +1,8 @@
-import { LogIn, UserPlus } from 'lucide-react'
+import { LogIn, LogOut, UserPlus } from 'lucide-react'
 import { useEffect } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { ButtonLink, Drawer, Logo } from '@/components/ui'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { cn } from '@/lib/cn'
 import { discoverNav, libraryNav, primaryNav, upgradeNav, type NavItem } from './navItems'
 import { ThemeSegmented } from './ThemeToggle'
@@ -34,6 +35,7 @@ function Section({ title, items }: { title: string; items: NavItem[] }) {
 }
 
 export function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { user, signedIn, isGuest, auth } = useCurrentUser()
   const { pathname } = useLocation()
   useEffect(() => {
     onClose()
@@ -47,14 +49,25 @@ export function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => 
       side="left"
       title="Menu"
       footer={
-        <div className="grid grid-cols-2 gap-2">
-          <ButtonLink to="/login" variant="secondary" size="md" leftIcon={<LogIn className="h-4 w-4" />}>
-            Sign in
-          </ButtonLink>
-          <ButtonLink to="/register" size="md" leftIcon={<UserPlus className="h-4 w-4" />}>
-            Join free
-          </ButtonLink>
-        </div>
+        isGuest ? (
+          <div className="grid grid-cols-2 gap-2">
+            <ButtonLink to="/login" variant="secondary" size="md" leftIcon={<LogIn className="h-4 w-4" />}>
+              Sign in
+            </ButtonLink>
+            <ButtonLink to="/register" size="md" leftIcon={<UserPlus className="h-4 w-4" />}>
+              Join free
+            </ButtonLink>
+          </div>
+        ) : signedIn ? (
+          <button
+            type="button"
+            onClick={() => void auth.signOut().then(onClose)}
+            className="flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-line bg-surface-2 text-sm font-semibold text-fg-muted hover:text-fg"
+          >
+            <LogOut className="h-4 w-4" />
+            Sign out ({user.displayName})
+          </button>
+        ) : undefined
       }
     >
       <div className="px-6 pb-4">

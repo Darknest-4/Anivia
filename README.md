@@ -323,6 +323,26 @@ To connect **your own backend** instead, the quickest path:
 
 ---
 
+### Accounts & cloud sync (Supabase)
+
+ANIVIA ships with real authentication and library sync through [Supabase](https://supabase.com):
+
+- Email + password sign-up (with email confirmation), sign-in, password reset (`/forgot-password` → email → `/reset-password`)
+- Google, Discord and GitHub sign-in (enable each provider in **Supabase → Authentication → Providers**)
+- Profile editing (display name, username, bio, avatar color), email and password changes, sign out / sign out everywhere
+- Watchlist, history, favorites and **all settings** sync automatically between devices. The local copy keeps the UI instant and offline-friendly; changes are pushed after a short debounce and merged (newest wins) on sign-in and whenever the tab regains focus.
+
+**Setup (one time):**
+
+1. **Create the tables.** Open Supabase → **SQL Editor**, paste `supabase/migrations/0001_anivia_init.sql` and run it.
+   Or run it from your machine: create `supabase/.env.local` (git-ignored) containing
+   `SUPABASE_DB_URL=postgresql://postgres:<password>@db.<project-ref>.supabase.co:5432/postgres`
+   (URL-encode special characters in the password) and run `npm run db:migrate`.
+2. **Allow your domains.** Supabase → **Authentication → URL Configuration**: set *Site URL* to your production URL and add `http://localhost:5173/**` and your Cloudflare URL (`https://<your-site>/**`) to *Redirect URLs*.
+3. **Point the app at your project** with `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` (defaults are set in `src/config/index.ts`).
+
+Security model: every table uses **Row Level Security** — users can only read and write their own rows. The publishable key is designed to be public. **Never** put the database password or an `sb_secret_…` key into frontend code or a `VITE_` variable: anything in the bundle is visible to every visitor and would give full access to your database.
+
 ## 14. AnimeProvider integration
 
 The full contract is in `src/services/anime/AnimeProvider.ts`:
@@ -405,6 +425,18 @@ Status values map to `'airing' | 'finished' | 'upcoming' | 'hiatus'` and formats
 Throw (or reject) from any provider method and the UI shows a friendly error state with **Try again**. `ProviderError` carries an optional HTTP status.
 
 ---
+
+## 14b. Performance
+
+- **Batched AniList requests** — list queries issued together are merged into one aliased GraphQL request (`services/anime/anilist/batch.ts`), so the home page needs ~6 requests instead of ~15, with automatic per-list fallback.
+- **Offline cache** — API responses are persisted to `localStorage` for 24 h (TanStack Query persister). Repeat visits render instantly and keep working when the API is down. Toggle or clear it in Settings → Speed & data.
+- **Hover prefetch** — pointing at a title preloads its data and the details-page chunk.
+- **Idle route preloading**, lazy-loaded Supabase SDK, non-blocking web fonts and `preconnect` hints for the API and image hosts.
+- **Data saver** — smaller images, no prefetching, no autoplaying trailers or spotlight rotation.
+
+## 14c. Settings
+
+Visitors can customise: theme, **accent color** (7 presets), **text size**, **grid density**, spotlight rotation, reduced motion, **data source** (AniList / MyAnimeList / offline demo), **title language** (English / Romaji / Japanese), **score format** (10 / 100 / 5 point), **hide scores**, **blur synopses** (spoiler shield), default sort and page size, **which home sections appear**, offline cache, hover prefetch, data saver, trailer autoplay, playback, notifications, privacy and language options. Signed-in users get all of these synced to their account.
 
 ## 15. VideoProvider integration
 

@@ -1,3 +1,4 @@
+import { usePreferences } from '@/hooks/useUserData'
 import { CalendarClock, ChevronRight, Tag } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export function OverviewTab({ anime, episodes, onShowEpisodes, onShowCharacters }: Props) {
+  const { prefs } = usePreferences()
   const [expanded, setExpanded] = useState(false)
   const { data: characters } = useCharacters({ animeId: anime.id })
   const latest = (episodes ?? []).filter((e) => !e.locked).slice(-4).reverse()
@@ -26,7 +28,7 @@ export function OverviewTab({ anime, episodes, onShowEpisodes, onShowCharacters 
         <h2 id="synopsis-heading" className="text-lg font-semibold text-fg">
           Synopsis
         </h2>
-        <p className={`mt-3 max-w-3xl text-[15px] leading-relaxed text-fg-muted ${expanded ? '' : 'line-clamp-4'}`}>{anime.description}</p>
+        <p tabIndex={0} className={`synopsis mt-3 max-w-3xl text-[15px] leading-relaxed text-fg-muted ${expanded ? '' : 'line-clamp-4'}`}>{anime.description}</p>
         {anime.description.length > 280 && (
           <button type="button" onClick={() => setExpanded((e) => !e)} className="mt-2 text-sm font-semibold text-accent-soft hover:underline" aria-expanded={expanded}>
             {expanded ? 'Show less' : 'Read more'}
@@ -49,7 +51,7 @@ export function OverviewTab({ anime, episodes, onShowEpisodes, onShowCharacters 
           <h2 id="trailer-heading" className="mb-3 text-lg font-semibold text-fg">
             Trailer
           </h2>
-          <TrailerEmbed youtubeId={anime.trailer.youtubeId} thumbnail={anime.trailer.thumbnail} title={anime.title} className="rounded-2xl ring-1 ring-line" />
+          <TrailerEmbed youtubeId={anime.trailer.youtubeId} thumbnail={anime.trailer.thumbnail} title={anime.title} autoplay={prefs.autoplayTrailers && !prefs.dataSaver} className="rounded-2xl ring-1 ring-line" />
         </section>
       )}
 

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { usePrefetchAnime } from '@/hooks/queries'
 import { cn } from '@/lib/cn'
 import { formatCompact } from '@/lib/format'
 import type { Anime } from '@/types'
@@ -18,8 +19,9 @@ interface Props {
  * Columns: # · title · genres · score · status · episodes · actions
  */
 export function AnimeCardList({ anime, index, className, actions }: Props) {
+  const prefetch = usePrefetchAnime()
   return (
-    <article
+    <article onPointerEnter={() => prefetch(anime.id)} onFocusCapture={() => prefetch(anime.id)}
       className={cn(
         'group grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-xl border border-transparent p-2.5 transition-colors hover:border-line hover:bg-surface md:grid-cols-[2.5rem_minmax(0,2.5fr)_minmax(0,1.4fr)_5.5rem_6.5rem_5.5rem_2.75rem] md:gap-4 md:px-3',
         className,

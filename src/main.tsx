@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
 import { AppProviders } from '@/providers/AppProviders'
 import { router } from '@/routes'
+import { preloadCommonRoutes } from '@/routes/preload'
 import { isMockProvider } from '@/services/anime'
 import { seedDemoLibrary } from '@/services/user'
 import '@/styles/index.css'
@@ -17,3 +18,5 @@ createRoot(document.getElementById('root')!).render(
     </AppProviders>
   </StrictMode>,
 )
+
+preloadCommonRoutes()

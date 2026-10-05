@@ -27,6 +27,7 @@ const SettingsPage = lazy(() => import('@/pages/settings/SettingsPage'))
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
 const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'))
 const ForgotPasswordPage = lazy(() => import('@/pages/auth/ForgotPasswordPage'))
+const ResetPasswordPage = lazy(() => import('@/pages/auth/ResetPasswordPage'))
 const PricingPage = lazy(() => import('@/pages/info/PricingPage'))
 const AboutPage = lazy(() => import('@/pages/info/AboutPage'))
 const ContactPage = lazy(() => import('@/pages/info/ContactPage'))
@@ -80,6 +81,7 @@ export const routes: RouteObject[] = [
           { path: 'login', element: <LoginPage /> },
           { path: 'register', element: <RegisterPage /> },
           { path: 'forgot-password', element: <ForgotPasswordPage /> },
+          { path: 'reset-password', element: <ResetPasswordPage /> },
         ],
       },
       { path: 'home', element: <Navigate to="/" replace /> },

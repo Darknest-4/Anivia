@@ -1,3 +1,4 @@
+import { preferencesStore } from '@/services/user/stores'
 import { useCallback, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { AnimeStatus, AnimeType, AudioLanguage, BrowseQuery, SeasonName, SortOption } from '@/types'
@@ -16,9 +17,9 @@ export function useBrowseParams(defaults: Partial<BrowseQuery> = {}) {
       type: (params.get('type') as AnimeType) ?? defaults.type,
       minRating: params.get('rating') ? Number(params.get('rating')) : undefined,
       language: (params.get('lang') as AudioLanguage) ?? undefined,
-      sort: (params.get('sort') as SortOption) ?? defaults.sort ?? 'popularity',
+      sort: (params.get('sort') as SortOption) ?? defaults.sort ?? preferencesStore.get().defaultSort,
       page: Number(params.get('page') ?? 1),
-      perPage: Number(params.get('per') ?? defaults.perPage ?? 24),
+      perPage: Number(params.get('per') ?? defaults.perPage ?? preferencesStore.get().pageSize),
     }),
     [params],
   )
@@ -35,9 +36,9 @@ export function useBrowseParams(defaults: Partial<BrowseQuery> = {}) {
       if (next.type) p.set('type', next.type)
       if (next.minRating) p.set('rating', String(next.minRating))
       if (next.language) p.set('lang', next.language)
-      if (next.sort && next.sort !== 'popularity') p.set('sort', next.sort)
+      if (next.sort && next.sort !== preferencesStore.get().defaultSort) p.set('sort', next.sort)
       if (next.page && next.page > 1) p.set('page', String(next.page))
-      if (next.perPage && next.perPage !== 24) p.set('per', String(next.perPage))
+      if (next.perPage && next.perPage !== preferencesStore.get().pageSize) p.set('per', String(next.perPage))
       setParams(p, { replace: true })
     },
     [query, setParams],

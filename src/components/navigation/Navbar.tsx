@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { Avatar, Logo } from '@/components/ui'
 import { SearchAutocomplete } from '@/components/search/SearchAutocomplete'
-import { demoUser } from '@/data/user'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { cn } from '@/lib/cn'
 import { useCommandMenu } from '@/providers/CommandMenuProvider'
 import { primaryNav } from './navItems'
@@ -18,6 +18,7 @@ interface NavbarProps {
 }
 
 export function Navbar({ transparent, onOpenMenu }: NavbarProps) {
+  const { user, isGuest } = useCurrentUser()
   const [scrolled, setScrolled] = useState(false)
   const { setOpen } = useCommandMenu()
   const { pathname } = useLocation()
@@ -99,8 +100,8 @@ export function Navbar({ transparent, onOpenMenu }: NavbarProps) {
           <div className="hidden pl-1 lg:block">
             <UserMenu />
           </div>
-          <Link to="/profile" aria-label="Profile" className="rounded-full lg:hidden">
-            <Avatar name={demoUser.displayName} hue={demoUser.avatarHue} size="sm" className="ring-line-strong" />
+          <Link to={isGuest ? '/login' : '/profile'} aria-label={isGuest ? 'Sign in' : 'Profile'} className="rounded-full lg:hidden">
+            <Avatar name={user.displayName} hue={user.avatarHue} size="sm" className="ring-line-strong" />
           </Link>
           <button
             type="button"

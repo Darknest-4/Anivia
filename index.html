@@ -14,9 +14,17 @@
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <!-- Fonts load without blocking the first paint -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap" /></noscript>
+    <!-- Warm up connections to the data and image hosts -->
+    <link rel="preconnect" href="https://graphql.anilist.co" crossorigin />
+    <link rel="preconnect" href="https://s4.anilist.co" />
+    <link rel="dns-prefetch" href="https://api.jikan.moe" />
+    <link rel="dns-prefetch" href="https://cdn.myanimelist.net" />
+    <link rel="dns-prefetch" href="https://wnmvktajokjhufuzpamy.supabase.co" />
     <script>
-      // Apply the persisted theme before first paint to avoid a flash of the wrong theme.
+      // Apply the persisted theme, accent and font size before first paint to avoid a flash of the wrong theme.
       (function () {
         try {
           var raw = localStorage.getItem('anivia:preferences')
@@ -24,8 +32,13 @@
           var theme = pref === 'system' || !pref
             ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
             : pref
-          document.documentElement.setAttribute('data-theme', theme)
-          document.documentElement.style.colorScheme = theme
+          var p = raw ? JSON.parse(raw) : {}
+          var root = document.documentElement
+          root.setAttribute('data-theme', theme)
+          root.style.colorScheme = theme
+          if (p.accent && p.accent !== 'crimson') root.setAttribute('data-accent', p.accent)
+          if (p.fontScale) root.setAttribute('data-font', p.fontScale)
+          if (p.blurSynopsis) root.setAttribute('data-blur-synopsis', '')
         } catch (e) {}
       })()
     </script>

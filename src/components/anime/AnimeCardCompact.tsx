@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { usePrefetchAnime } from '@/hooks/queries'
 import { cn } from '@/lib/cn'
 import type { Anime } from '@/types'
 import { AnimeMeta } from './AnimeMeta'
@@ -13,8 +14,9 @@ interface Props {
 
 /** Dense row: small poster + title + meta. Used in top lists, sidebars and autocomplete. */
 export function AnimeCardCompact({ anime, rank, className, aside }: Props) {
+  const prefetch = usePrefetchAnime()
   return (
-    <Link
+    <Link onPointerEnter={() => prefetch(anime.id)} onFocusCapture={() => prefetch(anime.id)}
       to={`/anime/${anime.id}`}
       className={cn('group flex min-w-0 items-center gap-3 rounded-xl p-2 transition-colors hover:bg-surface-2 focus-visible:bg-surface-2', className)}
     >

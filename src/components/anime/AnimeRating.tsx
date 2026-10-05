@@ -1,5 +1,6 @@
 import { Star } from 'lucide-react'
 import { cn } from '@/lib/cn'
+import { usePreferences } from '@/hooks/useUserData'
 import { formatRating } from '@/lib/format'
 
 interface AnimeRatingProps {
@@ -10,7 +11,8 @@ interface AnimeRatingProps {
 }
 
 export function AnimeRating({ rating, className, variant = 'plain', size = 'sm' }: AnimeRatingProps) {
-  if (!rating) return null
+  const { prefs } = usePreferences()
+  if (!rating || prefs.hideScores) return null
   return (
     <span
       className={cn(
@@ -21,7 +23,7 @@ export function AnimeRating({ rating, className, variant = 'plain', size = 'sm' 
         variant === 'plain' && 'text-fg',
         className,
       )}
-      aria-label={`Rated ${formatRating(rating)} out of 10`}
+      aria-label={`Rated ${formatRating(rating)} out of ${prefs.ratingScale}`}
     >
       <Star className={cn('fill-warning text-warning', size === 'sm' ? 'h-3 w-3' : 'h-4 w-4')} aria-hidden />
       {formatRating(rating)}

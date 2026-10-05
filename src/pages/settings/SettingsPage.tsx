@@ -1,6 +1,12 @@
-import { Bell, Globe, MonitorPlay, Palette, RotateCcw, Shield, Trash2, UserRound } from 'lucide-react'
-import { useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { Bell, Gauge, Globe, LayoutGrid, MonitorPlay, Palette, RotateCcw, Shield, Trash2, UserRound } from 'lucide-react'
+import { useRef, useState, type FormEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { Card, Row } from './parts'
+import { AccountSettings } from './sections/AccountSettings'
+import { AppearanceExtras } from './sections/AppearanceExtras'
+import { ContentSettings } from './sections/ContentSettings'
+import { PerformanceSettings } from './sections/PerformanceSettings'
+import { useAuth } from '@/providers/AuthProvider'
 import { DemoNotice } from '@/components/common/DemoNotice'
 import { PageHeader } from '@/components/common/PageHeader'
 import { ThemeSegmented } from '@/components/navigation/ThemeToggle'
@@ -15,11 +21,13 @@ import { storage } from '@/services/storage'
 import { favoritesStore, historyService, historyStore, preferencesStore, recentSearchesService, recentSearchesStore, seedDemoLibrary, seededStore, watchlistStore } from '@/services/user'
 import type { Preferences, VideoQuality } from '@/types'
 
-type Section = 'appearance' | 'playback' | 'notifications' | 'privacy' | 'language' | 'account'
+type Section = 'appearance' | 'content' | 'playback' | 'performance' | 'notifications' | 'privacy' | 'language' | 'account'
 
 const sections: { value: Section; label: string; icon: typeof Palette; description: string }[] = [
   { value: 'appearance', label: 'Appearance', icon: Palette, description: 'Theme and motion preferences.' },
+  { value: 'content', label: 'Content', icon: LayoutGrid, description: 'Data source, titles, scores and home layout.' },
   { value: 'playback', label: 'Playback', icon: MonitorPlay, description: 'Autoplay, quality and subtitles.' },
+  { value: 'performance', label: 'Speed & data', icon: Gauge, description: 'Caching, prefetching and data saver.' },
   { value: 'notifications', label: 'Notifications', icon: Bell, description: 'Choose what we notify you about.' },
   { value: 'privacy', label: 'Privacy', icon: Shield, description: 'Control your data and visibility.' },
   { value: 'language', label: 'Language', icon: Globe, description: 'Interface and audio languages.' },
@@ -35,25 +43,12 @@ const LANGS = [
   { value: 'de', label: 'Deutsch' },
 ]
 
-function Card({ title, description, children }: { title: string; description?: string; children: ReactNode }) {
-  return (
-    <section className="rounded-2xl border border-line bg-surface">
-      <div className="border-b border-line px-5 py-4">
-        <h2 className="text-base font-semibold text-fg">{title}</h2>
-        {description && <p className="mt-0.5 text-[13px] text-fg-subtle">{description}</p>}
-      </div>
-      <div className="divide-y divide-line/70 px-5">{children}</div>
-    </section>
-  )
-}
-
-const Row = ({ children }: { children: ReactNode }) => <div className="py-4">{children}</div>
-
 export default function SettingsPage() {
   useDocumentMeta({ title: 'Settings', noindex: true })
   const [params, setParams] = useSearchParams()
   const section = (params.get('tab') as Section) || 'appearance'
   const { prefs, update } = usePreferences()
+  const auth = useAuth()
   const toast = useToast()
   const lastToast = useRef(0)
   const [resetOpen, setResetOpen] = useState(false)
@@ -80,7 +75,9 @@ export default function SettingsPage() {
     }, 600)
   }
 
-  const resetDemo = () => {
+  const resetDemo = async () => {
+    // Sign out first so the cleared local library is never pushed over the cloud copy.
+    if (auth.status === 'signed-in') await auth.signOut().catch(() => undefined)
     storage.clearAll()
     ;[watchlistStore, historyStore, favoritesStore, recentSearchesStore, seededStore, preferencesStore].forEach((s) => s.reset())
     if (isMockProvider) seedDemoLibrary()
@@ -127,7 +124,7 @@ export default function SettingsPage() {
                         className={cn('overflow-hidden rounded-xl border-2 text-left transition-colors', prefs.theme === t ? 'border-accent' : 'border-line hover:border-line-strong')}
                       >
                         <div className={cn('h-20 p-2', t === 'light' ? 'bg-[#f4f5fa]' : t === 'dark' ? 'bg-[#0b0b10]' : 'bg-gradient-to-r from-[#0b0b10] from-50% to-[#f4f5fa] to-50%')}>
-                          <div className="h-2 w-10 rounded bg-[hsl(348_83%_54%)]" />
+                          <div className="h-2 w-10 rounded bg-accent" />
                           <div className="mt-2 grid grid-cols-3 gap-1">
                             {[0, 1, 2].map((i) => (
                               <div key={i} className={cn('h-8 rounded', t === 'light' ? 'bg-[#dfe2ec]' : 'bg-[#1d1e26]')} />
@@ -140,6 +137,7 @@ export default function SettingsPage() {
                   </div>
                 </Row>
               </Card>
+              <AppearanceExtras prefs={prefs} set={set} />
               <Card title="Motion">
                 <Row>
                   <Switch label="Reduce motion" description="Minimize animations, carousels and transitions." checked={prefs.reduceMotion} onChange={(v) => set('reduceMotion', v)} />
@@ -147,6 +145,9 @@ export default function SettingsPage() {
               </Card>
             </>
           )}
+
+          {section === 'content' && <ContentSettings prefs={prefs} set={set} />}
+          {section === 'performance' && <PerformanceSettings prefs={prefs} set={set} />}
 
           {section === 'playback' && (
             <Card title="Playback" description="Applied to the ANIVIA player on every device using this browser.">
@@ -273,7 +274,20 @@ export default function SettingsPage() {
             </Card>
           )}
 
-          {section === 'account' && (
+          {section === 'account' && auth.status !== 'disabled' && (
+            <>
+              <AccountSettings />
+              <section className="rounded-2xl border border-danger/30 bg-danger/[0.04] p-5">
+                <h2 className="text-base font-semibold text-fg">Reset this device</h2>
+                <p className="mt-1 text-[13px] text-fg-subtle">Clears the local library, preferences and cache in this browser. Your synced account data is not deleted.</p>
+                <Button className="mt-4" variant="secondary" leftIcon={<RotateCcw className="h-4 w-4" />} onClick={() => setResetOpen(true)}>
+                  Reset local data
+                </Button>
+              </section>
+            </>
+          )}
+
+          {section === 'account' && auth.status === 'disabled' && (
             <>
               <DemoNotice>Account management is UI-only. Connect your authentication provider and user API to persist these fields.</DemoNotice>
               <Card title="Profile">

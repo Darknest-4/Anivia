@@ -1,3 +1,4 @@
+import { preferencesStore } from '@/services/user/stores'
 import type { AnimeStatus, SeasonName } from '@/types'
 
 const compact = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 })
@@ -9,8 +10,17 @@ export const formatNumber = (n: number) => full.format(n)
 /** Scores out of 10: one decimal for whole-tenth scores (AniList), two otherwise (MAL, demo data). */
 export function formatRating(rating?: number) {
   if (!rating) return 'N/A'
+  const scale = preferencesStore.get().ratingScale
+  if (scale === '100') return String(Math.round(rating * 10))
+  if (scale === '5') return (rating / 2).toFixed(1)
   return Number.isInteger(Math.round(rating * 100) / 10) ? rating.toFixed(1) : rating.toFixed(2)
 }
+
+/** Max value of the active score scale, for labels such as “8.4 / 10”. */
+export const ratingMax = () => Number(preferencesStore.get().ratingScale)
+
+/** Spoiler-free mode hides every score. */
+export const scoresHidden = () => preferencesStore.get().hideScores
 
 export function formatDate(iso: string | undefined, opts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' }) {
   if (!iso) return '—'

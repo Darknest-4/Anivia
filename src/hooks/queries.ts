@@ -1,4 +1,7 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useCallback } from 'react'
+import { preloadRoute } from '@/routes/preload'
+import { preferencesStore } from '@/services/user/stores'
 import { animeProvider, isMockProvider, providerName } from '@/services/anime'
 import { videoProvider } from '@/services/video'
 import type { BrowseQuery, CharacterQuery, SeasonName } from '@/types'
@@ -37,6 +40,23 @@ export const queryKeys = {
 
 /** Static info about the active data source. */
 export const useProviderInfo = () => ({ name: providerName, isMock: isMockProvider, features: animeProvider.features ?? {} })
+
+/**
+ * Returns a handler that warms the cache for a title (details + route chunk) — attach it to
+ * hover/focus so the details page opens instantly. Disabled by data saver or the setting.
+ */
+export function usePrefetchAnime() {
+  const client = useQueryClient()
+  return useCallback(
+    (id: string) => {
+      const p = preferencesStore.get()
+      if (!p.prefetchOnHover || p.dataSaver) return
+      void preloadRoute.details()
+      void client.prefetchQuery({ queryKey: queryKeys.anime(id), queryFn: () => animeProvider.getAnime(id), staleTime: 5 * 60_000 })
+    },
+    [client],
+  )
+}
 
 export const useFeatured = () => useQuery({ queryKey: queryKeys.featured, queryFn: () => animeProvider.getFeatured() })
 export const useTrending = () => useQuery({ queryKey: queryKeys.trending, queryFn: () => animeProvider.getTrending() })

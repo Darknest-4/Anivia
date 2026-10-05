@@ -25,7 +25,7 @@ import { CharactersTab } from './details/CharactersTab'
 import { StaffTab } from './details/StaffTab'
 import { RelatedSections } from './details/RelatedSections'
 import { EpisodeList } from '@/components/anime'
-import { formatRating } from '@/lib/format'
+import { formatRating, scoresHidden } from '@/lib/format'
 
 type Tab = 'overview' | 'episodes' | 'characters' | 'staff'
 
@@ -83,7 +83,7 @@ export default function AnimeDetailsPage() {
           </p>
         )}
         <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[13px] text-white/75 md:justify-start">
-          {anime.rating ? (
+          {scoresHidden() ? null : anime.rating ? (
             <span className="inline-flex items-center gap-1.5">
               <span className="rounded-md bg-warning px-1.5 py-0.5 font-display text-sm font-bold text-black">{formatRating(anime.rating)}</span>
               <span>{anime.rank ? `Ranked #${anime.rank}` : 'Score'}</span>

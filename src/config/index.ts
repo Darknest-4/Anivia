@@ -17,6 +17,13 @@ export const config = {
   videoProvider: ((env.VITE_VIDEO_PROVIDER as string | undefined) ?? 'mock') as 'mock' | 'api',
   mockLatency: Number(env.VITE_MOCK_LATENCY ?? 350),
   storagePrefix: 'anivia:',
+  /**
+   * Supabase project used for accounts and library sync. Only the project URL and the
+   * *publishable* key belong in frontend code — never the database password or a secret key.
+   * Set VITE_SUPABASE_URL to an empty string to run without accounts.
+   */
+  supabaseUrl: (env.VITE_SUPABASE_URL as string | undefined) ?? 'https://wnmvktajokjhufuzpamy.supabase.co',
+  supabaseKey: (env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined) ?? 'sb_publishable_fr81aMF8zLh8ambsYTcJwg_SjxpX1DT',
 } as const
 
 export type AppConfig = typeof config

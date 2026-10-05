@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { Avatar } from '@/components/ui'
-import { demoUser } from '@/data/user'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { useHistory, useWatchlist } from '@/hooks/useUserData'
 import { cn } from '@/lib/cn'
 import { discoverNav, libraryNav, upgradeNav } from './navItems'
@@ -8,16 +8,23 @@ import { discoverNav, libraryNav, upgradeNav } from './navItems'
 /** Desktop sidebar for the personal library area (watchlist, history, profile, settings). */
 export function LibrarySidebar() {
   const { items } = useWatchlist()
+  const { user, isGuest } = useCurrentUser()
   const history = useHistory()
   const counts: Record<string, number> = { '/watchlist': items.length, '/history': history.length }
 
   return (
     <aside className="sticky top-[calc(var(--header-h)+1.5rem)] hidden h-fit w-60 shrink-0 lg:block" aria-label="Library">
       <div className="flex items-center gap-3 rounded-2xl border border-line bg-surface p-3">
-        <Avatar name={demoUser.displayName} hue={demoUser.avatarHue} />
+        <Avatar name={user.displayName} hue={user.avatarHue} />
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-fg">{demoUser.displayName}</p>
-          <p className="truncate text-xs text-fg-subtle">@{demoUser.username}</p>
+          <p className="truncate text-sm font-semibold text-fg">{user.displayName}</p>
+          {isGuest ? (
+            <NavLink to="/login" className="text-xs font-semibold text-accent-soft hover:underline">
+              Sign in to sync
+            </NavLink>
+          ) : (
+            <p className="truncate text-xs text-fg-subtle">@{user.username}</p>
+          )}
         </div>
       </div>
       <nav className="mt-4 space-y-6">

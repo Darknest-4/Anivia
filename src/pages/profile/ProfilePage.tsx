@@ -6,7 +6,7 @@ import { GenreBreakdown } from '@/components/profile/GenreBreakdown'
 import { ProfileHeader } from '@/components/profile/ProfileHeader'
 import { ProfileStats } from '@/components/profile/ProfileStats'
 import { ButtonLink, EmptyState, Tabs } from '@/components/ui'
-import { demoUser } from '@/data/user'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { useAnimeByIds } from '@/hooks/queries'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useFavorites, useHistory, useWatchlist } from '@/hooks/useUserData'
@@ -15,6 +15,7 @@ import { formatRelative } from '@/lib/format'
 type Tab = 'overview' | 'watchlist' | 'history' | 'favorites'
 
 export default function ProfilePage() {
+  const { user: demoUser } = useCurrentUser()
   useDocumentMeta({ title: `${demoUser.displayName} (@${demoUser.username})`, type: 'profile', noindex: true })
   const { items } = useWatchlist()
   const history = useHistory()

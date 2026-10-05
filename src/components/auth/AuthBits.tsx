@@ -1,7 +1,8 @@
-import { Eye, EyeOff, KeyRound, Mail } from 'lucide-react'
+import { Eye, EyeOff, GitBranch, Loader2, MessageCircle } from 'lucide-react'
 import { forwardRef, useState, type InputHTMLAttributes } from 'react'
 import { Input } from '@/components/ui'
 import { cn } from '@/lib/cn'
+import { useAuth, type OAuthProvider } from '@/providers/AuthProvider'
 import { useToast } from '@/providers/ToastProvider'
 
 export function AuthHeading({ title, description }: { title: string; description: string }) {
@@ -29,26 +30,37 @@ export const PasswordInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HT
   )
 })
 
-/** Visual-only social / alternative sign-in buttons. They never perform real OAuth. */
+/** OAuth sign-in buttons. Each provider must be enabled in Supabase → Authentication → Providers. */
 export function SocialButtons() {
   const toast = useToast()
-  const notice = () => toast({ title: 'Social sign-in is UI-only', description: 'Connect your OAuth provider to enable it.', variant: 'info' })
-  const items = [
-    { label: 'Google', icon: <span className="font-display text-base font-bold">G</span> },
-    { label: 'Passkey', icon: <KeyRound className="h-4 w-4" /> },
-    { label: 'Email link', icon: <Mail className="h-4 w-4" /> },
+  const { signInWithProvider, status } = useAuth()
+  const [busy, setBusy] = useState<OAuthProvider | null>(null)
+  const items: { id: OAuthProvider; label: string; icon: React.ReactNode }[] = [
+    { id: 'google', label: 'Google', icon: <span className="font-display text-base font-bold">G</span> },
+    { id: 'discord', label: 'Discord', icon: <MessageCircle className="h-4 w-4" /> },
+    { id: 'github', label: 'GitHub', icon: <GitBranch className="h-4 w-4" /> },
   ]
+  if (status === 'disabled') return null
   return (
     <div>
       <div className="grid grid-cols-3 gap-2">
         {items.map((i) => (
           <button
-            key={i.label}
+            key={i.id}
             type="button"
-            onClick={notice}
-            className="flex h-11 items-center justify-center gap-2 rounded-lg border border-line bg-surface-2 text-[13px] font-semibold text-fg-muted transition-colors hover:border-line-strong hover:text-fg"
+            disabled={busy !== null}
+            onClick={async () => {
+              setBusy(i.id)
+              try {
+                await signInWithProvider(i.id)
+              } catch (e) {
+                toast({ title: `${i.label} sign-in unavailable`, description: (e as Error).message, variant: 'error' })
+                setBusy(null)
+              }
+            }}
+            className="flex h-11 items-center justify-center gap-2 rounded-lg border border-line bg-surface-2 text-[13px] font-semibold text-fg-muted transition-colors hover:border-line-strong hover:text-fg disabled:opacity-60"
           >
-            {i.icon}
+            {busy === i.id ? <Loader2 className="h-4 w-4 animate-spin" /> : i.icon}
             <span className="hidden xs:inline">{i.label}</span>
           </button>
         ))}

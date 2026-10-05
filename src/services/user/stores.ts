@@ -17,6 +17,21 @@ export const defaultPreferences: Preferences = {
   privateProfile: false,
   showHistory: true,
   reduceMotion: false,
+  accent: 'crimson',
+  fontScale: 'md',
+  density: 'comfortable',
+  heroAutoplay: true,
+  titleLanguage: 'english',
+  ratingScale: '10',
+  hideScores: false,
+  blurSynopsis: false,
+  hiddenHomeSections: [],
+  defaultSort: 'popularity',
+  pageSize: 24,
+  dataSaver: false,
+  offlineCache: true,
+  prefetchOnHover: true,
+  autoplayTrailers: false,
 }
 
 /** Guards against corrupted or hand-edited storage values. */

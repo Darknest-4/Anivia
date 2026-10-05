@@ -107,7 +107,7 @@ export default function WatchPage() {
           <div className="min-w-0">
             {showTrailer && a.trailer ? (
               <div className="relative overflow-hidden sm:rounded-2xl">
-                <TrailerEmbed youtubeId={a.trailer.youtubeId} thumbnail={a.trailer.thumbnail} title={a.title} autoplay={prefs.autoplay} />
+                <TrailerEmbed youtubeId={a.trailer.youtubeId} thumbnail={a.trailer.thumbnail} title={a.title} autoplay={prefs.autoplay && !prefs.dataSaver} />
               </div>
             ) : (
             <VideoPlayer

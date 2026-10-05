@@ -1,3 +1,4 @@
+import { usePreferences } from '@/hooks/useUserData'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 import type { Anime } from '@/types'
@@ -21,7 +22,9 @@ export const gridClasses = {
 }
 
 /** Responsive poster grid with built-in skeleton and empty handling. */
-export function AnimeGrid({ items, loading, skeletonCount = 12, empty, className, density = 'comfortable', showGenres, priorityCount = 0 }: AnimeGridProps) {
+export function AnimeGrid({ items, loading, skeletonCount = 12, empty, className, density: densityProp, showGenres, priorityCount = 0 }: AnimeGridProps) {
+  const { prefs } = usePreferences()
+  const density = densityProp ?? (prefs.density === 'compact' ? 'dense' : 'comfortable')
   if (loading && !items?.length) {
     return (
       <div className={cn(gridClasses[density], className)} aria-busy="true" aria-label="Loading anime">

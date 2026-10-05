@@ -235,3 +235,36 @@
   animation-iteration-count: 1 !important;
   transition-duration: 0.01ms !important;
 }
+
+/* ── Accent presets (Settings → Appearance) ─────────────────────────────
+   Dark values also apply inside always-dark cinematic areas. */
+@layer base {
+  html[data-accent='violet'],
+  html[data-accent='violet'] [data-theme='dark'] { --accent: 265 85% 62%; --accent-hover: 265 90% 68%; --accent-soft: 265 100% 80%; }
+  html[data-accent='blue'],
+  html[data-accent='blue'] [data-theme='dark'] { --accent: 217 91% 58%; --accent-hover: 217 95% 64%; --accent-soft: 213 100% 76%; }
+  html[data-accent='emerald'],
+  html[data-accent='emerald'] [data-theme='dark'] { --accent: 155 70% 38%; --accent-hover: 155 70% 44%; --accent-soft: 152 70% 62%; }
+  html[data-accent='amber'],
+  html[data-accent='amber'] [data-theme='dark'] { --accent: 28 92% 50%; --accent-hover: 28 95% 56%; --accent-soft: 38 100% 68%; }
+  html[data-accent='pink'],
+  html[data-accent='pink'] [data-theme='dark'] { --accent: 325 82% 56%; --accent-hover: 325 88% 62%; --accent-soft: 325 100% 78%; }
+  html[data-accent='cyan'],
+  html[data-accent='cyan'] [data-theme='dark'] { --accent: 192 85% 40%; --accent-hover: 192 85% 46%; --accent-soft: 190 90% 66%; }
+
+  html[data-theme='light'][data-accent='violet'] { --accent: 265 70% 52%; --accent-hover: 265 72% 46%; --accent-soft: 265 65% 45%; }
+  html[data-theme='light'][data-accent='blue'] { --accent: 217 85% 50%; --accent-hover: 217 85% 44%; --accent-soft: 217 80% 42%; }
+  html[data-theme='light'][data-accent='emerald'] { --accent: 155 75% 32%; --accent-hover: 155 75% 27%; --accent-soft: 155 70% 28%; }
+  html[data-theme='light'][data-accent='amber'] { --accent: 26 90% 46%; --accent-hover: 26 90% 40%; --accent-soft: 26 85% 36%; }
+  html[data-theme='light'][data-accent='pink'] { --accent: 325 75% 48%; --accent-hover: 325 75% 42%; --accent-soft: 325 70% 40%; }
+  html[data-theme='light'][data-accent='cyan'] { --accent: 192 85% 34%; --accent-hover: 192 85% 29%; --accent-soft: 192 80% 30%; }
+
+  /* Font size (rem-based layout scales with it) */
+  html[data-font='sm'] { font-size: 15px; }
+  html[data-font='lg'] { font-size: 17.5px; }
+
+  /* Spoiler-free browsing */
+  html[data-blur-synopsis] .synopsis { filter: blur(6px); transition: filter 0.2s ease; cursor: help; }
+  html[data-blur-synopsis] .synopsis:hover,
+  html[data-blur-synopsis] .synopsis:focus { filter: none; }
+}

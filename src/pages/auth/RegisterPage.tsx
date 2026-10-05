@@ -1,46 +1,85 @@
+import { MailCheck } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { AuthHeading, isEmail, PasswordInput, SocialButtons, StrengthMeter } from '@/components/auth/AuthBits'
 import { Button, Checkbox, Field, Input } from '@/components/ui'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
+import { useAuth } from '@/providers/AuthProvider'
 import { useToast } from '@/providers/ToastProvider'
+import { safeRedirect } from './LoginPage'
 
-type Errors = Partial<Record<'name' | 'email' | 'password' | 'confirm' | 'terms', string>>
+type Errors = Partial<Record<'name' | 'email' | 'password' | 'confirm' | 'terms' | 'form', string>>
 
 export default function RegisterPage() {
   useDocumentMeta({ title: 'Create account', noindex: true })
+  const auth = useAuth()
   const toast = useToast()
+  const navigate = useNavigate()
+  const [params] = useSearchParams()
+  const next = safeRedirect(params.get('redirect'))
   const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' })
   const [terms, setTerms] = useState(false)
   const [errors, setErrors] = useState<Errors>({})
   const [loading, setLoading] = useState(false)
+  const [sentTo, setSentTo] = useState<string | null>(null)
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, [k]: e.target.value })
 
-  const submit = (e: FormEvent) => {
+  if (auth.status === 'signed-in') return <Navigate to={next} replace />
+
+  const submit = async (e: FormEvent) => {
     e.preventDefault()
-    const next: Errors = {
+    const v: Errors = {
       name: form.name.trim().length < 2 ? 'Please enter your name.' : undefined,
       email: !isEmail(form.email) ? 'Enter a valid email address.' : undefined,
       password: form.password.length < 8 ? 'Use at least 8 characters.' : undefined,
       confirm: form.confirm !== form.password ? 'Passwords do not match.' : undefined,
       terms: !terms ? 'You must accept the terms to continue.' : undefined,
     }
-    setErrors(next)
-    if (Object.values(next).some(Boolean)) return
+    setErrors(v)
+    if (Object.values(v).some(Boolean)) return
     setLoading(true)
-    window.setTimeout(() => {
+    try {
+      const { needsConfirmation } = await auth.signUp(form.email.trim(), form.password, form.name.trim())
+      if (needsConfirmation) setSentTo(form.email.trim())
+      else {
+        toast({ title: 'Welcome to ANIVIA!', description: 'Your account is ready.' })
+        navigate(next, { replace: true })
+      }
+    } catch (err) {
+      setErrors({ form: (err as Error).message })
+    } finally {
       setLoading(false)
-      toast({ title: 'Registration is UI-only', description: 'No account was created. Connect your backend to enable sign-up.', variant: 'info' })
-    }, 900)
+    }
   }
+
+  if (sentTo)
+    return (
+      <div className="animate-fade-up text-center">
+        <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-success/15 text-success">
+          <MailCheck className="h-8 w-8" />
+        </span>
+        <h1 className="mt-6 text-2xl font-bold text-fg">Confirm your email</h1>
+        <p className="mt-2 text-sm text-fg-muted">
+          We sent a confirmation link to <span className="font-semibold text-fg">{sentTo}</span>. Click it to activate your account.
+        </p>
+        <Link to="/login" className="mt-6 inline-block text-sm font-semibold text-accent-soft hover:underline">
+          Back to sign in
+        </Link>
+      </div>
+    )
 
   return (
     <div className="animate-fade-up">
-      <AuthHeading title="Create your account" description="Join free and start building your anime universe." />
+      <AuthHeading title="Create your account" description="Join free — your watchlist and history follow you on every device." />
       <SocialButtons />
       <form onSubmit={submit} noValidate className="space-y-4">
+        {errors.form && (
+          <p role="alert" className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2.5 text-sm text-danger">
+            {errors.form}
+          </p>
+        )}
         <Field label="Name" error={errors.name}>
-          {(p) => <Input {...p} autoComplete="name" placeholder="Hikari Stargazer" value={form.name} onChange={set('name')} />}
+          {(p) => <Input {...p} autoComplete="name" placeholder="Your name" value={form.name} onChange={set('name')} maxLength={48} />}
         </Field>
         <Field label="Email" error={errors.email}>
           {(p) => <Input {...p} type="email" autoComplete="email" placeholder="you@example.com" value={form.email} onChange={set('email')} />}
@@ -76,7 +115,7 @@ export default function RegisterPage() {
           />
           {errors.terms && <p className="mt-1.5 text-xs text-danger">{errors.terms}</p>}
         </div>
-        <Button type="submit" size="lg" className="w-full" loading={loading}>
+        <Button type="submit" size="lg" className="w-full" loading={loading} disabled={auth.status === 'disabled'}>
           Create account
         </Button>
       </form>

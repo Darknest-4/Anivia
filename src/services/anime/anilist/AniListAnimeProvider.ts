@@ -24,6 +24,7 @@ import { anilistBrowsableGenres, anilistGenreFilter, genreFromName } from '../sh
 import { createRequestQueue } from '../shared/requestQueue'
 import { isNumericId } from '../shared/text'
 import { mapCharacter, mapMedia, mapStudio, toAnilistFormats, toAnilistStatus } from './mappers'
+import { createPageBatcher, type PageResult } from './batch'
 import * as Q from './queries'
 import type { AlCharacter, AlMedia, AlPageInfo, AlStudio } from './types'
 
@@ -38,7 +39,6 @@ const SORT: Record<SortOption, string> = {
   episodes: 'EPISODES_DESC',
 }
 
-type PageResult = { Page: { pageInfo: AlPageInfo; media: AlMedia[] } }
 
 /**
  * AnimeProvider backed by the public AniList GraphQL API (no API key required).
@@ -50,7 +50,9 @@ type PageResult = { Page: { pageInfo: AlPageInfo; media: AlMedia[] } }
 export class AniListAnimeProvider implements AnimeProvider {
   readonly name = 'AniList'
   readonly features = { languageFilter: false }
-  private queue = createRequestQueue({ minInterval: 350, perMinute: 60 })
+  // AniList allows ~90 requests/minute; batching keeps real usage far below that.
+  private queue = createRequestQueue({ minInterval: 150, perMinute: 75 })
+  private batchPage = createPageBatcher((query) => this.gql<Record<string, PageResult>>(query))
   private episodeSource: JikanAnimeProvider | null
 
   constructor(
@@ -73,14 +75,14 @@ export class AniListAnimeProvider implements AnimeProvider {
   }
 
   private async page(vars: Record<string, unknown>): Promise<{ items: Anime[]; info: AlPageInfo }> {
-    const data = await this.gql<PageResult>(Q.PAGE_MEDIA, { page: 1, perPage: 24, ...vars })
-    return { items: data.Page.media.map(mapMedia), info: data.Page.pageInfo }
+    const page = await this.batchPage({ page: 1, perPage: 24, ...vars })
+    return { items: page.media.map(mapMedia), info: page.pageInfo }
   }
 
   private list = async (vars: Record<string, unknown>) => (await this.page(vars)).items
 
   async getFeatured() {
-    const items = await this.list({ sort: ['TRENDING_DESC'], perPage: 15 })
+    const items = await this.getTrending()
     return items.filter((a) => a.featured).slice(0, 6)
   }
   getTrending = () => this.list({ sort: ['TRENDING_DESC'], perPage: 18 })

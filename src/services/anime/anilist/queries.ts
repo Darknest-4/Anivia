@@ -20,18 +20,6 @@ export const MEDIA_FIELDS = `
   externalLinks { site url type color icon isDisabled }
 `
 
-export const PAGE_MEDIA = `
-  query ($page: Int, $perPage: Int, $sort: [MediaSort], $search: String, $genres: [String], $tags: [String],
-         $year: Int, $season: MediaSeason, $status: MediaStatus, $formats: [MediaFormat], $minScore: Int, $ids: [Int]) {
-    Page(page: $page, perPage: $perPage) {
-      pageInfo { total currentPage lastPage perPage }
-      media(type: ANIME, isAdult: false, sort: $sort, search: $search, genre_in: $genres, tag_in: $tags, seasonYear: $year,
-            season: $season, status: $status, format_in: $formats, averageScore_greater: $minScore, id_in: $ids) {
-        ${MEDIA_FIELDS}
-      }
-    }
-  }
-`
 
 export const MEDIA_DETAIL = `
   query ($id: Int) {

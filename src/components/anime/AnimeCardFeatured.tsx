@@ -1,6 +1,7 @@
 import { Info, Play } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { ButtonLink } from '@/components/ui'
+import { usePrefetchAnime } from '@/hooks/queries'
 import { cn } from '@/lib/cn'
 import type { Anime } from '@/types'
 import { AnimeMeta, StatusBadge } from './AnimeMeta'
@@ -8,8 +9,9 @@ import { AnimeRating } from './AnimeRating'
 
 /** Cinematic landscape card with backdrop artwork — spotlight sections. */
 export function AnimeCardFeatured({ anime, className, label = 'Featured' }: { anime: Anime; className?: string; label?: string }) {
+  const prefetch = usePrefetchAnime()
   return (
-    <article className={cn('group relative isolate flex min-h-[300px] overflow-hidden rounded-2xl border border-line sm:min-h-[340px]', className)}>
+    <article onPointerEnter={() => prefetch(anime.id)} onFocusCapture={() => prefetch(anime.id)} className={cn('group relative isolate flex min-h-[300px] overflow-hidden rounded-2xl border border-line sm:min-h-[340px]', className)}>
       <img
         src={anime.backdrop ?? anime.poster}
         alt=""
@@ -35,7 +37,7 @@ export function AnimeCardFeatured({ anime, className, label = 'Featured' }: { an
             </div>
           </div>
         </div>
-        <p className="line-clamp-3 text-sm leading-relaxed text-white/75">{anime.description}</p>
+        <p className="synopsis line-clamp-3 text-sm leading-relaxed text-white/75">{anime.description}</p>
         <div className="flex flex-wrap gap-2">
           {anime.status !== 'upcoming' && (
             <ButtonLink to={`/anime/${anime.id}/watch`} size="md" leftIcon={<Play className="h-4 w-4 fill-current" />}>

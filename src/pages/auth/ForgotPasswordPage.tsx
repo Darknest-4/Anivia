@@ -2,26 +2,31 @@ import { ArrowLeft, MailCheck } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { AuthHeading, isEmail } from '@/components/auth/AuthBits'
-import { DemoNotice } from '@/components/common/DemoNotice'
 import { Button, Field, Input } from '@/components/ui'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
+import { useAuth } from '@/providers/AuthProvider'
 
 export default function ForgotPasswordPage() {
   useDocumentMeta({ title: 'Reset password', noindex: true })
+  const auth = useAuth()
   const [email, setEmail] = useState('')
   const [error, setError] = useState<string>()
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const submit = (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault()
     if (!isEmail(email)) return setError('Enter a valid email address.')
     setError(undefined)
     setLoading(true)
-    window.setTimeout(() => {
-      setLoading(false)
+    try {
+      await auth.sendPasswordReset(email.trim())
       setSent(true)
-    }, 800)
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (sent)
@@ -34,7 +39,6 @@ export default function ForgotPasswordPage() {
         <p className="mt-2 text-sm text-fg-muted">
           If an account exists for <span className="font-semibold text-fg">{email}</span>, a reset link is on its way.
         </p>
-        <DemoNotice className="mt-6 text-left">Demo only — no email was sent. Connect your auth provider’s reset endpoint.</DemoNotice>
         <Button variant="secondary" className="mt-6" onClick={() => setSent(false)}>
           Use a different email
         </Button>
@@ -52,7 +56,7 @@ export default function ForgotPasswordPage() {
         <Field label="Email" error={error}>
           {(p) => <Input {...p} type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />}
         </Field>
-        <Button type="submit" size="lg" className="w-full" loading={loading}>
+        <Button type="submit" size="lg" className="w-full" loading={loading} disabled={auth.status === 'disabled'}>
           Send reset link
         </Button>
       </form>

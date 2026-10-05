@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Badge, ButtonLink } from '@/components/ui'
 import { usePrefersReducedMotion } from '@/hooks/useMediaQuery'
+import { usePreferences } from '@/hooks/useUserData'
 import { cn } from '@/lib/cn'
 import type { Anime } from '@/types'
 import { AnimeGenreBadge } from './AnimeGenreBadge'
@@ -17,13 +18,15 @@ export function AnimeHero({ items }: { items: Anime[] }) {
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
   const reduced = usePrefersReducedMotion()
+  const { prefs } = usePreferences()
+  const rotate = prefs.heroAutoplay && !prefs.dataSaver && !prefs.reduceMotion
   const anime = items[index]
 
   useEffect(() => {
-    if (paused || reduced || items.length < 2) return
+    if (paused || reduced || !rotate || items.length < 2) return
     const id = window.setTimeout(() => setIndex((i) => (i + 1) % items.length), INTERVAL)
     return () => window.clearTimeout(id)
-  }, [index, paused, reduced, items.length])
+  }, [index, paused, reduced, rotate, items.length])
 
   if (!anime) return null
   const watchHref = `/anime/${anime.id}/watch`
@@ -47,6 +50,7 @@ export function AnimeHero({ items }: { items: Anime[] }) {
               src={a.backdrop ?? a.poster}
               alt=""
               loading={i === 0 ? 'eager' : 'lazy'}
+              decoding="async"
               className={cn('absolute inset-0 h-full w-full object-cover object-[72%_30%] md:object-center', i === index && 'animate-ken-burns')}
             />
           </div>
@@ -103,7 +107,7 @@ export function AnimeHero({ items }: { items: Anime[] }) {
               ))}
             </div>
   
-            <p className="mx-auto mt-5 line-clamp-3 max-w-xl text-sm leading-relaxed text-white/75 md:mx-0 md:text-[15px]">{anime.description}</p>
+            <p className="synopsis mx-auto mt-5 line-clamp-3 max-w-xl text-sm leading-relaxed text-white/75 md:mx-0 md:text-[15px]">{anime.description}</p>
   
             {/* Desktop actions */}
             <div className="mt-8 hidden flex-wrap gap-3 md:flex">

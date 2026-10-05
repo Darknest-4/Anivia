@@ -2,6 +2,7 @@ import { Play } from 'lucide-react'
 import { memo } from 'react'
 import { Link } from 'react-router-dom'
 import { Badge } from '@/components/ui'
+import { usePrefetchAnime } from '@/hooks/queries'
 import { cn } from '@/lib/cn'
 import type { Anime } from '@/types'
 import { AnimeGenreBadge } from './AnimeGenreBadge'
@@ -36,8 +37,9 @@ function EpisodeBadge({ anime }: { anime: Anime }) {
  */
 export const AnimeCard = memo(function AnimeCard({ anime, className, priority, rank, showGenres, progress }: AnimeCardProps) {
   const href = `/anime/${anime.id}`
+  const prefetch = usePrefetchAnime()
   return (
-    <article className={cn('group relative min-w-0', className)}>
+    <article className={cn('group relative min-w-0', className)} onPointerEnter={() => prefetch(anime.id)} onFocusCapture={() => prefetch(anime.id)}>
       <div className="relative overflow-hidden rounded-xl bg-surface-2 shadow-card ring-1 ring-line/60 transition-[transform,box-shadow] duration-base ease-out group-hover:-translate-y-1 group-hover:shadow-pop">
         <AnimePoster src={anime.poster} alt="" priority={priority} className="transition-transform duration-slow ease-out group-hover:scale-[1.04]" />
         {/* Stretched link for the whole poster (title link below is the keyboard target) */}
@@ -62,7 +64,7 @@ export const AnimeCard = memo(function AnimeCard({ anime, className, priority, r
         {/* Hover overlay (desktop / hover-capable devices only) */}
         <div className="pointer-events-none absolute inset-0 hidden flex-col justify-end bg-gradient-to-t from-black via-black/75 to-black/10 p-3 opacity-0 transition-opacity duration-base group-focus-within:opacity-100 group-hover:opacity-100 [@media(hover:hover)]:flex">
           <div className="translate-y-2 transition-transform duration-base ease-out group-hover:translate-y-0">
-            <p className="line-clamp-3 text-xs leading-relaxed text-white/80">{anime.synopsisShort ?? anime.description}</p>
+            <p className="synopsis line-clamp-3 text-xs leading-relaxed text-white/80">{anime.synopsisShort ?? anime.description}</p>
             <p className="mt-2 text-2xs font-semibold uppercase tracking-wider text-white/60">
               {anime.genres
                 .slice(0, 3)

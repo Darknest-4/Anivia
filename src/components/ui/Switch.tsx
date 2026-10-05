@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import { cn } from '@/lib/cn'
 
 interface SwitchProps {
@@ -11,12 +12,15 @@ interface SwitchProps {
 }
 
 export function Switch({ checked, onChange, label, description, disabled, hideLabel, className }: SwitchProps) {
+  const id = useId()
   const control = (
     <button
       type="button"
       role="switch"
       aria-checked={checked}
       aria-label={hideLabel ? label : undefined}
+      aria-labelledby={hideLabel ? undefined : `${id}-label`}
+      aria-describedby={!hideLabel && description ? `${id}-desc` : undefined}
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={cn(
@@ -31,8 +35,8 @@ export function Switch({ checked, onChange, label, description, disabled, hideLa
   return (
     <div className={cn('flex items-center justify-between gap-4', className)}>
       <div className="min-w-0">
-        <p className="text-sm font-medium text-fg">{label}</p>
-        {description && <p className="mt-0.5 text-[13px] text-fg-subtle">{description}</p>}
+        <p id={`${id}-label`} className="text-sm font-medium text-fg">{label}</p>
+        {description && <p id={`${id}-desc`} className="mt-0.5 text-[13px] text-fg-subtle">{description}</p>}
       </div>
       {control}
     </div>

@@ -26,7 +26,7 @@ export function AuthLayout() {
             <Outlet />
           </Suspense>
         </main>
-        <p className="text-center text-xs text-fg-subtle">Authentication screens are UI-only. Connect your own auth provider.</p>
+        <p className="text-center text-xs text-fg-subtle">Secured by Supabase Auth. Your password is never stored by ANIVIA.</p>
       </div>
       <div data-theme="dark" className="relative hidden overflow-hidden bg-bg lg:block" aria-hidden>
         <div className="absolute inset-0 grid rotate-[-8deg] scale-125 grid-cols-3 gap-4 opacity-80">

@@ -1,15 +1,16 @@
 import { Award, Heart, Star, TrendingUp } from 'lucide-react'
 import { cn } from '@/lib/cn'
-import { formatCompact, formatRating } from '@/lib/format'
+import { formatCompact, formatRating, scoresHidden } from '@/lib/format'
 import type { Anime } from '@/types'
 
 export function AnimeStats({ anime, className }: { anime: Anime; className?: string }) {
-  const stats = [
+  const all = [
     { label: 'Score', value: formatRating(anime.rating), sub: anime.ratingCount ? `${formatCompact(anime.ratingCount)} votes` : 'Not rated yet', icon: Star, tone: 'text-warning bg-warning/12' },
     { label: 'Ranked', value: anime.rank ? `#${anime.rank}` : '—', sub: 'by score', icon: Award, tone: 'text-accent-soft bg-accent/12' },
     { label: 'Popularity', value: formatCompact(anime.popularity), sub: 'members', icon: TrendingUp, tone: 'text-info bg-info/12' },
     { label: 'Favorites', value: formatCompact(Math.round(anime.popularity * 0.064)), sub: 'users', icon: Heart, tone: 'text-danger bg-danger/12' },
   ]
+  const stats = scoresHidden() ? all.filter((s) => s.label !== 'Score' && s.label !== 'Ranked') : all
   return (
     <ul className={cn('grid grid-cols-2 gap-3 sm:grid-cols-4', className)}>
       {stats.map((s) => (
