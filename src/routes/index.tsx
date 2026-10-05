@@ -35,6 +35,7 @@ const ContactPage = lazy(() => import('@/pages/info/ContactPage'))
 const PrivacyPage = lazy(() => import('@/pages/info/PrivacyPage'))
 const TermsPage = lazy(() => import('@/pages/info/TermsPage'))
 const NotFoundPage = lazy(() => import('@/pages/info/NotFoundPage'))
+const StatusPage = lazy(() => import('@/pages/info/StatusPage'))
 
 export const routes: RouteObject[] = [
   {
@@ -73,6 +74,7 @@ export const routes: RouteObject[] = [
           { path: 'contact', element: <ContactPage /> },
           { path: 'privacy', element: <PrivacyPage /> },
           { path: 'terms', element: <TermsPage /> },
+          { path: 'status', element: <StatusPage /> },
           { path: '404', element: <NotFoundPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],

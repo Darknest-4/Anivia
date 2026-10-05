@@ -1,7 +1,8 @@
 import { AlertTriangle, PlugZap, RefreshCw } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/cn'
-import { Button } from './Button'
+import { lastProviderError } from '@/lib/diagnostics'
+import { Button, ButtonLink } from './Button'
 
 interface EmptyStateProps {
   icon: ReactNode
@@ -36,6 +37,7 @@ interface ErrorStateProps {
 
 export function ErrorState({ title, description, onRetry, className, variant = 'error' }: ErrorStateProps) {
   const isApi = variant === 'no-api'
+  const last = isApi ? null : lastProviderError()
   return (
     <EmptyState
       className={className}
@@ -48,11 +50,26 @@ export function ErrorState({ title, description, onRetry, className, variant = '
           : 'Please try again. If the problem persists, check your connection or API configuration.')
       }
       action={
-        onRetry && (
-          <Button variant="secondary" onClick={onRetry} leftIcon={<RefreshCw className="h-4 w-4" />}>
-            Try again
-          </Button>
-        )
+        <div className="flex flex-col items-center gap-3">
+          {last && (
+            <p className="max-w-md break-words rounded-lg bg-surface-3 px-3 py-2 font-mono text-[11px] leading-relaxed text-fg-muted">
+              {last.status ? `${last.status} · ` : ''}
+              {last.message} — {last.url}
+            </p>
+          )}
+          <div className="flex flex-wrap justify-center gap-2">
+            {onRetry && (
+              <Button variant="secondary" onClick={onRetry} leftIcon={<RefreshCw className="h-4 w-4" />}>
+                Try again
+              </Button>
+            )}
+            {!isApi && (
+              <ButtonLink to="/status" variant="ghost">
+                Run diagnostics
+              </ButtonLink>
+            )}
+          </div>
+        </div>
       }
     />
   )

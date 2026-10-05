@@ -51,7 +51,8 @@ export class AniListAnimeProvider implements AnimeProvider {
   readonly name = 'AniList'
   readonly features = { languageFilter: false }
   // AniList allows ~90 requests/minute; batching keeps real usage far below that.
-  private queue = createRequestQueue({ minInterval: 150, perMinute: 75 })
+  // AniList's documented limit is 90/min but it often runs in a degraded 30/min mode — stay under that.
+  private queue = createRequestQueue({ minInterval: 250, perMinute: 28 })
   private endpointPromise: Promise<string> | null = null
 
   /**
@@ -108,10 +109,14 @@ export class AniListAnimeProvider implements AnimeProvider {
       // Through the proxy, fail fast so the direct fallback below kicks in quickly.
       res = await this.queue.request(endpoint, init, undefined, endpoint === this.directEndpoint ? undefined : 1)
     } catch (err) {
-      // If the edge proxy itself fails, go straight to AniList for the rest of the session.
-      const status = (err as { status?: number }).status
-      if (endpoint === this.directEndpoint || (status !== undefined && status < 500)) throw err
+      // If the edge proxy fails in any way, go straight to AniList for the rest of the session.
+      if (endpoint === this.directEndpoint) throw err
       this.endpointPromise = Promise.resolve(this.directEndpoint)
+      try {
+        sessionStorage.setItem('anivia:anilist-proxy', 'no')
+      } catch {
+        /* ignore */
+      }
       res = await this.queue.request(this.directEndpoint, init)
     }
     // AniList answers unknown ids with HTTP 404; callers treat a missing root field as "not found".

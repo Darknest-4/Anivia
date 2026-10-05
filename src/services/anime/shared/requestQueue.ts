@@ -1,3 +1,4 @@
+import { reportProviderError } from '@/lib/diagnostics'
 import { ProviderError } from '../AnimeProvider'
 
 interface QueueOptions {
@@ -38,30 +39,55 @@ export function createRequestQueue({ minInterval, perMinute, retries = 3, cacheT
     sent.push(last)
   }
 
+  // Circuit breaker: after repeated server/network failures stop sending for a while and fail fast,
+  // so the UI shows an error quickly instead of waiting on retries and rate-limit windows.
+  let failures = 0
+  let openUntil = 0
+  let lastFailure = ''
+  const trip = (message: string) => {
+    lastFailure = message
+    if (++failures >= 3) openUntil = Date.now() + 20_000
+  }
+
   async function run<T>(input: string, init?: RequestInit, maxRetries = retries): Promise<T> {
+    if (Date.now() < openUntil) {
+      reportProviderError(input, `Service unavailable — ${lastFailure}`)
+      throw new ProviderError(`Service unavailable — ${lastFailure}`, 503)
+    }
     for (let attempt = 0; ; attempt++) {
       await waitForSlot()
       let res: Response
       try {
         res = await fetch(input, init)
       } catch (err) {
-        if (attempt < maxRetries) {
+        // Network errors and server errors get one quick retry; only rate limits are retried patiently.
+        if (attempt < Math.min(1, maxRetries)) {
           await sleep(800 * (attempt + 1))
           continue
         }
-        throw new ProviderError(err instanceof Error ? err.message : 'Network error')
+        const message = err instanceof Error ? err.message : 'Network error'
+        trip(message)
+        reportProviderError(input, message)
+        throw new ProviderError(message)
       }
-      if ((res.status === 429 || res.status >= 500) && attempt < maxRetries) {
+      if (res.status === 429 && attempt < maxRetries) {
         const retryAfter = Number(res.headers.get('Retry-After'))
-        await sleep(Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 1200 * (attempt + 1))
+        await sleep(Math.min(60_000, Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 1500 * (attempt + 1)))
         continue
       }
+      if (res.status >= 500 && attempt < Math.min(1, maxRetries)) {
+        await sleep(800)
+        continue
+      }
+      if (res.status >= 500) trip(`HTTP ${res.status}`)
+      else failures = 0
       if (res.status === 404) return null as T
       const body = (await res.json().catch(() => null)) as T
       if (!res.ok) {
         // AniList returns GraphQL errors with a 4xx status but a JSON body worth surfacing.
         const message = (body as { errors?: { message: string }[] } | null)?.errors?.[0]?.message
         if (res.status === 404 || message?.toLowerCase().includes('not found')) return null as T
+        reportProviderError(input, message ?? `HTTP ${res.status}`, res.status)
         throw new ProviderError(message ?? `Request failed (${res.status})`, res.status)
       }
       return body

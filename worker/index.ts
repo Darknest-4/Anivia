@@ -58,7 +58,7 @@ async function proxyAniList(request: Request, ctx: Ctx, origin: string) {
   try {
     upstream = await fetch(ANILIST, {
       method: 'POST',
-      headers: { 'content-type': 'application/json', accept: 'application/json' },
+      headers: { 'content-type': 'application/json', accept: 'application/json', 'user-agent': 'ANIVIA edge cache (+https://anivia.animehub.hu)' },
       body,
     })
   } catch {

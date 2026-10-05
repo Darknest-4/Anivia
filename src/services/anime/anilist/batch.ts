@@ -66,7 +66,7 @@ export function pageField(alias: string, vars: PageVars) {
  * using aliases. A home page that needs ~8 lists makes 2–3 requests instead of 8 — far faster
  * and much kinder to AniList's per-minute rate limit.
  */
-export function createPageBatcher(send: (query: string) => Promise<Record<string, PageResult>>, windowMs = 12, maxBatch = 4) {
+export function createPageBatcher(send: (query: string) => Promise<Record<string, PageResult>>, windowMs = 12, maxBatch = 3) {
   let pending: { vars: PageVars; resolve: (r: PageResult) => void; reject: (e: unknown) => void }[] = []
   let timer: ReturnType<typeof setTimeout> | undefined
 
