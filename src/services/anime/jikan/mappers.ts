@@ -81,6 +81,8 @@ export function mapAnime(a: JkAnime): Anime {
     tags: (a.demographics ?? []).map((d) => d.name),
     relatedIds: a.relations?.flatMap((r) => r.entry.filter((e) => e.type === 'anime').map((e) => String(e.mal_id))),
     featured: Boolean(a.trailer?.images?.maximum_image_url),
+    trailer: a.trailer?.youtube_id ? { youtubeId: a.trailer.youtube_id, thumbnail: a.trailer.images?.large_image_url ?? undefined } : undefined,
+    watchLinks: a.streaming?.map((l) => ({ name: l.name, url: l.url })),
   }
 }
 

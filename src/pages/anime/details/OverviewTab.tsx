@@ -6,6 +6,7 @@ import { Button } from '@/components/ui'
 import { useCharacters } from '@/hooks/queries'
 import { formatDate } from '@/lib/format'
 import type { Anime, Episode } from '@/types'
+import { TrailerEmbed } from '@/components/watch'
 
 interface Props {
   anime: Anime
@@ -42,6 +43,15 @@ export function OverviewTab({ anime, episodes, onShowEpisodes, onShowCharacters 
           </ul>
         )}
       </section>
+
+      {anime.trailer && (
+        <section aria-labelledby="trailer-heading">
+          <h2 id="trailer-heading" className="mb-3 text-lg font-semibold text-fg">
+            Trailer
+          </h2>
+          <TrailerEmbed youtubeId={anime.trailer.youtubeId} thumbnail={anime.trailer.thumbnail} title={anime.title} className="rounded-2xl ring-1 ring-line" />
+        </section>
+      )}
 
       <AnimeStats anime={anime} />
 

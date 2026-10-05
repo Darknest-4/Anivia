@@ -109,6 +109,10 @@ export interface Anime {
   relatedIds?: string[]
   trailerAvailable?: boolean
   featured?: boolean
+  /** Official promotional video (YouTube). */
+  trailer?: { youtubeId: string; thumbnail?: string }
+  /** Licensed services where the title can be watched legally. */
+  watchLinks?: WatchLink[]
   artwork?: ArtworkSeed
 }
 
@@ -197,4 +201,12 @@ export interface CharacterQuery {
   query?: string
   role?: Character['role']
   animeId?: string
+}
+
+export interface WatchLink {
+  name: string
+  url: string
+  /** Brand color (hex) when the API provides one. */
+  color?: string
+  icon?: string
 }

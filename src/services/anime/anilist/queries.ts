@@ -16,6 +16,8 @@ export const MEDIA_FIELDS = `
   updatedAt
   nextAiringEpisode { episode airingAt }
   rankings { rank type allTime }
+  trailer { id site thumbnail }
+  externalLinks { site url type color icon isDisabled }
 `
 
 export const PAGE_MEDIA = `

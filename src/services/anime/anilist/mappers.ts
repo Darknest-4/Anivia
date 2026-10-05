@@ -64,6 +64,10 @@ export function mapMedia(m: AlMedia): Anime {
     staff: m.staff?.edges.map((e) => ({ id: `${m.id}-${e.node.id}-${e.role}`, name: e.node.name.full, role: e.role })),
     relatedIds: m.relations?.edges.filter((e) => e.node.type === 'ANIME').map((e) => String(e.node.id)),
     featured: Boolean(m.bannerImage),
+    trailer: m.trailer?.site === 'youtube' && m.trailer.id ? { youtubeId: m.trailer.id, thumbnail: m.trailer.thumbnail ?? undefined } : undefined,
+    watchLinks: (m.externalLinks ?? [])
+      .filter((l) => l.type === 'STREAMING' && l.url && !l.isDisabled)
+      .map((l) => ({ name: l.site, url: l.url!, color: l.color ?? undefined, icon: l.icon ?? undefined })),
   }
 }
 

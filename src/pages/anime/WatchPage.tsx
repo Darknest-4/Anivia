@@ -11,6 +11,8 @@ import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useHistory, usePreferences } from '@/hooks/useUserData'
 import { formatDate, pad2 } from '@/lib/format'
 import NotFoundPage from '@/pages/info/NotFoundPage'
+import { TrailerEmbed, WatchLinks } from '@/components/watch'
+import { isMockProvider } from '@/services/anime'
 import { historyService } from '@/services/user'
 
 const previewStates: { value: string; label: string }[] = [
@@ -72,6 +74,9 @@ export default function WatchPage() {
     [episode, id],
   )
 
+  // Live catalogs have no episode streams: play the official trailer instead.
+  const showTrailer = !isMockProvider && !video.isLoading && !video.data && preview === 'live'
+
   const forced = useMemo<ForcedPlayerState>(() => (preview === 'live' ? null : (preview as ForcedPlayerState)), [preview])
 
   if (anime.isLoading || episodes.isLoading)
@@ -100,6 +105,11 @@ export default function WatchPage() {
       <div className="mx-auto w-full max-w-content sm:px-6 lg:px-8 2xl:px-12">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_400px]">
           <div className="min-w-0">
+            {showTrailer && a.trailer ? (
+              <div className="relative overflow-hidden sm:rounded-2xl">
+                <TrailerEmbed youtubeId={a.trailer.youtubeId} thumbnail={a.trailer.thumbnail} title={a.title} autoplay={prefs.autoplay} />
+              </div>
+            ) : (
             <VideoPlayer
               source={episode ? video.data : null}
               loading={video.isLoading}
@@ -125,6 +135,7 @@ export default function WatchPage() {
               onOpenEpisodes={() => setDrawer(true)}
               forcedState={forced}
             />
+            )}
 
             <div className="px-4 sm:px-0">
               {/* Episode header */}
@@ -179,7 +190,19 @@ export default function WatchPage() {
                 ))}
               </div>
 
+              {!isMockProvider && (
+                <>
+                  {a.trailer && (
+                    <p className="mt-6 text-xs text-fg-subtle">
+                      Showing the official trailer. Full episodes are available on the licensed services below.
+                    </p>
+                  )}
+                  <WatchLinks links={a.watchLinks} className="mt-4" title="Watch full episodes" />
+                </>
+              )}
+
               {/* Template demo: preview each player state */}
+              {isMockProvider && (
               <section aria-labelledby="states-heading" className="mt-8 rounded-2xl border border-dashed border-line-strong p-4 sm:p-5">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
@@ -194,6 +217,7 @@ export default function WatchPage() {
                   Playback is simulated over generated artwork. ANIVIA ships with no video files or streaming URLs — implement <code className="rounded bg-surface-3 px-1 text-fg">VideoProvider</code> to connect your own licensed media.
                 </DemoNotice>
               </section>
+              )}
             </div>
           </div>
 

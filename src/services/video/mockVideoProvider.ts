@@ -1,7 +1,7 @@
 import { config } from '@/config'
 import { demoSubtitleCues } from '@/data/episodes'
 import type { VideoSource } from '@/types'
-import { animeProvider } from '@/services/anime'
+import { animeProvider, isMockProvider } from '@/services/anime'
 import type { VideoProvider } from './VideoProvider'
 
 /**
@@ -11,6 +11,8 @@ import type { VideoProvider } from './VideoProvider'
  */
 export class MockVideoProvider implements VideoProvider {
   async getSource(animeId: string, episodeId: string): Promise<VideoSource | null> {
+    // Simulated playback is only for the fictional demo catalog; real titles fall back to trailers + licensed links.
+    if (!isMockProvider) return null
     const episode = await animeProvider.getEpisode(animeId, episodeId)
     await new Promise((r) => setTimeout(r, config.mockLatency))
     if (!episode || episode.locked) return null

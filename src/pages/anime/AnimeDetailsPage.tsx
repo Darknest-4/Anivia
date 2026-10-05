@@ -18,6 +18,7 @@ import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useHistory } from '@/hooks/useUserData'
 import { episodeLabel } from '@/components/anime/AnimeMeta'
 import NotFoundPage from '@/pages/info/NotFoundPage'
+import { WatchLinks } from '@/components/watch'
 import { DetailsHero } from './details/DetailsHero'
 import { OverviewTab } from './details/OverviewTab'
 import { CharactersTab } from './details/CharactersTab'
@@ -135,6 +136,7 @@ export default function AnimeDetailsPage() {
           </div>
         </div>
         <aside className="space-y-6">
+          <WatchLinks links={anime.watchLinks} />
           <AnimeInfoPanel anime={anime} />
         </aside>
       </div>

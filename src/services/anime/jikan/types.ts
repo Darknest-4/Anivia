@@ -12,7 +12,8 @@ export interface JkNamed {
 export interface JkAnime {
   mal_id: number
   images: JkImages
-  trailer?: { images?: { maximum_image_url?: string | null; large_image_url?: string | null } } | null
+  trailer?: { youtube_id?: string | null; images?: { maximum_image_url?: string | null; large_image_url?: string | null } } | null
+  streaming?: { name: string; url: string }[]
   title: string
   title_english: string | null
   title_japanese: string | null

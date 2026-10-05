@@ -31,6 +31,8 @@ export interface AlMedia {
   updatedAt: number | null
   nextAiringEpisode: { episode: number; airingAt: number } | null
   rankings: { rank: number; type: 'RATED' | 'POPULAR'; allTime: boolean }[] | null
+  trailer?: { id: string | null; site: string | null; thumbnail: string | null } | null
+  externalLinks?: { site: string; url: string | null; type: string | null; color: string | null; icon: string | null; isDisabled: boolean | null }[] | null
   staff?: { edges: { role: string; node: { id: number; name: { full: string } } }[] }
   relations?: { edges: { relationType: string; node: { id: number; type: string } & Partial<AlMedia> }[] }
   streamingEpisodes?: { title: string | null; thumbnail: string | null }[]
