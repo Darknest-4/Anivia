@@ -45,7 +45,7 @@ export const storage = {
   remove(key: string) {
     store?.removeItem(fullKey(key))
   },
-  /** Removes every ANIVIA key (used by "Reset demo data" in settings). */
+  /** Removes every ANIVIA key (used by "Reset local data" in settings). */
   clearAll() {
     if (typeof window === 'undefined') return
     try {

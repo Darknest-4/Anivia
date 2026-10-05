@@ -1,28 +1,18 @@
 import { ChevronLeft, ChevronRight, Flag, ListVideo, Share2 } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { AnimeCard, EpisodeList, ReportDialog, ScrollRow, ShareDialog, WatchlistButton, AnimeGenreBadge } from '@/components/anime'
-import { DemoNotice } from '@/components/common/DemoNotice'
 import { SectionHeader } from '@/components/common/SectionHeader'
-import { VideoPlayer, type ForcedPlayerState } from '@/components/player'
-import { Button, Drawer, ErrorState, Skeleton, Tabs } from '@/components/ui'
+import { VideoPlayer } from '@/components/player'
+import { Button, Drawer, ErrorState, Skeleton } from '@/components/ui'
 import { useAnime, useEpisodes, useRecommendations, useVideoSource } from '@/hooks/queries'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useHistory, usePreferences } from '@/hooks/useUserData'
 import { formatDate, pad2 } from '@/lib/format'
 import NotFoundPage from '@/pages/info/NotFoundPage'
 import { TrailerEmbed, WatchLinks } from '@/components/watch'
-import { isMockProvider } from '@/services/anime'
 import { historyService } from '@/services/user'
 
-const previewStates: { value: string; label: string }[] = [
-  { value: 'live', label: 'Live' },
-  { value: 'loading', label: 'Loading' },
-  { value: 'buffering', label: 'Buffering' },
-  { value: 'finished', label: 'Finished' },
-  { value: 'no-source', label: 'No source' },
-  { value: 'error', label: 'Error' },
-]
 
 export default function WatchPage() {
   const { id } = useParams()
@@ -34,7 +24,6 @@ export default function WatchPage() {
   const [drawer, setDrawer] = useState(false)
   const [share, setShare] = useState(false)
   const [report, setReport] = useState(false)
-  const [preview, setPreview] = useState('live')
 
   const list = episodes.data ?? []
   const resume = history.find((h) => h.animeId === id)
@@ -75,9 +64,8 @@ export default function WatchPage() {
   )
 
   // Live catalogs have no episode streams: play the official trailer instead.
-  const showTrailer = !isMockProvider && !video.isLoading && !video.data && preview === 'live'
+  const showTrailer = !video.isLoading && !video.data
 
-  const forced = useMemo<ForcedPlayerState>(() => (preview === 'live' ? null : (preview as ForcedPlayerState)), [preview])
 
   if (anime.isLoading || episodes.isLoading)
     return (
@@ -133,7 +121,6 @@ export default function WatchPage() {
               defaultQuality={prefs.defaultQuality}
               onProgress={onProgress}
               onOpenEpisodes={() => setDrawer(true)}
-              forcedState={forced}
             />
             )}
 
@@ -190,7 +177,7 @@ export default function WatchPage() {
                 ))}
               </div>
 
-              {!isMockProvider && (
+              {(
                 <>
                   {a.trailer && (
                     <p className="mt-6 text-xs text-fg-subtle">
@@ -201,23 +188,6 @@ export default function WatchPage() {
                 </>
               )}
 
-              {/* Template demo: preview each player state */}
-              {isMockProvider && (
-              <section aria-labelledby="states-heading" className="mt-8 rounded-2xl border border-dashed border-line-strong p-4 sm:p-5">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <h2 id="states-heading" className="text-sm font-semibold text-fg">
-                      Player state preview
-                    </h2>
-                    <p className="text-xs text-fg-subtle">Template demo — inspect every playback state without a backend.</p>
-                  </div>
-                  <Tabs items={previewStates.map((s) => ({ value: s.value, label: s.label }))} value={preview} onChange={setPreview} label="Player state" variant="segmented" size="sm" idPrefix="pstate" />
-                </div>
-                <DemoNotice className="mt-4">
-                  Playback is simulated over generated artwork. ANIVIA ships with no video files or streaming URLs — implement <code className="rounded bg-surface-3 px-1 text-fg">VideoProvider</code> to connect your own licensed media.
-                </DemoNotice>
-              </section>
-              )}
             </div>
           </div>
 

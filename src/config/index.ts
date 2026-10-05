@@ -10,8 +10,8 @@ export const config = {
   shortTagline: 'Your anime universe.',
   siteUrl: (env.VITE_SITE_URL as string | undefined) ?? 'https://anivia.animehub.hu',
   apiBaseUrl: (env.VITE_API_BASE_URL as string | undefined) ?? '',
-  /** Catalog data source: AniList (+ Jikan episode titles), Jikan only, your own REST API, or local demo data. */
-  animeProvider: ((env.VITE_ANIME_PROVIDER as string | undefined) || 'anilist') as 'anilist' | 'jikan' | 'api' | 'mock',
+  /** Catalog data source: AniList (episode details from ani.zip), Jikan/MyAnimeList, or your own REST API. */
+  animeProvider: ((env.VITE_ANIME_PROVIDER as string | undefined) || 'anilist') as 'anilist' | 'jikan' | 'api',
   anilistUrl: (env.VITE_ANILIST_URL as string | undefined) || 'https://graphql.anilist.co',
   /**
    * AniList API client (https://anilist.co/settings/developer). Only the PUBLIC client id is used —
@@ -21,8 +21,7 @@ export const config = {
   /** Same-origin edge cache (Cloudflare Worker in worker/index.ts). Auto-detected; set to '' to disable. */
   anilistProxy: (env.VITE_ANILIST_PROXY as string | undefined) ?? (env.PROD ? '/api/anilist' : ''),
   jikanUrl: (env.VITE_JIKAN_URL as string | undefined) || 'https://api.jikan.moe/v4',
-  videoProvider: ((env.VITE_VIDEO_PROVIDER as string | undefined) ?? 'mock') as 'mock' | 'api',
-  mockLatency: Number(env.VITE_MOCK_LATENCY ?? 350),
+  videoProvider: ((env.VITE_VIDEO_PROVIDER as string | undefined) ?? 'none') as 'none' | 'api',
   storagePrefix: 'anivia:',
   /** Show pricing / upgrade UI. Off by default — enable once you connect a payment provider. */
   enablePricing: (env.VITE_ENABLE_PRICING as string | undefined) === 'true',

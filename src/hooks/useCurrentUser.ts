@@ -1,7 +1,5 @@
-import { demoUser } from '@/data/user'
 import { useAniList } from '@/providers/AniListProvider'
 import { useAuth } from '@/providers/AuthProvider'
-import { isMockProvider } from '@/services/anime'
 import type { User } from '@/types'
 
 const guest: User = {
@@ -15,8 +13,8 @@ const guest: User = {
 }
 
 /**
- * The signed-in ANIVIA account, else the connected AniList account, else the demo
- * account (offline catalog) or a local guest profile.
+ * The signed-in ANIVIA account, else the connected AniList account, else a
+ * local guest profile.
  */
 export function useCurrentUser() {
   const auth = useAuth()
@@ -27,9 +25,7 @@ export function useCurrentUser() {
     ? { ...auth.user!, avatarUrl: al?.avatar }
     : al
       ? { id: `anilist-${al.userId}`, username: al.name, displayName: al.name, avatarHue: 200, bio: '', memberSince: new Date().toISOString(), plan: 'free', avatarUrl: al.avatar }
-      : isMockProvider && auth.status === 'disabled'
-        ? demoUser
-        : guest
+      : guest
   const isGuest = !signedIn && !al && user === guest
   return { user, signedIn, isGuest, anilistOnly: !signedIn && Boolean(al), auth, anilist }
 }

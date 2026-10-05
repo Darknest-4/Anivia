@@ -13,7 +13,6 @@ type Set = <K extends keyof Preferences>(key: K, value: Preferences[K]) => void
 const SOURCES: { value: DataSource; label: string; description: string }[] = [
   { value: 'anilist', label: 'AniList', description: 'Fast GraphQL API with trailers, streaming links and schedules (recommended).' },
   { value: 'jikan', label: 'MyAnimeList (Jikan)', description: 'MyAnimeList scores and rankings. Slower due to strict rate limits.' },
-  { value: 'mock', label: 'Offline demo', description: 'Fictional catalog with simulated playback — works without internet.' },
 ]
 
 export function ContentSettings({ prefs, set }: { prefs: Preferences; set: Set }) {
@@ -22,7 +21,7 @@ export function ContentSettings({ prefs, set }: { prefs: Preferences; set: Set }
     <>
       <Card title="Data source" description="Where anime information comes from. Switching reloads the app; your library stays on this device.">
         <Row>
-          <div role="radiogroup" aria-label="Data source" className="grid gap-2 md:grid-cols-3">
+          <div role="radiogroup" aria-label="Data source" className="grid gap-2 md:grid-cols-2">
             {SOURCES.map((s) => (
               <button
                 key={s.value}

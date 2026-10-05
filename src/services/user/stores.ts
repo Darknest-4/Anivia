@@ -46,7 +46,6 @@ export const watchlistStore = createPersistentStore<WatchlistItem[]>('watchlist'
 export const favoritesStore = createPersistentStore<string[]>('favorites', [], asArray)
 export const historyStore = createPersistentStore<WatchProgress[]>('history', [], asArray)
 export const recentSearchesStore = createPersistentStore<string[]>('recent-searches', [], asArray)
-export const seededStore = createPersistentStore<boolean>('demo-seeded', false)
 export const viewModeStore = createPersistentStore<'grid' | 'list'>('view-mode', 'grid')
 /** The user's own 1–10 scores, keyed by anime id. */
 export const ratingsStore = createPersistentStore<Record<string, number>>('ratings', {}, (v) => (v && typeof v === 'object' && !Array.isArray(v) ? v : {}))

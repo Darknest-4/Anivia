@@ -99,7 +99,7 @@ export function Footer() {
         </div>
         <div className="mt-12 flex flex-col gap-3 border-t border-line pt-6 text-xs text-fg-subtle sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} ANIVIA. All rights reserved.</p>
-          <p>{source.isMock ? 'All titles, characters and artwork shown are fictional demo content.' : `Anime data provided by ${source.name}. Not affiliated with any rights holder.`}</p>
+          <p>{`Anime data provided by ${source.name}. Not affiliated with any rights holder.`}</p>
         </div>
       </div>
     </footer>

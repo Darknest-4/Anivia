@@ -1,4 +1,4 @@
-import { genreRecords } from '@/data/genres'
+import { genreRecords } from './genreMeta'
 import type { Genre } from '@/types'
 import { hueFromString, slugify } from './text'
 

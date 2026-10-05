@@ -2,7 +2,7 @@ import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-quer
 import { useCallback } from 'react'
 import { preloadRoute } from '@/routes/preload'
 import { preferencesStore } from '@/services/user/stores'
-import { animeProvider, isMockProvider, providerName } from '@/services/anime'
+import { animeProvider, providerName } from '@/services/anime'
 import { videoProvider } from '@/services/video'
 import type { BrowseQuery, CharacterQuery, SeasonName } from '@/types'
 
@@ -39,7 +39,7 @@ export const queryKeys = {
 }
 
 /** Static info about the active data source. */
-export const useProviderInfo = () => ({ name: providerName, isMock: isMockProvider, features: animeProvider.features ?? {} })
+export const useProviderInfo = () => ({ name: providerName, isMock: false, features: animeProvider.features ?? {} })
 
 /**
  * Returns a handler that warms the cache for a title (details + route chunk) — attach it to

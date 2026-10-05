@@ -1,5 +1,5 @@
-import { Bell, Gauge, Link2, Globe, LayoutGrid, MonitorPlay, Palette, RotateCcw, Shield, Trash2, UserRound } from 'lucide-react'
-import { useRef, useState, type FormEvent } from 'react'
+import { Bell, Gauge, Link2, Globe, LayoutGrid, MonitorPlay, Palette, RotateCcw, Shield, UserRound } from 'lucide-react'
+import { useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Card, Row } from './parts'
 import { AccountSettings } from './sections/AccountSettings'
@@ -13,15 +13,13 @@ import { useAuth } from '@/providers/AuthProvider'
 import { DemoNotice } from '@/components/common/DemoNotice'
 import { PageHeader } from '@/components/common/PageHeader'
 import { ThemeSegmented } from '@/components/navigation/ThemeToggle'
-import { Badge, Button, ButtonLink, Dialog, Field, Input, Select, Switch } from '@/components/ui'
-import { demoUser } from '@/data/user'
+import { Button, Dialog, Field, Select, Switch } from '@/components/ui'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { usePreferences } from '@/hooks/useUserData'
 import { cn } from '@/lib/cn'
 import { useToast } from '@/providers/ToastProvider'
-import { isMockProvider } from '@/services/anime'
 import { storage } from '@/services/storage'
-import { favoritesStore, historyService, historyStore, preferencesStore, recentSearchesService, recentSearchesStore, seedDemoLibrary, seededStore, watchlistStore } from '@/services/user'
+import { favoritesStore, historyService, historyStore, preferencesStore, recentSearchesService, recentSearchesStore, watchlistStore } from '@/services/user'
 import type { Preferences, VideoQuality } from '@/types'
 
 type Section = 'appearance' | 'content' | 'playback' | 'performance' | 'notifications' | 'privacy' | 'language' | 'connections' | 'account'
@@ -56,9 +54,6 @@ export default function SettingsPage() {
   const toast = useToast()
   const lastToast = useRef(0)
   const [resetOpen, setResetOpen] = useState(false)
-  const [deleteOpen, setDeleteOpen] = useState(false)
-  const [profile, setProfile] = useState({ displayName: demoUser.displayName, username: demoUser.username, email: 'stargazer@example.com' })
-  const [saving, setSaving] = useState(false)
 
   const set = <K extends keyof Preferences>(key: K, value: Preferences[K]) => {
     update(key, value)
@@ -70,23 +65,14 @@ export default function SettingsPage() {
 
   const go = (s: Section) => setParams(s === 'appearance' ? {} : { tab: s }, { replace: true })
 
-  const saveProfile = (e: FormEvent) => {
-    e.preventDefault()
-    setSaving(true)
-    window.setTimeout(() => {
-      setSaving(false)
-      toast({ title: 'Profile updated', description: 'Demo only — connect your account API to persist changes.' })
-    }, 600)
-  }
 
-  const resetDemo = async () => {
+  const resetLocal = async () => {
     // Sign out first so the cleared local library is never pushed over the cloud copy.
     if (auth.status === 'signed-in') await auth.signOut().catch(() => undefined)
     storage.clearAll()
-    ;[watchlistStore, historyStore, favoritesStore, recentSearchesStore, seededStore, preferencesStore].forEach((s) => s.reset())
-    if (isMockProvider) seedDemoLibrary()
+    ;[watchlistStore, historyStore, favoritesStore, recentSearchesStore, preferencesStore].forEach((s) => s.reset())
     setResetOpen(false)
-    toast({ title: 'Demo data restored', description: 'Watchlist, history and preferences were reset.' })
+    toast({ title: 'Local data cleared', description: 'Watchlist, history and preferences on this device were reset.' })
   }
 
   return (
@@ -286,51 +272,7 @@ export default function SettingsPage() {
           )}
 
           {section === 'account' && auth.status === 'disabled' && (
-            <>
-              <DemoNotice>Account management is UI-only. Connect your authentication provider and user API to persist these fields.</DemoNotice>
-              <Card title="Profile">
-                <Row>
-                  <form onSubmit={saveProfile} className="grid gap-4 sm:grid-cols-2">
-                    <Field label="Display name">{(p) => <Input {...p} value={profile.displayName} onChange={(e) => setProfile({ ...profile, displayName: e.target.value })} autoComplete="name" />}</Field>
-                    <Field label="Username">{(p) => <Input {...p} value={profile.username} onChange={(e) => setProfile({ ...profile, username: e.target.value })} autoComplete="username" />}</Field>
-                    <Field label="Email" className="sm:col-span-2" hint="Used for account notices only.">
-                      {(p) => <Input {...p} type="email" value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} autoComplete="email" />}
-                    </Field>
-                    <div className="sm:col-span-2">
-                      <Button type="submit" loading={saving}>
-                        Save changes
-                      </Button>
-                    </div>
-                  </form>
-                </Row>
-              </Card>
-              <Card title="Plan">
-                <Row>
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <Badge variant="accent" size="md">
-                        PLUS
-                      </Badge>
-                      <p className="text-sm text-fg-muted">Ad-free · Full HD · 2 screens</p>
-                    </div>
-                    <ButtonLink to="/pricing" variant="secondary" size="sm">
-                      Compare plans
-                    </ButtonLink>
-                  </div>
-                </Row>
-              </Card>
-              <section className="rounded-2xl border border-danger/30 bg-danger/[0.04] p-5">
-                <h2 className="text-base font-semibold text-fg">Danger zone</h2>
-                <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                  <Button variant="secondary" leftIcon={<RotateCcw className="h-4 w-4" />} onClick={() => setResetOpen(true)}>
-                    Reset demo data
-                  </Button>
-                  <Button variant="danger" leftIcon={<Trash2 className="h-4 w-4" />} onClick={() => setDeleteOpen(true)}>
-                    Delete account
-                  </Button>
-                </div>
-              </section>
-            </>
+            <DemoNotice>Accounts are disabled. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY to enable sign-in and sync.</DemoNotice>
           )}
         </div>
       </div>
@@ -340,38 +282,14 @@ export default function SettingsPage() {
         onClose={() => setResetOpen(false)}
         size="sm"
         icon={<RotateCcw className="h-5 w-5" />}
-        title="Reset demo data?"
-        description="Restores the original demo watchlist, history and default preferences on this device."
+        title="Reset local data?"
+        description="Clears the watchlist, history and preferences stored on this device."
         footer={
           <>
             <Button variant="ghost" onClick={() => setResetOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={resetDemo}>Reset</Button>
-          </>
-        }
-      />
-      <Dialog
-        open={deleteOpen}
-        onClose={() => setDeleteOpen(false)}
-        size="sm"
-        icon={<Trash2 className="h-5 w-5" />}
-        title="Delete account?"
-        description="This is a UI demonstration. In production this would permanently delete the account via your backend."
-        footer={
-          <>
-            <Button variant="ghost" onClick={() => setDeleteOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              variant="danger"
-              onClick={() => {
-                setDeleteOpen(false)
-                toast({ title: 'Nothing was deleted', description: 'Account deletion requires a connected backend.', variant: 'info' })
-              }}
-            >
-              Delete
-            </Button>
+            <Button onClick={resetLocal}>Reset</Button>
           </>
         }
       />

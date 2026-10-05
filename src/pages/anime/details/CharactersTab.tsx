@@ -15,7 +15,7 @@ export function CharactersTab({ anime }: { anime: Anime }) {
       </div>
     )
   if (!data?.length)
-    return <EmptyState compact icon={<Users />} title="No characters yet" description="Character profiles for this title haven’t been added to the demo catalog." />
+    return <EmptyState compact icon={<Users />} title="No characters yet" description="Character profiles for this title aren’t available yet." />
   return (
     <ul className="grid gap-3 md:grid-cols-2">
       {data.map((c) => (

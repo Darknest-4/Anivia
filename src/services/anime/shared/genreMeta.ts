@@ -1,6 +1,6 @@
 import type { Genre } from '@/types'
 
-/** Fictional demo catalog — genre definitions. */
+/** Genre descriptions and colors shared by all data sources. */
 export const genreRecords: Omit<Genre, 'animeCount'>[] = [
   { id: 'g-action', slug: 'action', name: 'Action', hue: 350, description: 'High-stakes battles, kinetic choreography and heroes pushed past their limits.' },
   { id: 'g-adventure', slug: 'adventure', name: 'Adventure', hue: 28, description: 'Uncharted lands, long roads and companions forged along the journey.' },
