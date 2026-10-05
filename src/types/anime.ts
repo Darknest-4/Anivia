@@ -109,6 +109,8 @@ export interface Anime {
   relatedIds?: string[]
   trailerAvailable?: boolean
   featured?: boolean
+  /** Transparent title logo (from ani.zip / TVDB clearlogo). */
+  logo?: string
   /** Official promotional video (YouTube). */
   trailer?: { youtubeId: string; thumbnail?: string }
   /** Licensed services where the title can be watched legally. */

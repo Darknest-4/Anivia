@@ -17,7 +17,7 @@ import type {
   Studio,
 } from '@/types'
 import type { AnimeProvider } from '../AnimeProvider'
-import { JikanAnimeProvider } from '../jikan/JikanAnimeProvider'
+import { fetchAniZip, withinMs } from '../anizip'
 import { currentSeason, dayIndex, hhmm, scheduleStatus, startOfWeek } from '../shared/dates'
 import { buildEpisodes, type EpisodeHint } from '../shared/episodes'
 import { anilistBrowsableGenres, anilistGenreFilter, genreFromName } from '../shared/genres'
@@ -44,8 +44,7 @@ const SORT: Record<SortOption, string> = {
  * AnimeProvider backed by the public AniList GraphQL API (no API key required).
  * https://docs.anilist.co — rate limited to ~90 requests/minute per IP.
  *
- * AniList has no episode titles, so episode lists are enriched from Jikan (MyAnimeList)
- * through each title's `idMal` when available.
+ * AniList has no episode titles, so episode lists and artwork are enriched from ani.zip.
  */
 export class AniListAnimeProvider implements AnimeProvider {
   readonly name = 'AniList'
@@ -88,14 +87,8 @@ export class AniListAnimeProvider implements AnimeProvider {
   }
 
   private batchPage = createPageBatcher((query) => this.gql<Record<string, PageResult>>(query))
-  private episodeSource: JikanAnimeProvider | null
 
-  constructor(
-    private readonly directEndpoint = config.anilistUrl,
-    episodeSource: JikanAnimeProvider | null = new JikanAnimeProvider(),
-  ) {
-    this.episodeSource = episodeSource
-  }
+  constructor(private readonly directEndpoint = config.anilistUrl) {}
 
   private async gql<T>(query: string, variables: Record<string, unknown> = {}): Promise<T> {
     const endpoint = await this.endpoint()
@@ -185,7 +178,12 @@ export class AniListAnimeProvider implements AnimeProvider {
     if (!isNumericId(id)) return null
     const data = await this.gql<{ Media: AlMedia | null }>(Q.MEDIA_DETAIL, { id: Number(id) })
     if (!data.Media) return null
-    return mapMedia(data.Media)
+    const anime = mapMedia(data.Media)
+    // High-resolution fanart + title logo from ani.zip when available (≤ 2.5 s).
+    const zip = await withinMs(fetchAniZip({ anilist: id }), 2500)
+    if (zip?.fanart) anime.backdrop = zip.fanart
+    if (zip?.logo) anime.logo = zip.logo
+    return anime
   }
 
   async getAnimeByIds(ids: string[]) {
@@ -306,18 +304,12 @@ export class AniListAnimeProvider implements AnimeProvider {
       const match = /episode\s+(\d+)\s*[-–:]\s*(.+)$/i.exec(ep.title ?? '')
       if (match) hints.set(Number(match[1]), { title: match[2].trim(), thumbnail: ep.thumbnail ?? undefined })
     }
-    // Episode titles, air dates and filler flags from Jikan (MyAnimeList).
-    const mal = data.Media.idMal
-    if (mal && this.episodeSource) {
-      try {
-        // Jikan is often slow; never let it hold the episode list for more than 4 seconds.
-        const jikan = await Promise.race([
-          this.episodeSource.episodeHints(String(mal), 2),
-          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Jikan timeout')), 4000)),
-        ])
-        for (const [n, hint] of jikan) hints.set(n, { ...hint, ...hints.get(n), title: hints.get(n)?.title ?? hint.title })
-      } catch {
-        /* Jikan is optional enrichment — fall back to generic titles. */
+    // Real episode titles, synopses, air dates and thumbnails from ani.zip (capped at 5 s).
+    const zip = await withinMs(fetchAniZip({ anilist: animeId }), 5000)
+    if (zip) {
+      for (const [n, hint] of zip.episodes) {
+        const prev = hints.get(n)
+        hints.set(n, { ...hint, title: hint.title ?? prev?.title, thumbnail: hint.thumbnail ?? prev?.thumbnail })
       }
     }
     return buildEpisodes(anime, hints)

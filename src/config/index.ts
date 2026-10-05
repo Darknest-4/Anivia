@@ -21,6 +21,7 @@ export const config = {
   /** Same-origin edge cache (Cloudflare Worker in worker/index.ts). Auto-detected; set to '' to disable. */
   anilistProxy: (env.VITE_ANILIST_PROXY as string | undefined) ?? (env.PROD ? '/api/anilist' : ''),
   jikanUrl: (env.VITE_JIKAN_URL as string | undefined) || 'https://api.jikan.moe/v4',
+  aniZipUrl: (env.VITE_ANIZIP_URL as string | undefined) || 'https://api.ani.zip',
   videoProvider: ((env.VITE_VIDEO_PROVIDER as string | undefined) ?? 'none') as 'none' | 'api',
   storagePrefix: 'anivia:',
   /** Show pricing / upgrade UI. Off by default — enable once you connect a payment provider. */

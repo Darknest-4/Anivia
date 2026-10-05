@@ -79,6 +79,16 @@ const CHECKS: Check[] = [
     run: async () => `OK — ${(await animeProvider.getGenres()).length} genres`,
   },
   {
+    id: 'anizip',
+    label: 'ani.zip (episode details & artwork)',
+    run: async () => {
+      const res = await timedFetch(`${config.aniZipUrl}/mappings?anilist_id=21`)
+      if (!res.ok) throw new Error(await describe(res))
+      const j = (await res.json()) as { episodeCount?: number }
+      return `OK — ${j.episodeCount ?? '?'} episodes for test title`
+    },
+  },
+  {
     id: 'jikan',
     label: 'Jikan (MyAnimeList) API',
     run: async () => {

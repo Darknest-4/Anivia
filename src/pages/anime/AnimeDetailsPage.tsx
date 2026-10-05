@@ -76,7 +76,13 @@ export default function AnimeDetailsPage() {
           {anime.quality && <span className="rounded-md bg-white/10 px-1.5 py-1 text-2xs font-semibold text-white/85">{anime.quality}</span>}
           {anime.ageRating && <span className="rounded-md border border-white/25 px-1.5 py-0.5 text-2xs font-bold text-white/85">{anime.ageRating}</span>}
         </div>
-        <h1 className="mt-3 font-display text-3xl font-extrabold leading-[1.05] text-white sm:text-4xl lg:text-5xl">{anime.title}</h1>
+        <h1 className="mt-3 font-display text-3xl font-extrabold leading-[1.05] text-white sm:text-4xl lg:text-5xl">
+          {anime.logo ? (
+            <img src={anime.logo} alt={anime.title} className="mx-auto max-h-24 w-auto max-w-[min(100%,420px)] object-contain drop-shadow-[0_4px_24px_rgba(0,0,0,0.5)] md:mx-0 lg:max-h-32" />
+          ) : (
+            anime.title
+          )}
+        </h1>
         {anime.alternativeTitle && (
           <p className="mt-2 text-sm text-white/60">
             {anime.alternativeTitle}

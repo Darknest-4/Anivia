@@ -19,6 +19,7 @@ import type { AnimeProvider } from '../AnimeProvider'
 import { currentSeason, dayIndex, hhmm, nextJstBroadcast, scheduleStatus, startOfWeek } from '../shared/dates'
 import { buildEpisodes, type EpisodeHint } from '../shared/episodes'
 import { genreFromJikan, isExcludedGenre, jikanGenreIds } from '../shared/genres'
+import { fetchAniZip, withinMs } from '../anizip'
 import { createRequestQueue } from '../shared/requestQueue'
 import { isNumericId } from '../shared/text'
 import { mapAnime, mapCharacter, mapEntry, mapProducer, toJikanStatus, toJikanType } from './mappers'
@@ -244,7 +245,9 @@ export class JikanAnimeProvider implements AnimeProvider {
   async getEpisodes(animeId: string): Promise<Episode[]> {
     const anime = await this.getAnime(animeId)
     if (!anime) return []
-    const hints = await this.episodeHints(animeId).catch(() => new Map<number, EpisodeHint>())
+    // ani.zip first (titles, synopses, thumbnails); Jikan's own episode list as fallback.
+    const zip = await withinMs(fetchAniZip({ mal: animeId }), 5000)
+    const hints = zip?.episodes.size ? zip.episodes : await withinMs(this.episodeHints(animeId, 2), 5000).then((h) => h ?? new Map<number, EpisodeHint>())
     // When MAL knows the aired episodes, trust that over the weekly estimate.
     if (anime.status === 'airing' && hints.size) anime.episodesAired = Math.max(...hints.keys())
     return buildEpisodes(anime, hints)
