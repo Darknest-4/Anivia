@@ -1,0 +1,237 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   ANIVIA design tokens
+   All colors are HSL channels so Tailwind can apply alpha (e.g. bg-surface/80).
+   Change these values to re-skin the whole template.
+   ========================================================================== */
+@layer base {
+  :root,
+  [data-theme='dark'] {
+    --bg: 236 16% 4.5%;
+    --surface: 236 13% 7.5%;
+    --surface-2: 236 12% 10.5%;
+    --surface-3: 236 10% 14.5%;
+    --line: 236 10% 15%;
+    --line-strong: 236 9% 23%;
+    --fg: 230 25% 97%;
+    --fg-muted: 232 11% 72%;
+    --fg-subtle: 232 8% 54%;
+
+    --accent: 348 83% 54%;
+    --accent-hover: 348 88% 60%;
+    --accent-fg: 0 0% 100%;
+    --accent-soft: 350 100% 74%;
+
+    --success: 152 62% 48%;
+    --warning: 38 95% 58%;
+    --danger: 0 84% 62%;
+    --info: 208 92% 64%;
+
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.25rem;
+    --radius-2xl: 1.75rem;
+
+    --shadow-card: 0 1px 0 0 hsl(0 0% 100% / 0.04) inset, 0 10px 30px -12px hsl(0 0% 0% / 0.6);
+    --shadow-pop: 0 24px 60px -16px hsl(0 0% 0% / 0.75), 0 0 0 1px hsl(var(--line-strong) / 0.6);
+    --shadow-glow: 0 10px 40px -10px hsl(var(--accent) / 0.55);
+
+    --header-h: 4rem;
+    --bottom-nav-h: 4.25rem;
+
+    color-scheme: dark;
+  }
+
+  [data-theme='light'] {
+    --bg: 228 30% 97.5%;
+    --surface: 0 0% 100%;
+    --surface-2: 228 24% 95.5%;
+    --surface-3: 228 18% 91%;
+    --line: 228 16% 88%;
+    --line-strong: 228 12% 78%;
+    --fg: 236 30% 9%;
+    --fg-muted: 234 11% 34%;
+    --fg-subtle: 234 8% 48%;
+
+    --accent: 348 80% 50%;
+    --accent-hover: 348 82% 45%;
+    --accent-fg: 0 0% 100%;
+    --accent-soft: 348 75% 44%;
+
+    --success: 152 68% 34%;
+    --warning: 32 92% 42%;
+    --danger: 0 74% 50%;
+    --info: 210 85% 44%;
+
+    --shadow-card: 0 1px 2px hsl(230 30% 20% / 0.06), 0 8px 24px -12px hsl(230 30% 20% / 0.18);
+    --shadow-pop: 0 24px 60px -18px hsl(230 30% 20% / 0.3), 0 0 0 1px hsl(var(--line));
+    --shadow-glow: 0 10px 30px -10px hsl(var(--accent) / 0.45);
+
+    color-scheme: light;
+  }
+
+  * {
+    @apply border-line;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    scroll-padding-top: calc(var(--header-h) + 1rem);
+  }
+
+  body {
+    @apply bg-bg font-sans text-fg antialiased;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display tracking-tight;
+  }
+
+  ::selection {
+    background: hsl(var(--accent) / 0.35);
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--accent-soft));
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  input[type='search']::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+  }
+
+  /* Disable transitions during theme swaps to avoid flashing. */
+  .theme-switching *,
+  .theme-switching *::before,
+  .theme-switching *::after {
+    transition: none !important;
+  }
+}
+
+@layer components {
+  .container-app {
+    @apply mx-auto w-full max-w-content px-4 sm:px-6 lg:px-8 2xl:px-12;
+  }
+
+  .surface-glass {
+    background: hsl(var(--bg) / 0.72);
+    -webkit-backdrop-filter: saturate(160%) blur(18px);
+    backdrop-filter: saturate(160%) blur(18px);
+  }
+
+  .card-surface {
+    @apply rounded-xl border border-line bg-surface shadow-card;
+  }
+
+  .text-gradient-accent {
+    background: linear-gradient(100deg, hsl(var(--fg)) 10%, hsl(var(--accent-soft)) 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .eyebrow {
+    @apply text-2xs font-semibold uppercase tracking-[0.18em] text-fg-subtle;
+  }
+
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--line-strong)) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--line-strong));
+    border-radius: 999px;
+  }
+
+  /* Cinematic scrims. Hero areas render inside a dark-scoped wrapper ([data-theme='dark'])
+     and fade into the *page* background captured in --page-bg. */
+  .cinematic {
+    --page-bg: var(--bg);
+  }
+  .hero-fade-bottom {
+    background: linear-gradient(
+      to top,
+      hsl(var(--page-bg, var(--bg))) 0%,
+      hsl(var(--bg) / 0.92) 12%,
+      hsl(var(--bg) / 0.6) 34%,
+      hsl(var(--bg) / 0) 62%
+    );
+  }
+  .hero-fade-side {
+    background: linear-gradient(to right, hsl(var(--bg) / 0.95) 0%, hsl(var(--bg) / 0.7) 30%, hsl(var(--bg) / 0) 68%);
+  }
+
+  .range-track {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+  }
+  .range-track::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 0 0 4px hsl(var(--accent) / 0.35);
+  }
+  .range-track::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border: 0;
+    border-radius: 999px;
+    background: #fff;
+  }
+
+  .pb-bottom-nav {
+    padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom));
+  }
+}
+
+@media (min-width: 1024px) {
+  .pb-bottom-nav {
+    padding-bottom: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+[data-reduce-motion] *,
+[data-reduce-motion] *::before,
+[data-reduce-motion] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
