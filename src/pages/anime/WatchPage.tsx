@@ -7,6 +7,7 @@ import { VideoPlayer } from '@/components/player'
 import { Button, Drawer, ErrorState, Skeleton } from '@/components/ui'
 import { useAnime, useEpisodes, useRecommendations, useVideoSource } from '@/hooks/queries'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
+import { useFlag } from '@/providers/PlatformProvider'
 import { useHistory, usePreferences } from '@/hooks/useUserData'
 import { formatDate, pad2 } from '@/lib/format'
 import NotFoundPage from '@/pages/info/NotFoundPage'
@@ -64,7 +65,8 @@ export default function WatchPage() {
   )
 
   // Live catalogs have no episode streams: play the official trailer instead.
-  const showTrailer = !video.isLoading && !video.data
+  const trailersOn = useFlag('trailers')
+  const showTrailer = trailersOn && !video.isLoading && !video.data
 
 
   if (anime.isLoading || episodes.isLoading)

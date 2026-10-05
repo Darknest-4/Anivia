@@ -4,6 +4,7 @@ import { PageHeader } from '@/components/common/PageHeader'
 import { isEmail } from '@/components/auth/AuthBits'
 import { Button, Field, Input, Select, Textarea } from '@/components/ui'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
+import { useFlag } from '@/providers/PlatformProvider'
 import { useToast } from '@/providers/ToastProvider'
 import { backend } from '@/services/backend'
 import { config } from '@/config'
@@ -15,6 +16,7 @@ const channels = [
 
 export default function ContactPage() {
   useDocumentMeta({ title: 'Contact', description: 'Get in touch with the ANIVIA team.' })
+  const contactOn = useFlag('contact_form')
   const toast = useToast()
   const [form, setForm] = useState({ name: '', email: '', topic: 'general', message: '' })
   const [errors, setErrors] = useState<Record<string, string | undefined>>({})
@@ -62,6 +64,9 @@ export default function ContactPage() {
             </li>
           ))}
         </ul>
+        {!contactOn ? (
+          <div className="rounded-3xl border border-line bg-surface p-8 text-center text-sm text-fg-muted">The contact form is temporarily unavailable. Please try again later.</div>
+        ) : (
         <form onSubmit={submit} noValidate className="space-y-4 rounded-3xl border border-line bg-surface p-5 sm:p-8">
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Name" error={errors.name}>
@@ -95,6 +100,7 @@ export default function ContactPage() {
             Send message
           </Button>
         </form>
+        )}
       </div>
     </div>
   )

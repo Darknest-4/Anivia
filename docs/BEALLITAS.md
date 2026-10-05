@@ -8,13 +8,48 @@ Ez a lista végigvezet mindenen, amit **a Supabase és a Cloudflare felületén 
 2. Másold be és futtasd **sorrendben**:
    - `supabase/migrations/0001_anivia_init.sql` (profilok, könyvtár-szinkron)
    - `supabase/migrations/0002_anivia_features.sql` (kapcsolat/hibajelentés, saját pontszámok, kedvenc karakterek, nyilvános profil, fióktörlés)
+   - `supabase/migrations/0003_anivia_platform.sql` (jogosultságok/szerepkörök, feature flagek, látogatottsági statisztika, anime-adatok tárolása, AniList-fiók összekötés, admin funkciók)
 3. Alternatíva a saját gépedről: hozz létre egy `supabase/.env.local` fájlt (nem kerül a repóba):
    ```
    SUPABASE_DB_URL=postgresql://postgres:JELSZÓ@db.wnmvktajokjhufuzpamy.supabase.co:5432/postgres
    ```
    A jelszóban a `%` → `%25`, a `+` → `%2B`. Utána: `npm run db:migrate`.
 
-A beérkezett üzeneteket és hibajelentéseket a Supabase **Table Editor**-ban látod (`contact_messages`, `reports` tábla).
+4. **Tedd magad adminná** (egyszer, a saját e-mail címeddel — előbb regisztrálj/lépj be az oldalon):
+   ```sql
+   insert into public.user_roles (user_id, role)
+     select id, 'admin' from auth.users where email = 'te@example.com'
+     on conflict (user_id) do update set role = 'admin';
+   ```
+   Ezután a jobb felső menüben megjelenik az **Admin dashboard** (`/admin`):
+   - **Analytics**: hányan vannak most online, mai/időszaki látogatók és oldalmegtekintések, átlagos oldalon töltött idő, legnézettebb oldalak és animék, eszközök, forgalomforrások, regisztrációk;
+   - **Feature flags**: funkciók ki/bekapcsolása (karbantartási mód, bejelentő sáv, regisztráció, AniList-belépés, trailerek, értesítések stb.), célközönség (mindenki / bejelentkezettek / csak staff) és fokozatos bevezetés %-ban;
+   - **Users & roles**: felhasználók keresése, szerepkör: `user` / `moderator` (statisztika + üzenetek) / `admin` (minden);
+   - **Inbox**: kapcsolatfelvételi üzenetek és hibajelentések állapotkezeléssel;
+   - **Anime data**: az adatbázisban tárolt animék és a cache.
+
+A statisztika csak akkor gyűjt, ha a látogató a felugró sávon az „Allow”-ra kattint (GDPR), IP-címet nem tárol. 180 napnál régebbi adatok törlése: `select public.analytics_cleanup(180);` (időzíthető a Supabase **Cron** moduljával).
+
+## 1b. Edge Function-ök — az AniList-belépéshez és az anime-adatok adatbázisba mentéséhez
+
+Két szerverfüggvény van a `supabase/functions` mappában. **Titkos kulcsot nem kell megadni** — a Supabase automatikusan átadja nekik a service role kulcsot.
+
+| Függvény | Mit csinál |
+| --- | --- |
+| `anilist-auth` | „Continue with AniList”: ellenőrzi az AniList tokent, és **ugyanabba az ANIVIA-fiókba** léptet be (első alkalommal létrehozza). Bejelentkezett felhasználónál a fiókhoz köti az AniList-et, így minden eszközön megmarad, amíg le nem választod. |
+| `anilist-proxy` | Az anime-adatokat a szerveren kéri le az AniList-től, a válaszokat az `api_cache`, minden animét az `anime_catalog` táblába menti. Ha az AniList blokkolja a Supabase szervereit, az oldal automatikusan közvetlenül kéri az adatot. |
+
+Telepítés a saját gépedről (egyszer kell bejelentkezni: `npx supabase login`):
+```
+npx supabase link --project-ref wnmvktajokjhufuzpamy
+npx supabase functions deploy anilist-auth --no-verify-jwt
+npx supabase functions deploy anilist-proxy --no-verify-jwt
+```
+Vagy a Supabase felületén: **Edge Functions → Deploy a new function → Via Editor**, név: `anilist-auth`, másold be a `supabase/functions/anilist-auth/index.ts` tartalmát, és kapcsold **ki** a *Verify JWT* opciót. Ugyanígy az `anilist-proxy`-val.
+
+Ellenőrzés: nyisd meg a `https://anivia.animehub.hu/status` oldalt — a „Supabase anime store”, „AniList sign-in function” és „Database” soroknak OK-nak kell lennie.
+
+A beérkezett üzeneteket és hibajelentéseket az **Admin dashboard → Inbox** fülön (vagy a Supabase Table Editorban) látod.
 
 ## 2. E-mail küldés — élesben kötelező
 
@@ -39,7 +74,7 @@ AniList → **Settings → Developer → Anivia** kliens:
 - A **Client ID (52829)** már be van állítva a kódban. A **Secret-et ne add meg sehol** — a böngészős belépés (implicit grant) nem használja, és ha a weboldalba kerülne, bárki visszaélhetne vele.
 - Helyi fejlesztéshez hozz létre egy második AniList klienst `http://localhost:5173` redirecttel, és az ID-ját írd a `.env.local` fájlba: `VITE_ANILIST_CLIENT_ID=...`
 
-Mit tud: belépés AniList-fiókkal (ANIVIA-fiók nélkül is), kétirányú szinkron (lista + státuszok, pontszámok, megnézett részek, kedvencek), az AniList saját értesítései a csengőben. A token csak az adott böngészőben tárolódik, nem kerül az adatbázisba. A szinkron az AniList adatforrással működik (ez az alapértelmezett).
+Mit tud: **belépés AniList-fiókkal egy valódi ANIVIA-fiókba** (első belépéskor automatikusan létrejön), kétirányú szinkron (lista + státuszok, pontszámok, megnézett részek, kedvencek), az AniList saját értesítései a csengőben. Az összekötés a fiókodhoz mentődik (`anilist_links` tábla, csak te olvashatod), ezért minden eszközön működik, **amíg a Settings → Connections → Disconnect gombbal le nem választod** (vagy az AniList-token egy év után le nem jár). Ehhez az `anilist-auth` Edge Function kell (1b. pont). A szinkron az AniList adatforrással működik (ez az alapértelmezett).
 
 ## 4. Google / Discord / GitHub belépés — opcionális
 

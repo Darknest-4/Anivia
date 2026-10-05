@@ -48,7 +48,7 @@ export default function LoginPage() {
   return (
     <div className="animate-fade-up">
       <AuthHeading title="Welcome back" description="Sign in to sync your watchlist, history and settings across devices." />
-      <AniListButton returnTo={next} className="mb-3" />
+      <AniListButton intent="login" returnTo={next} className="mb-3" />
       <SocialButtons />
       <form onSubmit={submit} noValidate className="space-y-4">
         {errors.form && (

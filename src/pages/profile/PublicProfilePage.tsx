@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
-import { CalendarDays, Lock, Star } from 'lucide-react'
+import { CalendarDays, Lock, Star, UserX } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { AnimeGrid, ShareDialog } from '@/components/anime'
 import { Avatar, Button, EmptyState, ErrorState, Skeleton, Tabs } from '@/components/ui'
 import { useAnimeByIds } from '@/hooks/queries'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
+import { useFlag } from '@/providers/PlatformProvider'
 import { formatDate } from '@/lib/format'
 import { backend } from '@/services/backend'
 import { WATCHLIST_STATUSES } from '@/services/user'
@@ -17,7 +18,8 @@ export default function PublicProfilePage() {
   const { username = '' } = useParams()
   const [tab, setTab] = useState<Tab>('watchlist')
   const [share, setShare] = useState(false)
-  const query = useQuery({ queryKey: ['public-profile', username.toLowerCase()], queryFn: () => backend.publicProfile(username), retry: false })
+  const profilesOn = useFlag('public_profiles')
+  const query = useQuery({ queryKey: ['public-profile', username.toLowerCase()], queryFn: () => backend.publicProfile(username), retry: false, enabled: profilesOn })
   const data = query.data
   useDocumentMeta({ title: data ? `${data.profile.display_name} (@${data.profile.username})` : `@${username}`, type: 'profile' })
 
@@ -26,6 +28,12 @@ export default function PublicProfilePage() {
   const ids = tab === 'watchlist' ? (data?.watchlist ?? []).map((w) => w.animeId) : tab === 'favorites' ? data?.favorites ?? [] : tab === 'rated' ? ratedIds : historyIds
   const anime = useAnimeByIds(ids.slice(0, 24))
 
+  if (!profilesOn)
+    return (
+      <div className="container-app py-16">
+        <EmptyState icon={<UserX />} title="Public profiles are turned off" description="Profile pages are temporarily unavailable." />
+      </div>
+    )
   if (query.isLoading)
     return (
       <div className="container-app py-10">

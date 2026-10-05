@@ -49,13 +49,30 @@ export default function PrivacyPage() {
           ),
         },
         {
+          id: 'analytics',
+          title: 'Usage statistics',
+          body: (
+            <>
+              <p>
+                Only if you click “Allow” on the statistics prompt, ANIVIA records which pages are opened, how long they stay open (while the tab is visible), the referring website’s domain, your device class
+                (mobile / tablet / desktop), browser language and user agent. A random visitor id stored in your browser groups the visits; if you’re signed in, visits are linked to your account. No IP addresses
+                are stored and nothing is shared with advertisers.
+              </p>
+              <p>
+                Statistics are stored in our Supabase database and deleted after 180 days. Anime pages show aggregated counts (e.g. “views this week”) without personal data. “Do Not Track” / Global Privacy
+                Control are respected. You can change your choice at any time in Settings → Privacy.
+              </p>
+            </>
+          ),
+        },
+        {
           id: 'processors',
           title: 'Service providers',
           body: (
             <ul className="list-disc space-y-1 pl-5">
-              <li><strong className="text-fg">Supabase</strong> — accounts, authentication and database hosting.</li>
+              <li><strong className="text-fg">Supabase</strong> — accounts, authentication, database hosting (library, usage statistics, cached anime data) and server functions.</li>
               <li><strong className="text-fg">Cloudflare</strong> — hosting, content delivery and security{config.cfAnalyticsToken ? ', plus cookie-free, aggregated visitor statistics (Web Analytics)' : ''}.</li>
-              <li><strong className="text-fg">AniList</strong> and <strong className="text-fg">Jikan / MyAnimeList</strong> — public anime information. Your browser requests this data; no account data is sent.</li>
+              <li><strong className="text-fg">AniList</strong> and <strong className="text-fg">Jikan / MyAnimeList</strong> and <strong className="text-fg">ani.zip</strong> — public anime information. No account data is sent. If you connect AniList, your AniList access token is stored on your ANIVIA account (readable only by you) so the connection works on all your devices until you disconnect it.</li>
               <li><strong className="text-fg">YouTube</strong> — official trailers load from youtube-nocookie.com only after you press play (or enable trailer autoplay). YouTube’s own privacy policy applies to the player.</li>
               <li>Sign-in providers you choose (Google, Discord, GitHub).</li>
             </ul>

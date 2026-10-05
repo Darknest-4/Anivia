@@ -20,6 +20,7 @@ import { useHistory } from '@/hooks/useUserData'
 import { episodeLabel } from '@/components/anime/AnimeMeta'
 import NotFoundPage from '@/pages/info/NotFoundPage'
 import { WatchLinks } from '@/components/watch'
+import { ViewCount } from '@/components/common/PlatformBits'
 import { DetailsHero } from './details/DetailsHero'
 import { OverviewTab } from './details/OverviewTab'
 import { CharactersTab } from './details/CharactersTab'
@@ -101,6 +102,7 @@ export default function AnimeDetailsPage() {
           <span>{anime.year}</span>
           <span>{episodeLabel(anime)}</span>
           {anime.duration && <span>{anime.duration} min</span>}
+          <ViewCount animeId={anime.id} />
         </div>
         <div className="mt-4 flex flex-wrap justify-center gap-2 md:justify-start">
           {anime.genres.map((g) => (

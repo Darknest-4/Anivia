@@ -69,6 +69,34 @@ const CHECKS: Check[] = [
     },
   },
   {
+    id: 'db-proxy',
+    label: 'Supabase anime store (anilist-proxy function)',
+    run: async () => {
+      if (!config.anilistDbProxy) return 'SKIP — disabled in this build'
+      const hr = await timedFetch(`${config.anilistDbProxy}/health`).catch(() => null)
+      if (!hr || hr.status === 404) return 'SKIP — function not deployed (supabase functions deploy anilist-proxy --no-verify-jwt)'
+      const h = (await hr.json().catch(() => ({}))) as { ok?: boolean; upstreamStatus?: number }
+      if (!h.ok) return `SKIP — AniList refuses the function (HTTP ${h.upstreamStatus ?? '?'}); using another route`
+      const res = await timedFetch(config.anilistDbProxy, { method: 'POST', headers: { 'content-type': 'application/json' }, body: SIMPLE })
+      if (!res.ok) throw new Error(await describe(res))
+      return `OK — cache ${res.headers.get('x-cache') ?? '?'}`
+    },
+  },
+  {
+    id: 'endpoint',
+    label: 'AniList route in use',
+    run: async () => {
+      let chosen = ''
+      try {
+        chosen = sessionStorage.getItem('anivia:anilist-endpoint') ?? ''
+      } catch {
+        /* ignore */
+      }
+      if (!chosen) return 'SKIP — not chosen yet (open any page first)'
+      return `OK — ${chosen === config.anilistDbProxy ? 'Supabase (stored in database)' : chosen === config.anilistProxy ? 'Cloudflare edge cache' : 'AniList direct'}`
+    },
+  },
+  {
     id: 'provider',
     label: `App data (${providerName}): trending list`,
     run: async () => `OK — ${(await animeProvider.getTrending()).length} titles`,
@@ -104,6 +132,27 @@ const CHECKS: Check[] = [
       if (!config.supabaseUrl) return 'SKIP — accounts disabled'
       const res = await timedFetch(`${config.supabaseUrl}/auth/v1/health`, { headers: { apikey: config.supabaseKey } })
       if (!res.ok) throw new Error(await describe(res))
+      return 'OK'
+    },
+  },
+  {
+    id: 'supabase-db',
+    label: 'Database (feature flags, analytics)',
+    run: async () => {
+      if (!config.supabaseUrl) return 'SKIP — accounts disabled'
+      const res = await timedFetch(`${config.supabaseUrl}/rest/v1/feature_flags?select=key&limit=50`, { headers: { apikey: config.supabaseKey } })
+      if (res.status === 404) throw new Error('Tables missing — run supabase/migrations/0003_anivia_platform.sql')
+      if (!res.ok) throw new Error(await describe(res))
+      return `OK — ${((await res.json()) as unknown[]).length} feature flags`
+    },
+  },
+  {
+    id: 'anilist-auth',
+    label: 'AniList sign-in function',
+    run: async () => {
+      if (!config.supabaseUrl) return 'SKIP — accounts disabled'
+      const res = await timedFetch(`${config.supabaseUrl}/functions/v1/anilist-auth`, { method: 'OPTIONS' }).catch(() => null)
+      if (!res || res.status === 404) throw new Error('Not deployed — supabase functions deploy anilist-auth --no-verify-jwt')
       return 'OK'
     },
   },

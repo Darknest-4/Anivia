@@ -10,6 +10,7 @@ import { primaryNav } from './navItems'
 import { NotificationsMenu } from './NotificationsMenu'
 import { ThemeToggle } from './ThemeToggle'
 import { UserMenu } from './UserMenu'
+import { useFlag } from '@/providers/PlatformProvider'
 
 interface NavbarProps {
   /** Transparent over hero artwork until the user scrolls. */
@@ -22,6 +23,7 @@ export function Navbar({ transparent, onOpenMenu }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false)
   const { setOpen } = useCommandMenu()
   const { pathname } = useLocation()
+  const notificationsOn = useFlag('notifications')
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -95,7 +97,7 @@ export function Navbar({ transparent, onOpenMenu }: NavbarProps) {
           </button>
           <div className={cn('hidden items-center gap-1 lg:flex', !solid && '[&>*]:text-white/85')}>
             <ThemeToggle />
-            <NotificationsMenu />
+            {notificationsOn && <NotificationsMenu />}
           </div>
           <div className="hidden pl-1 lg:block">
             <UserMenu />

@@ -55,33 +55,41 @@ export class AniListAnimeProvider implements AnimeProvider {
   private endpointPromise: Promise<string> | null = null
 
   /**
-   * Uses the edge-cached Worker proxy (`/api/anilist`) when the site is deployed with it,
-   * otherwise talks to AniList directly. Detected once per session.
+   * Picks the AniList endpoint once per session, in order of preference:
+   *  1. the Supabase `anilist-proxy` Edge Function (caches and stores anime data in the database),
+   *  2. the same-origin Cloudflare Worker edge cache (`/api/anilist`),
+   *  3. AniList directly.
+   * A proxy is used only when its `/health` probe reports that it can reach AniList.
    */
   private endpoint() {
-    const proxy = config.anilistProxy
-    if (!proxy) return Promise.resolve(this.directEndpoint)
+    const candidates = [config.anilistDbProxy, config.anilistProxy].filter(Boolean)
+    if (!candidates.length) return Promise.resolve(this.directEndpoint)
     this.endpointPromise ??= (async () => {
-      const key = 'anivia:anilist-proxy'
+      const key = 'anivia:anilist-endpoint'
       try {
         const known = sessionStorage.getItem(key)
-        if (known) return known === 'yes' ? proxy : this.directEndpoint
+        if (known) return known
       } catch {
         /* storage unavailable */
       }
-      let ok = false
-      try {
-        const res = await fetch(`${proxy}/health`, { headers: { accept: 'application/json' } })
-        ok = res.ok && ((await res.json()) as { ok?: boolean }).ok === true
-      } catch {
-        ok = false
+      let chosen = this.directEndpoint
+      for (const proxy of candidates) {
+        try {
+          const res = await withinMs(fetch(`${proxy}/health`, { headers: { accept: 'application/json' } }), 2500)
+          if (res?.ok && ((await res.json()) as { ok?: boolean }).ok === true) {
+            chosen = proxy
+            break
+          }
+        } catch {
+          /* try the next one */
+        }
       }
       try {
-        sessionStorage.setItem(key, ok ? 'yes' : 'no')
+        sessionStorage.setItem(key, chosen)
       } catch {
         /* ignore */
       }
-      return ok ? proxy : this.directEndpoint
+      return chosen
     })()
     return this.endpointPromise
   }
@@ -106,7 +114,7 @@ export class AniListAnimeProvider implements AnimeProvider {
       if (endpoint === this.directEndpoint) throw err
       this.endpointPromise = Promise.resolve(this.directEndpoint)
       try {
-        sessionStorage.setItem('anivia:anilist-proxy', 'no')
+        sessionStorage.setItem('anivia:anilist-endpoint', this.directEndpoint)
       } catch {
         /* ignore */
       }

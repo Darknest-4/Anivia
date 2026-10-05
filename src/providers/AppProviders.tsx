@@ -6,6 +6,7 @@ import { usePreferences } from '@/hooks/useUserData'
 import { activeDataSource } from '@/services/anime'
 import { preferencesStore } from '@/services/user'
 import { AuthProvider } from './AuthProvider'
+import { PlatformProvider } from './PlatformProvider'
 import { ThemeProvider } from './ThemeProvider'
 import { ToastProvider } from './ToastProvider'
 
@@ -51,12 +52,14 @@ export function AppProviders({ children }: { children: ReactNode }) {
 
   const inner = (
     <AuthProvider>
+      <PlatformProvider>
       <ThemeProvider>
         <ToastProvider>
           <DisplayPreferenceSync />
           {children}
         </ToastProvider>
       </ThemeProvider>
+      </PlatformProvider>
     </AuthProvider>
   )
 

@@ -20,6 +20,13 @@ export const config = {
   anilistClientId: (env.VITE_ANILIST_CLIENT_ID as string | undefined) ?? '52829',
   /** Same-origin edge cache (Cloudflare Worker in worker/index.ts). Auto-detected; set to '' to disable. */
   anilistProxy: (env.VITE_ANILIST_PROXY as string | undefined) ?? (env.PROD ? '/api/anilist' : ''),
+  /**
+   * Supabase Edge Function proxy (supabase/functions/anilist-proxy) — stores every response and
+   * title in the database. Preferred when deployed and healthy; set VITE_ANILIST_DB_PROXY='' to disable.
+   */
+  anilistDbProxy:
+    (env.VITE_ANILIST_DB_PROXY as string | undefined) ??
+    `${(env.VITE_SUPABASE_URL as string | undefined) ?? 'https://wnmvktajokjhufuzpamy.supabase.co'}/functions/v1/anilist-proxy`,
   jikanUrl: (env.VITE_JIKAN_URL as string | undefined) || 'https://api.jikan.moe/v4',
   aniZipUrl: (env.VITE_ANIZIP_URL as string | undefined) || 'https://api.ani.zip',
   videoProvider: ((env.VITE_VIDEO_PROVIDER as string | undefined) ?? 'none') as 'none' | 'api',

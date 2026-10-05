@@ -2,12 +2,43 @@ import { Copy, ExternalLink } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, ButtonLink, Switch } from '@/components/ui'
+import { useStore } from '@/hooks/useUserData'
 import { useAuth } from '@/providers/AuthProvider'
+import { useFlag } from '@/providers/PlatformProvider'
+import { consentStore } from '@/services/platform/analytics'
 import { useToast } from '@/providers/ToastProvider'
 import { Card, Row } from '../parts'
 
+/** Opt in / out of first-party usage statistics. */
+function StatisticsCard() {
+  const consent = useStore(consentStore)
+  const on = useFlag('analytics')
+  if (!on) return null
+  return (
+    <Card title="Usage statistics" description="Anonymous page views and time on page, stored on ANIVIA’s own database. No ads, no third-party trackers.">
+      <Row>
+        <Switch
+          label="Share anonymous usage statistics"
+          description={consent === null ? 'You haven’t chosen yet.' : 'You can change this at any time.'}
+          checked={consent === 'granted'}
+          onChange={(v) => consentStore.set(v ? 'granted' : 'denied')}
+        />
+      </Row>
+    </Card>
+  )
+}
+
 /** Profile visibility, stored on the account so it applies to the public profile page. */
 export function PrivacySettings() {
+  return (
+    <div className="space-y-6">
+      <StatisticsCard />
+      <ProfileVisibility />
+    </div>
+  )
+}
+
+function ProfileVisibility() {
   const auth = useAuth()
   const toast = useToast()
   const [busy, setBusy] = useState(false)

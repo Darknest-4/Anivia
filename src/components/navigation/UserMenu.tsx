@@ -1,7 +1,8 @@
-import { Cloud, CloudOff, LogIn, LogOut, RefreshCw, Sparkles, UserPlus } from 'lucide-react'
+import { Cloud, CloudOff, LogIn, LogOut, RefreshCw, ShieldCheck, Sparkles, UserPlus } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Avatar, ButtonLink, Popover, Skeleton } from '@/components/ui'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
+import { usePlatform } from '@/providers/PlatformProvider'
 import { useToast } from '@/providers/ToastProvider'
 import { config } from '@/config'
 import { libraryNav } from './navItems'
@@ -12,6 +13,7 @@ const syncLabel = { idle: 'Sync idle', syncing: 'Syncing…', synced: 'Library s
 export function UserMenu() {
   const { user, signedIn, isGuest, auth, anilist, anilistOnly } = useCurrentUser()
   const toast = useToast()
+  const { isStaff } = usePlatform()
   const navigate = useNavigate()
 
   if (auth.status === 'loading') return <Skeleton className="h-9 w-9 rounded-full" />
@@ -66,6 +68,12 @@ export function UserMenu() {
                 {item.label}
               </Link>
             ))}
+            {isStaff && (
+              <Link to="/admin" onClick={close} className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-fg-muted hover:bg-surface-3 hover:text-fg">
+                <ShieldCheck className="h-4 w-4" />
+                Admin dashboard
+              </Link>
+            )}
             {config.enablePricing && (
               <Link to="/pricing" onClick={close} className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-semibold text-accent-soft hover:bg-surface-3">
               <Sparkles className="h-4 w-4" />
@@ -102,7 +110,7 @@ export function UserMenu() {
                 type="button"
                 onClick={() => {
                   close()
-                  anilist.disconnect()
+                  void anilist.disconnect()
                 }}
                 className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-fg-muted hover:bg-surface-3 hover:text-fg"
               >

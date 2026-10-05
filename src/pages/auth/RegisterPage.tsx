@@ -6,6 +6,7 @@ import { AniListButton } from '@/components/auth/AniListButton'
 import { Button, Checkbox, Field, Input } from '@/components/ui'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useAuth } from '@/providers/AuthProvider'
+import { useFlag } from '@/providers/PlatformProvider'
 import { useToast } from '@/providers/ToastProvider'
 import { safeRedirect } from './LoginPage'
 
@@ -18,6 +19,7 @@ export default function RegisterPage() {
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const next = safeRedirect(params.get('redirect'))
+  const registrationOpen = useFlag('registration')
   const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' })
   const [terms, setTerms] = useState(false)
   const [errors, setErrors] = useState<Errors>({})
@@ -69,10 +71,21 @@ export default function RegisterPage() {
       </div>
     )
 
+  if (!registrationOpen)
+    return (
+      <div className="animate-fade-up text-center">
+        <h1 className="text-2xl font-bold text-fg">Sign-ups are paused</h1>
+        <p className="mt-2 text-sm text-fg-muted">New accounts can’t be created right now. Please check back later.</p>
+        <Link to="/login" className="mt-6 inline-block text-sm font-semibold text-accent-soft hover:underline">
+          Already have an account? Sign in
+        </Link>
+      </div>
+    )
+
   return (
     <div className="animate-fade-up">
       <AuthHeading title="Create your account" description="Join free — your watchlist and history follow you on every device." />
-      <AniListButton label="Use my AniList account" returnTo={next} className="mb-3" />
+      <AniListButton intent="login" label="Sign up with AniList" returnTo={next} className="mb-3" />
       <SocialButtons />
       <form onSubmit={submit} noValidate className="space-y-4">
         {errors.form && (

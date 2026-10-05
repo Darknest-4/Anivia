@@ -58,7 +58,7 @@ export function ConnectionsSettings() {
                 <Button variant="secondary" size="sm" disabled={!al.syncSupported} loading={al.status === 'syncing'} leftIcon={<RefreshCw className="h-4 w-4" />} onClick={() => void al.syncNow()}>
                   Sync now
                 </Button>
-                <Button variant="ghost" size="sm" leftIcon={<Link2Off className="h-4 w-4" />} onClick={al.disconnect}>
+                <Button variant="ghost" size="sm" leftIcon={<Link2Off className="h-4 w-4" />} onClick={() => void al.disconnect()}>
                   Disconnect
                 </Button>
               </div>
@@ -73,7 +73,10 @@ export function ConnectionsSettings() {
             </div>
           </Row>
           <Row>
-            <p className="text-xs text-fg-subtle">{Object.keys(snap.entries).length} titles on your AniList list · {snap.favorites.length} favourites</p>
+            <p className="text-xs text-fg-subtle">
+              {Object.keys(snap.entries).length} titles on your AniList list · {snap.favorites.length} favourites
+              {al.linkedToAccount ? ' · saved to your ANIVIA account — stays connected on every device until you disconnect' : ' · connected on this device only (sign in to keep it on your account)'}
+            </p>
           </Row>
         </>
       )}

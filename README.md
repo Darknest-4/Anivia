@@ -20,7 +20,7 @@ ANIVIA gives you a complete, production-quality anime frontend — not just a ho
 9. [Project structure](#9-project-structure)
 10. [Customization](#10-customization)
 11. [Theme customization](#11-theme-customization)
-12. [Mock data](#12-mock-data)
+12. [Data sources](#12-data-sources)
 13. [API integration](#13-api-integration)
 14. [AnimeProvider integration](#14-animeprovider-integration)
 15. [VideoProvider integration](#15-videoprovider-integration)
@@ -261,22 +261,9 @@ Theme behavior:
 
 ---
 
-## 12. Mock data
+## 12. Data sources
 
-The offline demo catalog (`VITE_ANIME_PROVIDER=mock`) lives in `src/data/` and is entirely fictional:
-
-| File | Content |
-| --- | --- |
-| `anime.ts` | 48 titles with descriptions, ratings, popularity, seasons, studios, tags and relations |
-| `characters.ts` | 29 characters with fictional voice cast |
-| `studios.ts` | 12 fictional studios |
-| `genres.ts` | 17 genres |
-| `schedule.ts` | 21 weekly broadcast slots |
-| `episodes.ts` | Episode titles (≈720 episodes are generated) and demo subtitle lines |
-
-`src/services/anime/mock/catalog.ts` hydrates these records into full domain models, generating episodes, ranks, counts and schedule state.
-
-**Artwork** is procedurally generated SVG (`src/lib/artwork.ts`) — posters, backdrops, episode thumbnails and character portraits — so the repository contains **no copyrighted images**. Real providers simply return image URLs instead.
+There is no bundled demo catalog any more: all anime data is live. **AniList** (default) or **Jikan** provides the catalog, **ani.zip** adds episode titles, synopses, air dates and artwork (fanart, clear logos), and the Supabase `anilist-proxy` Edge Function stores what it fetches in the database (`api_cache`, `anime_catalog`). `src/lib/artwork.ts` still generates SVG placeholders for missing images.
 
 ---
 
@@ -352,9 +339,20 @@ Security model: every table uses **Row Level Security** — users can only read 
 - **Notifications** are derived from the watchlist and live airing data (new episode, airing within 24 h, premieres within 14 days), with optional browser notifications.
 - **AniList import**: Settings → Content → *Import from AniList* copies a public AniList list (statuses, scores, favorites) by username — no login or API key required.
 
+### Platform features (Supabase, migration `0003` + Edge Functions)
+
+- **Roles & permissions**: `user_roles`, `role_permissions`, `has_permission()`, `my_access()`. Roles `user` / `moderator` / `admin`; permissions `admin.access`, `analytics.view`, `flags.manage`, `users.manage`, `reports.manage`, `cache.manage`. Make the first admin with the SQL at the end of the migration.
+- **Feature flags** (`feature_flags`, public read, admin write): on/off, audience (`all` / `signed_in` / `staff`), percentage rollout and a JSON payload. `useFlag('key')` from `PlatformProvider`. Built-in flags: `maintenance_mode`, `announcement_banner`, `registration`, `anilist_login`, `anilist_sync`, `public_profiles`, `contact_form`, `trailers`, `notifications`, `analytics`, `view_counts`.
+- **First-party analytics** (`analytics_sessions`, `page_views`; consent-gated, honours DNT/GPC, no IPs): sessions, page views, visible time on page (sent with `keepalive` when the tab hides), heartbeat for “online now”. Written only through `track_*` RPCs. `analytics_overview()` powers the dashboard; `anime_views()` shows “views this week” on anime pages; `analytics_cleanup()` enforces retention.
+- **Admin dashboard** at `/admin` (permission-gated): analytics, flag editor, user & role management, contact/report inbox, anime data cache.
+- **Anime data in the database**: `supabase/functions/anilist-proxy` caches AniList responses (`api_cache`) and upserts every title into `anime_catalog`. The client prefers it when its `/health` probe is OK, then the Cloudflare Worker cache, then AniList directly.
+- **AniList sign-in**: `supabase/functions/anilist-auth` verifies the AniList token server-side, finds or creates the ANIVIA account and returns a one-time magic-link hash that the browser exchanges with `verifyOtp`. When signed in, it links the AniList account (`anilist_links`, readable/deletable only by the owner), so the connection follows the user to every device until they disconnect.
+
+Deploy both functions with `--no-verify-jwt` (`npx supabase functions deploy anilist-auth --no-verify-jwt`). They use the service-role key Supabase injects at runtime — no secrets in the repo.
+
 ### AniList account connection
 
-Settings → **Connections** (or *Continue with AniList* on the sign-in page) connects an AniList account via OAuth **implicit grant** — only the public client id (`VITE_ANILIST_CLIENT_ID`) is used; the client secret is never needed in the browser. The token is kept in this browser only.
+Settings → **Connections** (or *Continue with AniList* on the sign-in page) connects an AniList account via OAuth **implicit grant** — only the public client id (`VITE_ANILIST_CLIENT_ID`) is used; the client secret is never needed. With accounts enabled, the connection is saved to the ANIVIA account (see above); otherwise it stays in this browser.
 
 - **Two-way sync** (`services/anilistAccount/sync.ts`): list & statuses, scores (`scoreRaw`, format-independent), episode progress from finished episodes, and favourites. Changes are diffed against a snapshot of the last sync, so edits are sent once and never echo back; the newest change wins on conflicts. Each part can be toggled.
 - AniList's own **airing / related-media notifications** appear in the bell; *Mark all as read* also clears the AniList badge.
