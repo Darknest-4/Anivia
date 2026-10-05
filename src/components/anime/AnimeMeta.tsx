@@ -12,7 +12,7 @@ interface AnimeMetaProps {
 
 export function episodeLabel(anime: Anime) {
   if (anime.type === 'Movie') return 'Movie'
-  if (anime.status === 'airing') return `${anime.episodesAired ?? 0}/${anime.episodes ?? '?'} eps`
+  if (anime.status === 'airing') return anime.episodesAired ? `${anime.episodesAired}/${anime.episodes ?? '?'} eps` : anime.episodes ? `${anime.episodes} eps` : 'Airing'
   if (!anime.episodes) return 'TBA'
   return `${anime.episodes} ${anime.episodes === 1 ? 'ep' : 'eps'}`
 }

@@ -29,9 +29,9 @@ export default function StudioPage() {
   if (!studio) return <NotFoundPage />
   const items = works.data?.items ?? []
   const stats = [
-    { icon: MapPin, label: 'Country', value: studio.country },
-    { icon: CalendarDays, label: 'Founded', value: String(studio.founded) },
-    { icon: Film, label: 'Anime', value: String(studio.animeCount ?? items.length) },
+    { icon: MapPin, label: 'Country', value: studio.country ?? '—' },
+    { icon: CalendarDays, label: 'Founded', value: studio.founded ? String(studio.founded) : '—' },
+    { icon: Film, label: 'Anime', value: String(studio.animeCount ?? works.data?.total ?? items.length) },
     { icon: Users, label: 'Staff', value: studio.employees ? formatNumber(studio.employees) : '—' },
   ]
 

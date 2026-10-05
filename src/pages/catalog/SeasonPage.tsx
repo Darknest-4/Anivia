@@ -46,7 +46,7 @@ export default function SeasonPage() {
     { value: current.data.slug, label: `Current · ${current.data.label}` },
     { value: next.slug, label: `Upcoming · ${next.label}` },
   ]
-  const yearOptions = [2027, 2026, 2025, 2024, 2023, 2022, 2021]
+  const yearOptions = Array.from({ length: 16 }, (_, i) => current.data!.year + 1 - i)
   const selectOptions = yearOptions.flatMap((y) => [...SEASON_ORDER].reverse().map((s) => makeSeason(s, y))).map((s) => ({ value: s.slug, label: s.label }))
 
   return (

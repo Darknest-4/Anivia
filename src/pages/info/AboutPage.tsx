@@ -2,7 +2,7 @@ import { Code2, Database, Layers, MonitorSmartphone, Palette, PlayCircle, Search
 import { PageHeader } from '@/components/common/PageHeader'
 import { ButtonLink, ErrorState } from '@/components/ui'
 import { config } from '@/config'
-import { isMockProvider } from '@/services/anime'
+import { isMockProvider, providerName } from '@/services/anime'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 
 const features = [
@@ -56,7 +56,10 @@ export default function AboutPage() {
             }
           />
         ) : (
-          <p className="mt-8 rounded-xl border border-success/30 bg-success/10 px-4 py-3 text-sm text-fg-muted">Connected to {config.apiBaseUrl}</p>
+          <p className="mt-8 rounded-xl border border-success/30 bg-success/10 px-4 py-3 text-sm text-fg-muted">
+            Live data source: <span className="font-semibold text-fg">{providerName}</span>
+            {config.animeProvider === 'api' && ` · ${config.apiBaseUrl}`}
+          </p>
         )}
         <ul className="mt-8 grid gap-4 md:grid-cols-2">
           {dev.map((d) => (

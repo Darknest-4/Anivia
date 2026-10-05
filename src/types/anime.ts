@@ -40,8 +40,8 @@ export interface Genre {
 export interface Studio {
   id: string
   name: string
-  country: string
-  founded: number
+  country?: string
+  founded?: number
   description: string
   website?: string
   logoHue: number
@@ -69,6 +69,8 @@ export interface Character {
   affiliation?: string
   favorites: number
   image: string
+  /** Title of `animeId`, when the API returns it alongside the character. */
+  animeTitle?: string
 }
 
 export interface Anime {
@@ -96,7 +98,8 @@ export interface Anime {
   genres: Genre[]
   studios: Studio[]
   languages: AudioLanguage[]
-  quality: 'HD' | 'FHD' | '4K'
+  /** Highest available stream quality, when your backend knows it. */
+  quality?: 'HD' | 'FHD' | '4K'
   airedFrom?: string
   airedTo?: string
   updatedAt: string

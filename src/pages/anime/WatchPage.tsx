@@ -144,7 +144,7 @@ export default function WatchPage() {
                   </h1>
                   {episode && (
                     <p className="mt-1 text-sm text-fg-subtle">
-                      Aired {formatDate(episode.airDate)} · {Math.round(episode.duration / 60)} min · {a.languages.slice(0, 2).join(' / ')} audio
+                      Aired {formatDate(episode.airDate)} · {Math.round(episode.duration / 60)} min{a.languages.length ? ` · ${a.languages.slice(0, 2).join(' / ')} audio` : ''}
                     </p>
                   )}
                 </div>
@@ -203,7 +203,7 @@ export default function WatchPage() {
               <div className="mb-3 flex items-center justify-between">
                 <h2 className="text-base font-semibold text-fg">Episodes</h2>
                 <span className="text-xs text-fg-subtle">
-                  {a.episodesAired ?? list.length} / {a.episodes ?? list.length} available
+                  {list.filter((e) => !e.locked).length} / {a.episodes ?? list.length} available
                 </span>
               </div>
               {episodeSidebar}

@@ -58,75 +58,91 @@ export function AnimeHero({ items }: { items: Anime[] }) {
       </div>
 
       <div className="container-app flex min-h-[640px] flex-col justify-end pb-10 pt-[calc(var(--header-h)+2rem)] md:h-[72vh] md:max-h-[880px] md:min-h-[600px] lg:h-[82vh] md:justify-center md:pb-24">
-        <div key={anime.id} className="max-w-2xl animate-fade-up text-center md:text-left">
-          <div className="flex flex-wrap items-center justify-center gap-2 md:justify-start">
-            <Badge variant="solid" size="md">
-              #{index + 1} Spotlight
-            </Badge>
-            <StatusBadge status={anime.status} />
-            <Badge variant="glass" size="md">
-              {anime.quality}
-            </Badge>
+        <div className="flex items-center justify-between gap-12">
+          <div key={anime.id} className="min-w-0 max-w-2xl flex-1 animate-fade-up text-center md:text-left">
+            <div className="flex flex-wrap items-center justify-center gap-2 md:justify-start">
+              <Badge variant="solid" size="md">
+                #{index + 1} Spotlight
+              </Badge>
+              <StatusBadge status={anime.status} />
+              {anime.quality && (
+                <Badge variant="glass" size="md">
+                  {anime.quality}
+                </Badge>
+              )}
+            </div>
+  
+            <h1 className="mt-4 font-display text-hero font-extrabold text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.45)]">{anime.title}</h1>
+            {anime.alternativeTitle && (
+              <p className="mt-2 text-sm font-medium tracking-wide text-white/65 md:text-base">
+                {anime.alternativeTitle}
+                {anime.nativeTitle && <span className="ml-2 text-white/45">{anime.nativeTitle}</span>}
+              </p>
+            )}
+  
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[13px] font-medium text-white/80 md:justify-start">
+              <AnimeRating rating={anime.rating} size="md" className="text-white" />
+              <span className="inline-flex items-center gap-1.5">
+                <Tv className="h-4 w-4 text-white/50" aria-hidden />
+                {anime.type}
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Calendar className="h-4 w-4 text-white/50" aria-hidden />
+                {anime.year}
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Clock className="h-4 w-4 text-white/50" aria-hidden />
+                {episodeLabel(anime)}
+              </span>
+              {anime.ageRating && <span className="rounded border border-white/30 px-1.5 py-0.5 text-2xs font-bold">{anime.ageRating}</span>}
+            </div>
+  
+            <div className="mt-4 hidden flex-wrap gap-2 sm:flex sm:justify-center md:justify-start">
+              {anime.genres.slice(0, 4).map((g) => (
+                <AnimeGenreBadge key={g.id} genre={g} variant="glass" />
+              ))}
+            </div>
+  
+            <p className="mx-auto mt-5 line-clamp-3 max-w-xl text-sm leading-relaxed text-white/75 md:mx-0 md:text-[15px]">{anime.description}</p>
+  
+            {/* Desktop actions */}
+            <div className="mt-8 hidden flex-wrap gap-3 md:flex">
+              <ButtonLink to={watchHref} size="lg" leftIcon={<Play className="h-5 w-5 fill-current" />}>
+                Watch Now
+              </ButtonLink>
+              <ButtonLink to={`/anime/${anime.id}`} size="lg" variant="glass" leftIcon={<Info className="h-5 w-5" />}>
+                View Details
+              </ButtonLink>
+              <WatchlistButton anime={anime} variant="glass" />
+            </div>
+  
+            {/* Mobile actions */}
+            <div className="mt-6 flex items-center justify-center gap-3 md:hidden">
+              <Link
+                to={`/anime/${anime.id}`}
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white ring-1 ring-inset ring-white/15 backdrop-blur-md"
+                aria-label={`View details for ${anime.title}`}
+              >
+                <Info className="h-5 w-5" />
+              </Link>
+              <ButtonLink to={watchHref} size="lg" className="max-w-[240px] flex-1" leftIcon={<Play className="h-5 w-5 fill-current" />}>
+                Watch Now
+              </ButtonLink>
+              <WatchlistIconButton anime={anime} className="h-12 w-12 rounded-xl" />
+            </div>
           </div>
-
-          <h1 className="mt-4 font-display text-hero font-extrabold text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.45)]">{anime.title}</h1>
-          {anime.alternativeTitle && (
-            <p className="mt-2 text-sm font-medium tracking-wide text-white/65 md:text-base">
-              {anime.alternativeTitle}
-              {anime.nativeTitle && <span className="ml-2 text-white/45">{anime.nativeTitle}</span>}
-            </p>
-          )}
-
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[13px] font-medium text-white/80 md:justify-start">
-            <AnimeRating rating={anime.rating} size="md" className="text-white" />
-            <span className="inline-flex items-center gap-1.5">
-              <Tv className="h-4 w-4 text-white/50" aria-hidden />
-              {anime.type}
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Calendar className="h-4 w-4 text-white/50" aria-hidden />
-              {anime.year}
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Clock className="h-4 w-4 text-white/50" aria-hidden />
-              {episodeLabel(anime)}
-            </span>
-            {anime.ageRating && <span className="rounded border border-white/30 px-1.5 py-0.5 text-2xs font-bold">{anime.ageRating}</span>}
-          </div>
-
-          <div className="mt-4 hidden flex-wrap gap-2 sm:flex sm:justify-center md:justify-start">
-            {anime.genres.slice(0, 4).map((g) => (
-              <AnimeGenreBadge key={g.id} genre={g} variant="glass" />
-            ))}
-          </div>
-
-          <p className="mx-auto mt-5 line-clamp-3 max-w-xl text-sm leading-relaxed text-white/75 md:mx-0 md:text-[15px]">{anime.description}</p>
-
-          {/* Desktop actions */}
-          <div className="mt-8 hidden flex-wrap gap-3 md:flex">
-            <ButtonLink to={watchHref} size="lg" leftIcon={<Play className="h-5 w-5 fill-current" />}>
-              Watch Now
-            </ButtonLink>
-            <ButtonLink to={`/anime/${anime.id}`} size="lg" variant="glass" leftIcon={<Info className="h-5 w-5" />}>
-              View Details
-            </ButtonLink>
-            <WatchlistButton anime={anime} variant="glass" />
-          </div>
-
-          {/* Mobile actions */}
-          <div className="mt-6 flex items-center justify-center gap-3 md:hidden">
+          {/* Real APIs ship wide banners; show the cover art alongside on large screens. */}
+          {!anime.artwork && anime.poster && (
             <Link
+              key={`poster-${anime.id}`}
               to={`/anime/${anime.id}`}
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white ring-1 ring-inset ring-white/15 backdrop-blur-md"
-              aria-label={`View details for ${anime.title}`}
+              tabIndex={-1}
+              aria-hidden
+              className="hidden w-56 shrink-0 animate-fade-up overflow-hidden rounded-2xl shadow-pop ring-1 ring-white/15 transition-transform duration-slow hover:-translate-y-1 lg:block xl:w-64"
             >
-              <Info className="h-5 w-5" />
+              <img src={anime.poster} alt="" className="aspect-[2/3] w-full object-cover" />
             </Link>
-            <ButtonLink to={watchHref} size="lg" className="max-w-[240px] flex-1" leftIcon={<Play className="h-5 w-5 fill-current" />}>
-              Watch Now
-            </ButtonLink>
-            <WatchlistIconButton anime={anime} className="h-12 w-12 rounded-xl" />
-          </div>
+          )}
         </div>
 
         {/* Slide selector */}

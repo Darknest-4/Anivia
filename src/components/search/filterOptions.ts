@@ -1,6 +1,7 @@
 import type { SelectOption } from '@/components/ui'
 
-export const YEAR_OPTIONS: SelectOption[] = [2027, 2026, 2025, 2024, 2023, 2022, 2021].map((y) => ({ value: String(y), label: String(y) }))
+const thisYear = new Date().getFullYear()
+export const YEAR_OPTIONS: SelectOption[] = Array.from({ length: thisYear + 2 - 1980 }, (_, i) => thisYear + 1 - i).map((y) => ({ value: String(y), label: String(y) }))
 export const SEASON_OPTIONS: SelectOption[] = [
   { value: 'winter', label: 'Winter' },
   { value: 'spring', label: 'Spring' },

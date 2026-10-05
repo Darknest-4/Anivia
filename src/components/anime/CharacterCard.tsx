@@ -22,7 +22,7 @@ export function CharacterCard({ character, animeTitle, className }: { character:
         </span>
       </div>
       <p className="mt-2.5 truncate text-sm font-semibold text-fg transition-colors group-hover:text-accent-soft">{character.name}</p>
-      <p className="truncate text-xs text-fg-subtle">{animeTitle ?? `CV: ${character.voiceActor}`}</p>
+      <p className="truncate text-xs text-fg-subtle">{animeTitle ?? character.animeTitle ?? `CV: ${character.voiceActor}`}</p>
     </Link>
   )
 }

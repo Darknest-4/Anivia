@@ -32,17 +32,21 @@ export function StudioCard({ studio, posters = [], className }: { studio: Studio
       </div>
       <h3 className="mt-4 text-base font-semibold text-fg">{studio.name}</h3>
       <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-fg-subtle">
-        <span className="inline-flex items-center gap-1">
-          <MapPin className="h-3.5 w-3.5" />
-          {studio.country}
-        </span>
-        <span>Est. {studio.founded}</span>
-        <span className="inline-flex items-center gap-1">
-          <Film className="h-3.5 w-3.5" />
-          {studio.animeCount ?? 0} titles
-        </span>
+        {studio.country && (
+          <span className="inline-flex items-center gap-1">
+            <MapPin className="h-3.5 w-3.5" />
+            {studio.country}
+          </span>
+        )}
+        {studio.founded ? <span>Est. {studio.founded}</span> : null}
+        {studio.animeCount !== undefined && (
+          <span className="inline-flex items-center gap-1">
+            <Film className="h-3.5 w-3.5" />
+            {studio.animeCount} titles
+          </span>
+        )}
       </div>
-      <p className="mt-3 line-clamp-2 text-[13px] leading-relaxed text-fg-muted">{studio.description}</p>
+      {studio.description && <p className="mt-3 line-clamp-2 text-[13px] leading-relaxed text-fg-muted">{studio.description}</p>}
       {posters.length > 0 && (
         <div className="mt-4 flex -space-x-3">
           {posters.slice(0, 4).map((src, i) => (

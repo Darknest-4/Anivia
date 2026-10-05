@@ -24,6 +24,7 @@ import { CharactersTab } from './details/CharactersTab'
 import { StaffTab } from './details/StaffTab'
 import { RelatedSections } from './details/RelatedSections'
 import { EpisodeList } from '@/components/anime'
+import { formatRating } from '@/lib/format'
 
 type Tab = 'overview' | 'episodes' | 'characters' | 'staff'
 
@@ -70,7 +71,7 @@ export default function AnimeDetailsPage() {
         <div className="flex flex-wrap items-center justify-center gap-2 md:justify-start">
           <StatusBadge status={anime.status} />
           <span className="rounded-md bg-white/10 px-1.5 py-1 text-2xs font-semibold text-white/85">{anime.type}</span>
-          <span className="rounded-md bg-white/10 px-1.5 py-1 text-2xs font-semibold text-white/85">{anime.quality}</span>
+          {anime.quality && <span className="rounded-md bg-white/10 px-1.5 py-1 text-2xs font-semibold text-white/85">{anime.quality}</span>}
           {anime.ageRating && <span className="rounded-md border border-white/25 px-1.5 py-0.5 text-2xs font-bold text-white/85">{anime.ageRating}</span>}
         </div>
         <h1 className="mt-3 font-display text-3xl font-extrabold leading-[1.05] text-white sm:text-4xl lg:text-5xl">{anime.title}</h1>
@@ -83,7 +84,7 @@ export default function AnimeDetailsPage() {
         <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[13px] text-white/75 md:justify-start">
           {anime.rating ? (
             <span className="inline-flex items-center gap-1.5">
-              <span className="rounded-md bg-warning px-1.5 py-0.5 font-display text-sm font-bold text-black">{anime.rating.toFixed(2)}</span>
+              <span className="rounded-md bg-warning px-1.5 py-0.5 font-display text-sm font-bold text-black">{formatRating(anime.rating)}</span>
               <span>{anime.rank ? `Ranked #${anime.rank}` : 'Score'}</span>
             </span>
           ) : (

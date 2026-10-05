@@ -25,7 +25,8 @@ interface AnimeCardProps {
 function EpisodeBadge({ anime }: { anime: Anime }) {
   if (anime.status === 'upcoming') return <Badge variant="glass">Coming {anime.year}</Badge>
   if (anime.type === 'Movie') return <Badge variant="glass">Movie</Badge>
-  if (anime.status === 'airing') return <Badge variant="solid">EP {anime.episodesAired}</Badge>
+  if (!anime.episodes) return null
+  if (anime.status === 'airing') return <Badge variant="solid">{anime.episodesAired ? `EP ${anime.episodesAired}` : 'Airing'}</Badge>
   return <Badge variant="glass">{anime.episodes} EPS</Badge>
 }
 
@@ -49,7 +50,7 @@ export const AnimeCard = memo(function AnimeCard({ anime, className, priority, r
         </div>
         <div className="pointer-events-none absolute bottom-2 left-2 flex flex-wrap gap-1 transition-opacity duration-base group-hover:opacity-0">
           <EpisodeBadge anime={anime} />
-          <Badge variant="glass">{anime.quality}</Badge>
+          {anime.quality && <Badge variant="glass">{anime.quality}</Badge>}
         </div>
 
         {progress !== undefined && (
@@ -68,7 +69,7 @@ export const AnimeCard = memo(function AnimeCard({ anime, className, priority, r
                 .map((g) => g.name)
                 .join(' · ')}
             </p>
-            {anime.status === 'airing' && <p className="mt-1 text-2xs font-semibold text-accent-soft">Latest: Episode {anime.episodesAired}</p>}
+            {anime.status === 'airing' && anime.episodesAired ? <p className="mt-1 text-2xs font-semibold text-accent-soft">Latest: Episode {anime.episodesAired}</p> : null}
             <div className="pointer-events-auto mt-3 flex items-center gap-2">
               <Link
                 to={anime.status === 'upcoming' ? href : `${href}/watch`}

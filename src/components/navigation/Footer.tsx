@@ -1,6 +1,7 @@
 import { AtSign, Globe, Mail, MessageCircle, Rss } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Logo } from '@/components/ui'
+import { useProviderInfo } from '@/hooks/queries'
 
 const columns = [
   {
@@ -51,6 +52,7 @@ const socials = [
 ]
 
 export function Footer() {
+  const source = useProviderInfo()
   return (
     <footer className="mt-20 border-t border-line bg-surface/40">
       <div className="container-app py-12 lg:py-16">
@@ -95,7 +97,7 @@ export function Footer() {
         </div>
         <div className="mt-12 flex flex-col gap-3 border-t border-line pt-6 text-xs text-fg-subtle sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} ANIVIA. All rights reserved.</p>
-          <p>All titles, characters and artwork shown are fictional demo content.</p>
+          <p>{source.isMock ? 'All titles, characters and artwork shown are fictional demo content.' : `Anime data provided by ${source.name}. Not affiliated with any rights holder.`}</p>
         </div>
       </div>
     </footer>

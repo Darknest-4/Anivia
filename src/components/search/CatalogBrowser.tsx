@@ -2,7 +2,7 @@ import { Search, SearchX, SlidersHorizontal } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { AnimeCardList, AnimeGrid, AnimeListHeader } from '@/components/anime'
 import { Badge, Button, Drawer, EmptyState, ErrorState, Input, Pagination, Select } from '@/components/ui'
-import { useBrowse } from '@/hooks/queries'
+import { useBrowse, useProviderInfo } from '@/hooks/queries'
 import { useBrowseParams } from '@/hooks/useBrowseParams'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useStore } from '@/hooks/useUserData'
@@ -21,7 +21,9 @@ interface CatalogBrowserProps {
 }
 
 /** Complete catalog explorer: search, filters, sorting, grid/list, pagination. URL-synced. */
-export function CatalogBrowser({ fixed = {}, hide = [] }: CatalogBrowserProps) {
+export function CatalogBrowser({ fixed = {}, hide: hideProp = [] }: CatalogBrowserProps) {
+  const { features } = useProviderInfo()
+  const hide: (keyof AnimeFilters)[] = features.languageFilter ? hideProp : [...hideProp, 'language']
   const { query, update, reset } = useBrowseParams()
   const [text, setText] = useState(query.query ?? '')
   const debounced = useDebounce(text, 300)

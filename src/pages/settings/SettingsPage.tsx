@@ -10,6 +10,7 @@ import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { usePreferences } from '@/hooks/useUserData'
 import { cn } from '@/lib/cn'
 import { useToast } from '@/providers/ToastProvider'
+import { isMockProvider } from '@/services/anime'
 import { storage } from '@/services/storage'
 import { favoritesStore, historyService, historyStore, preferencesStore, recentSearchesService, recentSearchesStore, seedDemoLibrary, seededStore, watchlistStore } from '@/services/user'
 import type { Preferences, VideoQuality } from '@/types'
@@ -82,7 +83,7 @@ export default function SettingsPage() {
   const resetDemo = () => {
     storage.clearAll()
     ;[watchlistStore, historyStore, favoritesStore, recentSearchesStore, seededStore, preferencesStore].forEach((s) => s.reset())
-    seedDemoLibrary()
+    if (isMockProvider) seedDemoLibrary()
     setResetOpen(false)
     toast({ title: 'Demo data restored', description: 'Watchlist, history and preferences were reset.' })
   }

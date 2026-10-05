@@ -28,6 +28,9 @@ const byPopularity = (list: Anime[]) => sortAnime(list, 'popularity')
  * Tip: search for "!error" to preview the UI's error state.
  */
 export class MockAnimeProvider implements AnimeProvider {
+  readonly name = 'Demo catalog'
+  readonly features = { languageFilter: true }
+
   getFeatured() {
     return delay(byPopularity(animeList.filter((a) => a.featured)))
   }

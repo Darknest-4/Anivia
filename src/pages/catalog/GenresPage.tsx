@@ -4,6 +4,7 @@ import { ErrorState, Skeleton } from '@/components/ui'
 import { useBrowse, useGenres } from '@/hooks/queries'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { Link } from 'react-router-dom'
+import { formatRating } from '@/lib/format'
 
 export default function GenresPage() {
   useDocumentMeta({ title: 'Genres', description: 'Explore anime by genre — action, fantasy, romance, sci-fi and more.' })
@@ -35,7 +36,7 @@ export default function GenresPage() {
                           <span className="block text-2xs font-semibold uppercase tracking-wider text-fg-subtle">Featured</span>
                           <span className="block truncate text-sm font-semibold text-fg group-hover:text-accent-soft">{featured.title}</span>
                         </span>
-                        <span className="ml-auto text-xs text-fg-subtle">{featured.rating?.toFixed(2) ?? 'New'}</span>
+                        <span className="ml-auto text-xs text-fg-subtle">{featured.rating ? formatRating(featured.rating) : 'New'}</span>
                       </Link>
                     )}
                   </li>

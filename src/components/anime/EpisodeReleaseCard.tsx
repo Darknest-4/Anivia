@@ -17,7 +17,7 @@ export function EpisodeReleaseCard({ release, className }: { release: EpisodeRel
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
           <div className="absolute left-2 top-2 flex gap-1">
             <Badge variant="solid">EP {episode.number}</Badge>
-            <Badge variant="glass">{anime.quality}</Badge>
+            {anime.quality && <Badge variant="glass">{anime.quality}</Badge>}
           </div>
           <span className="absolute inset-0 m-auto flex h-11 w-11 scale-90 items-center justify-center rounded-full bg-white/90 text-black opacity-0 shadow-pop transition-all duration-base group-hover:scale-100 group-hover:opacity-100">
             <Play className="ml-0.5 h-5 w-5 fill-current" />

@@ -6,9 +6,10 @@ const full = new Intl.NumberFormat('en')
 export const formatCompact = (n: number) => compact.format(n)
 export const formatNumber = (n: number) => full.format(n)
 
+/** Scores out of 10: one decimal for whole-tenth scores (AniList), two otherwise (MAL, demo data). */
 export function formatRating(rating?: number) {
   if (!rating) return 'N/A'
-  return rating.toFixed(2)
+  return Number.isInteger(Math.round(rating * 100) / 10) ? rating.toFixed(1) : rating.toFixed(2)
 }
 
 export function formatDate(iso: string | undefined, opts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' }) {

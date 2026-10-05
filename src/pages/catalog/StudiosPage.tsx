@@ -16,8 +16,8 @@ export default function StudiosPage() {
   const [sort, setSort] = useState<Sort>('titles')
   const list = useMemo(() => {
     const q = text.trim().toLowerCase()
-    const filtered = (data ?? []).filter((s) => !q || s.name.toLowerCase().includes(q) || s.country.toLowerCase().includes(q))
-    return filtered.sort((a, b) => (sort === 'name' ? a.name.localeCompare(b.name) : sort === 'founded' ? a.founded - b.founded : (b.animeCount ?? 0) - (a.animeCount ?? 0)))
+    const filtered = (data ?? []).filter((s) => !q || s.name.toLowerCase().includes(q) || (s.country ?? '').toLowerCase().includes(q))
+    return filtered.sort((a, b) => (sort === 'name' ? a.name.localeCompare(b.name) : sort === 'founded' ? (a.founded || 9999) - (b.founded || 9999) : (b.animeCount ?? 0) - (a.animeCount ?? 0)))
   }, [data, text, sort])
 
   return (

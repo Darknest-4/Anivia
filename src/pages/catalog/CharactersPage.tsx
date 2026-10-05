@@ -20,8 +20,8 @@ export default function CharactersPage() {
   const all = useBrowse({ perPage: 100, sort: 'title-asc' })
   const titles = new Map((all.data?.items ?? []).map((a) => [a.id, a.title]))
   const everyone = useCharacters()
-  const animeWithCast = [...new Set((everyone.data ?? []).map((c) => c.animeId))]
-    .map((id) => ({ value: id, label: titles.get(id) ?? id }))
+  const animeWithCast = [...new Set((everyone.data ?? []).map((c) => c.animeId).filter(Boolean))]
+    .map((id) => ({ value: id, label: titles.get(id) ?? everyone.data?.find((c) => c.animeId === id)?.animeTitle ?? id }))
     .sort((a, b) => a.label.localeCompare(b.label))
 
   return (

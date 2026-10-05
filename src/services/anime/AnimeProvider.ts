@@ -22,6 +22,11 @@ import type {
  * interface and register it in `src/services/anime/index.ts`.
  */
 export interface AnimeProvider {
+  /** Human-readable data source name (shown in the footer / About page). */
+  readonly name?: string
+  /** Optional capabilities the UI adapts to. */
+  readonly features?: { languageFilter?: boolean }
+
   /** Hand-picked titles for the home hero carousel. */
   getFeatured(): Promise<Anime[]>
   getTrending(): Promise<Anime[]>

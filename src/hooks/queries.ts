@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { animeProvider } from '@/services/anime'
+import { animeProvider, isMockProvider, providerName } from '@/services/anime'
 import { videoProvider } from '@/services/video'
 import type { BrowseQuery, CharacterQuery, SeasonName } from '@/types'
 
@@ -34,6 +34,9 @@ export const queryKeys = {
   studio: (id: string) => ['studio', id] as const,
   videoSource: (animeId: string, episodeId: string) => ['video', animeId, episodeId] as const,
 }
+
+/** Static info about the active data source. */
+export const useProviderInfo = () => ({ name: providerName, isMock: isMockProvider, features: animeProvider.features ?? {} })
 
 export const useFeatured = () => useQuery({ queryKey: queryKeys.featured, queryFn: () => animeProvider.getFeatured() })
 export const useTrending = () => useQuery({ queryKey: queryKeys.trending, queryFn: () => animeProvider.getTrending() })

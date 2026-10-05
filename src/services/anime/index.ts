@@ -1,18 +1,33 @@
 import { config } from '@/config'
 import type { AnimeProvider } from './AnimeProvider'
+import { AniListAnimeProvider } from './anilist/AniListAnimeProvider'
 import { ApiAnimeProvider } from './apiAnimeProvider'
+import { JikanAnimeProvider } from './jikan/JikanAnimeProvider'
 import { MockAnimeProvider } from './mockAnimeProvider'
 
 export * from './AnimeProvider'
 
 /**
- * The active AnimeProvider. Swap implementations here (or via VITE_ANIME_PROVIDER).
- * The app falls back to the mock provider whenever no API base URL is configured.
+ * The active AnimeProvider, selected with VITE_ANIME_PROVIDER:
+ * - `anilist` (default) — AniList GraphQL, episode titles enriched from Jikan. No API key.
+ * - `jikan`   — Jikan v4 (MyAnimeList). No API key.
+ * - `api`     — your own REST backend (requires VITE_API_BASE_URL).
+ * - `mock`    — fictional offline demo catalog.
  */
 function createAnimeProvider(): AnimeProvider {
-  if (config.animeProvider === 'api' && config.apiBaseUrl) return new ApiAnimeProvider(config.apiBaseUrl)
-  return new MockAnimeProvider()
+  switch (config.animeProvider) {
+    case 'jikan':
+      return new JikanAnimeProvider()
+    case 'api':
+      return config.apiBaseUrl ? new ApiAnimeProvider(config.apiBaseUrl) : new MockAnimeProvider()
+    case 'mock':
+      return new MockAnimeProvider()
+    case 'anilist':
+    default:
+      return new AniListAnimeProvider()
+  }
 }
 
 export const animeProvider: AnimeProvider = createAnimeProvider()
-export const isMockProvider = !(config.animeProvider === 'api' && config.apiBaseUrl)
+export const isMockProvider = animeProvider instanceof MockAnimeProvider
+export const providerName = animeProvider.name ?? 'Custom API'

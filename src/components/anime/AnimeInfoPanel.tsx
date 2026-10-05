@@ -19,7 +19,7 @@ export function AnimeInfoPanel({ anime, className }: { anime: Anime; className?:
         '—'
       ),
     ],
-    ['Episodes', anime.episodes ? (anime.status === 'airing' ? `${anime.episodesAired} of ${anime.episodes}` : anime.episodes) : 'TBA'],
+    ['Episodes', anime.episodes ? (anime.status === 'airing' && anime.episodesAired ? `${anime.episodesAired} of ${anime.episodes}` : anime.episodes) : 'TBA'],
     ['Episode duration', anime.duration ? `${anime.duration} min` : '—'],
     ['Aired', anime.airedFrom ? `${formatDate(anime.airedFrom)}${anime.airedTo && anime.airedTo !== anime.airedFrom ? ` – ${formatDate(anime.airedTo)}` : anime.status === 'airing' ? ' – present' : ''}` : 'TBA'],
     [
@@ -51,8 +51,8 @@ export function AnimeInfoPanel({ anime, className }: { anime: Anime; className?:
     ['Age rating', anime.ageRating ?? '—'],
     ['Score', anime.rating ? `${formatRating(anime.rating)} (${formatCompact(anime.ratingCount ?? 0)} votes)` : 'Not yet rated'],
     ['Popularity', `${formatCompact(anime.popularity)} members`],
-    ['Audio', anime.languages.join(', ')],
-    ['Quality', anime.quality],
+    ...(anime.languages.length ? [['Audio', anime.languages.join(', ')] as [string, React.ReactNode]] : []),
+    ...(anime.quality ? [['Quality', anime.quality] as [string, React.ReactNode]] : []),
   ]
   return (
     <section aria-labelledby="info-heading" className={cn('rounded-2xl border border-line bg-surface p-5', className)}>
