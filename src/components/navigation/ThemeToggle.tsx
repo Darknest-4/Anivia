@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Monitor, Moon, Sun } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { useTheme } from '@/providers/ThemeProvider'
@@ -10,8 +11,8 @@ export function ThemeToggle({ className }: { className?: string }) {
     <button
       type="button"
       onClick={toggleTheme}
-      aria-label={dark ? 'Switch to light theme' : 'Switch to dark theme'}
-      title={dark ? 'Light mode' : 'Dark mode'}
+      aria-label={dark ? t('Switch to light theme') : t('Switch to dark theme')}
+      title={dark ? t('Light mode') : t('Dark mode')}
       className={cn('inline-flex h-10 w-10 items-center justify-center rounded-lg text-fg-muted transition-colors hover:bg-surface-3 hover:text-fg', className)}
     >
       {dark ? <Sun className="h-[18px] w-[18px]" /> : <Moon className="h-[18px] w-[18px]" />}
@@ -20,16 +21,16 @@ export function ThemeToggle({ className }: { className?: string }) {
 }
 
 const options: { value: ThemePreference; label: string; icon: typeof Sun }[] = [
-  { value: 'dark', label: 'Dark', icon: Moon },
-  { value: 'light', label: 'Light', icon: Sun },
-  { value: 'system', label: 'System', icon: Monitor },
+  { value: 'dark', label: t('Dark'), icon: Moon },
+  { value: 'light', label: t('Light'), icon: Sun },
+  { value: 'system', label: t('System'), icon: Monitor },
 ]
 
 /** Three-way Dark / Light / System segmented control. */
 export function ThemeSegmented({ className }: { className?: string }) {
   const { theme, setTheme } = useTheme()
   return (
-    <div role="radiogroup" aria-label="Theme" className={cn('grid grid-cols-3 gap-1 rounded-xl border border-line bg-surface-2 p-1', className)}>
+    <div role="radiogroup" aria-label={t('Theme')} className={cn('grid grid-cols-3 gap-1 rounded-xl border border-line bg-surface-2 p-1', className)}>
       {options.map((o) => (
         <button
           key={o.value}

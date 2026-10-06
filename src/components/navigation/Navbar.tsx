@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Command, Menu, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
@@ -43,11 +44,11 @@ export function Navbar({ transparent, onOpenMenu }: NavbarProps) {
     >
       {!solid && <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/50 to-transparent" aria-hidden />}
       <div className="container-app relative flex h-full items-center gap-3 lg:gap-6">
-        <Link to="/" aria-label="ANIVIA home" className={cn('shrink-0', !solid && '[&_span]:text-white')}>
+        <Link to="/" aria-label={t('ANIVIA home')} className={cn('shrink-0', !solid && '[&_span]:text-white')}>
           <Logo />
         </Link>
 
-        <nav aria-label="Primary" className="hidden items-center gap-1 lg:flex">
+        <nav aria-label={t('Primary')} className="hidden items-center gap-1 lg:flex">
           {primaryNav.map((item) => (
             <NavLink
               key={item.to}
@@ -73,7 +74,7 @@ export function Navbar({ transparent, onOpenMenu }: NavbarProps) {
               cn('rounded-lg px-2.5 py-2 text-sm font-semibold transition-colors xl:px-3', isActive ? (solid ? 'text-fg' : 'text-white') : solid ? 'text-fg-muted hover:text-fg' : 'text-white/75 hover:text-white')
             }
           >
-            Watchlist
+            {t('Watchlist')}
           </NavLink>
         </nav>
 
@@ -81,7 +82,7 @@ export function Navbar({ transparent, onOpenMenu }: NavbarProps) {
           {pathname !== '/search' && <SearchAutocomplete className="hidden xl:block xl:w-[260px] 2xl:w-[300px]" showShortcut />}
           <Link
             to="/search"
-            aria-label="Search"
+            aria-label={t('Search')}
             className={cn('inline-flex h-10 w-10 items-center justify-center rounded-lg transition-colors xl:hidden', solid ? 'text-fg-muted hover:bg-surface-3 hover:text-fg' : 'text-white hover:bg-white/10')}
           >
             <Search className="h-5 w-5" />
@@ -89,8 +90,8 @@ export function Navbar({ transparent, onOpenMenu }: NavbarProps) {
           <button
             type="button"
             onClick={() => setOpen(true)}
-            aria-label="Open command menu"
-            title="Command menu (Ctrl/⌘ K)"
+            aria-label={t('Open command menu')}
+            title={t('Command menu (Ctrl/⌘ K)')}
             className={cn('hidden h-10 w-10 items-center justify-center rounded-lg transition-colors md:inline-flex lg:hidden xl:hidden', solid ? 'text-fg-muted hover:bg-surface-3 hover:text-fg' : 'text-white hover:bg-white/10')}
           >
             <Command className="h-[18px] w-[18px]" />
@@ -108,7 +109,7 @@ export function Navbar({ transparent, onOpenMenu }: NavbarProps) {
           <button
             type="button"
             onClick={onOpenMenu}
-            aria-label="Open menu"
+            aria-label={t('Open menu')}
             className={cn('inline-flex h-10 w-10 items-center justify-center rounded-lg transition-colors lg:hidden', solid ? 'text-fg hover:bg-surface-3' : 'text-white hover:bg-white/10')}
           >
             <Menu className="h-5 w-5" />

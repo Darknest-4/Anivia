@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Link } from 'react-router-dom'
 import { usePrefetchAnime } from '@/hooks/queries'
 import { cn } from '@/lib/cn'
@@ -73,12 +74,12 @@ export function AnimeListHeader({ className }: { className?: string }) {
       )}
     >
       <span className="text-center">#</span>
-      <span>Title</span>
-      <span>Genres</span>
-      <span>Score</span>
-      <span>Status</span>
-      <span>Episodes</span>
-      <span className="sr-only">Actions</span>
+      <span>{t('Title')}</span>
+      <span>{t('Genres')}</span>
+      <span>{t('Score')}</span>
+      <span>{t('Status')}</span>
+      <span>{t('Episodes')}</span>
+      <span className="sr-only">{t('Actions')}</span>
     </div>
   )
 }

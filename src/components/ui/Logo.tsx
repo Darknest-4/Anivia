@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { useId } from 'react'
 import { cn } from '@/lib/cn'
 
@@ -25,7 +26,7 @@ export function Logo({ className, compact }: { className?: string; compact?: boo
   return (
     <span className={cn('inline-flex items-center gap-2.5', className)}>
       <LogoMark />
-      {!compact && <span className="font-display text-[19px] font-extrabold tracking-[0.14em] text-fg">ANIVIA</span>}
+      {!compact && <span className="font-display text-[19px] font-extrabold tracking-[0.14em] text-fg">{t('ANIVIA')}</span>}
     </span>
   )
 }

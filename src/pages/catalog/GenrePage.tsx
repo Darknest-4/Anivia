@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { useParams } from 'react-router-dom'
 import { AnimeCardFeatured } from '@/components/anime'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -11,7 +12,7 @@ export default function GenrePage() {
   const { genre: slug } = useParams()
   const { data: genre, isLoading } = useGenre(slug)
   const top = useBrowse({ genres: slug ? [slug] : [], sort: 'rating', perPage: 1 })
-  useDocumentMeta({ title: genre ? `${genre.name} Anime` : 'Genre', description: genre?.description })
+  useDocumentMeta({ title: genre ? t('{p0} Anime', { p0: genre.name }) : t('Genre'), description: genre?.description })
 
   if (isLoading)
     return (
@@ -26,8 +27,8 @@ export default function GenrePage() {
   return (
     <div className="container-app">
       <PageHeader
-        crumbs={[{ label: 'Home', to: '/' }, { label: 'Genres', to: '/genres' }, { label: genre.name }]}
-        eyebrow={genre.animeCount !== undefined ? `${genre.animeCount} titles` : 'Genre'}
+        crumbs={[{ label: t('Home'), to: '/' }, { label: t('Genres'), to: '/genres' }, { label: genre.name }]}
+        eyebrow={genre.animeCount !== undefined ? t('{p0} titles', { p0: genre.animeCount }) : t('Genre')}
         title={
           <span className="inline-flex items-center gap-3">
             <span className="h-3 w-3 rounded-full" style={{ background: `hsl(${genre.hue} 85% 60%)` }} aria-hidden />

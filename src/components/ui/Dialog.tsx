@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { X } from 'lucide-react'
 import { useEffect, useId, useRef, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
@@ -81,7 +82,7 @@ export function Dialog({ open, onClose, title, description, children, footer, si
           </h2>
           {description && <p className="mt-1 text-sm text-fg-muted">{description}</p>}
         </div>
-        <button type="button" onClick={onClose} aria-label="Close dialog" className="-mr-1.5 rounded-lg p-2 text-fg-subtle transition-colors hover:bg-surface-3 hover:text-fg">
+        <button type="button" onClick={onClose} aria-label={t('Close dialog')} className="-mr-1.5 rounded-lg p-2 text-fg-subtle transition-colors hover:bg-surface-3 hover:text-fg">
           <X className="h-5 w-5" />
         </button>
       </div>
@@ -111,7 +112,7 @@ export function Drawer({ open, onClose, title, side = 'right', children, footer,
         <h2 id={titleId} className="text-base font-semibold text-fg">
           {title}
         </h2>
-        <button type="button" onClick={onClose} aria-label="Close panel" className="-mr-1.5 rounded-lg p-2 text-fg-subtle transition-colors hover:bg-surface-3 hover:text-fg">
+        <button type="button" onClick={onClose} aria-label={t('Close panel')} className="-mr-1.5 rounded-lg p-2 text-fg-subtle transition-colors hover:bg-surface-3 hover:text-fg">
           <X className="h-5 w-5" />
         </button>
       </div>

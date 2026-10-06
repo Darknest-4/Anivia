@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Check, ChevronLeft, ChevronRight, Gauge, MonitorPlay, Repeat, Subtitles } from 'lucide-react'
 import { useState } from 'react'
 import { Switch } from '@/components/ui'
@@ -22,7 +23,7 @@ const RATES = [0.5, 0.75, 1, 1.25, 1.5, 2]
 
 export function PlayerSettingsMenu(props: Props) {
   const [panel, setPanel] = useState<Panel>('main')
-  const subLabel = props.subtitles.find((s) => s.id === props.subtitle)?.label ?? 'Off'
+  const subLabel = props.subtitles.find((s) => s.id === props.subtitle)?.label ?? t('Off')
 
   const Row = ({ icon: Icon, label, value, to }: { icon: typeof Gauge; label: string; value: string; to: Panel }) => (
     <button type="button" onClick={() => setPanel(to)} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/90 hover:bg-white/10">
@@ -57,30 +58,30 @@ export function PlayerSettingsMenu(props: Props) {
   )
 
   return (
-    <div role="menu" aria-label="Player settings" className="w-64 animate-scale-in rounded-xl border border-white/10 bg-black/85 p-1.5 shadow-pop backdrop-blur-xl">
+    <div role="menu" aria-label={t('Player settings')} className="w-64 animate-scale-in rounded-xl border border-white/10 bg-black/85 p-1.5 shadow-pop backdrop-blur-xl">
       {panel === 'main' && (
         <>
-          <Row icon={MonitorPlay} label="Quality" value={props.quality === 'auto' ? 'Auto' : props.quality} to="quality" />
-          <Row icon={Subtitles} label="Subtitles" value={subLabel} to="subtitles" />
-          <Row icon={Gauge} label="Speed" value={props.rate === 1 ? 'Normal' : `${props.rate}×`} to="speed" />
+          <Row icon={MonitorPlay} label={t('Quality')} value={props.quality === 'auto' ? t('Auto') : props.quality} to="quality" />
+          <Row icon={Subtitles} label={t('Subtitles')} value={subLabel} to="subtitles" />
+          <Row icon={Gauge} label={t('Speed')} value={props.rate === 1 ? t('Normal') : `${props.rate}×`} to="speed" />
           <div className="mt-1 flex items-center gap-3 border-t border-white/10 px-3 pb-1 pt-2.5 text-sm text-white/90 [&_p]:text-white/90">
             <Repeat className="h-4 w-4 shrink-0 text-white/60" />
-            <Switch label="Autoplay next" checked={props.autoNext} onChange={props.onAutoNext} className="flex-1" />
+            <Switch label={t('Autoplay next')} checked={props.autoNext} onChange={props.onAutoNext} className="flex-1" />
           </div>
         </>
       )}
       {panel === 'quality' && (
         <>
-          <Back title="Quality" />
+          <Back title={t('Quality')} />
           {['auto', ...props.qualities].map((q) => (
-            <Option key={q} active={props.quality === q} label={q === 'auto' ? 'Auto (recommended)' : q} onClick={() => props.onQuality(q)} />
+            <Option key={q} active={props.quality === q} label={q === 'auto' ? t('Auto (recommended)') : q} onClick={() => props.onQuality(q)} />
           ))}
         </>
       )}
       {panel === 'subtitles' && (
         <>
-          <Back title="Subtitles" />
-          <Option active={props.subtitle === null} label="Off" onClick={() => props.onSubtitle(null)} />
+          <Back title={t('Subtitles')} />
+          <Option active={props.subtitle === null} label={t('Off')} onClick={() => props.onSubtitle(null)} />
           {props.subtitles.map((s) => (
             <Option key={s.id} active={props.subtitle === s.id} label={s.label} onClick={() => props.onSubtitle(s.id)} />
           ))}
@@ -88,9 +89,9 @@ export function PlayerSettingsMenu(props: Props) {
       )}
       {panel === 'speed' && (
         <>
-          <Back title="Playback speed" />
+          <Back title={t('Playback speed')} />
           {RATES.map((r) => (
-            <Option key={r} active={props.rate === r} label={r === 1 ? 'Normal' : `${r}×`} onClick={() => props.onRate(r)} />
+            <Option key={r} active={props.rate === r} label={r === 1 ? t('Normal') : `${r}×`} onClick={() => props.onRate(r)} />
           ))}
         </>
       )}

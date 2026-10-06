@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Check, CheckCircle2, ChevronLeft, ChevronRight, Flag, ListVideo, Share2 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom'
@@ -43,7 +44,7 @@ export default function WatchPage() {
   const recs = useRecommendations(id ? [id] : [])
 
   useDocumentMeta({
-    title: anime.data && episode ? `${anime.data.title} · Episode ${episode.number}` : anime.data?.title ?? 'Watch',
+    title: anime.data && episode ? t('{p0} · Episode {p1}', { p0: anime.data.title, p1: episode.number }) : anime.data?.title ?? t('Watch'),
     description: episode?.synopsis,
     type: 'video.episode',
   })
@@ -125,7 +126,7 @@ export default function WatchPage() {
               onRetry={() => video.refetch()}
               poster={episode?.thumbnail ?? a.backdrop}
               title={a.title}
-              subtitle={episode ? `Episode ${episode.number} · ${episode.title}` : undefined}
+              subtitle={episode ? t('Episode {p0} · {p1}', { p0: episode.number, p1: episode.title }) : undefined}
               startAt={startAt}
               hasPrev={Boolean(prev)}
               hasNext={Boolean(nextAvailable)}
@@ -153,7 +154,7 @@ export default function WatchPage() {
                   <h1 className="mt-1 text-xl font-bold text-fg sm:text-2xl">
                     {episode ? (
                       /^episode\s*\d+$/i.test(episode.title.trim()) ? (
-                        `Episode ${episode.number}`
+                        t('Episode {p0}', { p0: episode.number })
                       ) : (
                         <>
                           <span className="text-fg-subtle">EP {pad2(episode.number)}</span> {episode.title}
@@ -165,19 +166,19 @@ export default function WatchPage() {
                   </h1>
                   {episode && (
                     <p className="mt-1 text-sm text-fg-subtle">
-                      Aired {formatDate(episode.airDate)} · {Math.round(episode.duration / 60)} min{a.languages.length ? ` · ${a.languages.slice(0, 2).join(' / ')} audio` : ''}
+                      Aired {formatDate(episode.airDate)} · {Math.round(episode.duration / 60)} min{a.languages.length ? t(' · {p0} audio', { p0: a.languages.slice(0, 2).join(' / ') }) : ''}
                     </p>
                   )}
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <Button variant="secondary" size="sm" disabled={!prev} onClick={() => prev && goTo(prev.number)} leftIcon={<ChevronLeft className="h-4 w-4" />}>
-                    Prev
+                    {t('Prev')}
                   </Button>
                   <Button variant="secondary" size="sm" disabled={!nextAvailable} onClick={() => nextAvailable && goTo(nextAvailable.number)} rightIcon={<ChevronRight className="h-4 w-4" />}>
-                    Next
+                    {t('Next')}
                   </Button>
                   <Button variant="secondary" size="sm" className="lg:hidden" onClick={() => setDrawer(true)} leftIcon={<ListVideo className="h-4 w-4" />}>
-                    Episodes
+                    {t('Episodes')}
                   </Button>
                 </div>
               </div>
@@ -192,15 +193,15 @@ export default function WatchPage() {
                     leftIcon={saved?.completed ? <CheckCircle2 className="h-4 w-4 text-success" /> : <Check className="h-4 w-4" />}
                     onClick={() => historyService.setWatched(episode, !saved?.completed)}
                   >
-                    {saved?.completed ? `Watched EP ${episode.number}` : 'Mark as watched'}
+                    {saved?.completed ? t('Watched EP {p0}', { p0: episode.number }) : t('Mark as watched')}
                   </Button>
                 )}
                 <WatchlistButton anime={a} size="md" />
                 <Button variant="secondary" leftIcon={<Share2 className="h-4 w-4" />} onClick={() => setShare(true)}>
-                  Share
+                  {t('Share')}
                 </Button>
                 <Button variant="ghost" leftIcon={<Flag className="h-4 w-4" />} onClick={() => setReport(true)}>
-                  Report
+                  {t('Report')}
                 </Button>
               </div>
 
@@ -214,16 +215,16 @@ export default function WatchPage() {
                 <>
                   {a.trailer && (
                     <p className="mt-6 text-xs text-fg-subtle">
-                      Showing the official trailer. Full episodes are available on the licensed services below.
+                      {t('Showing the official trailer. Full episodes are available on the licensed services below.')}
                     </p>
                   )}
-                  <WatchLinks links={a.watchLinks} className="mt-4" title="Watch full episodes" />
+                  <WatchLinks links={a.watchLinks} className="mt-4" title={t('Watch full episodes')} />
                 </>
               )}
 
               {episode && (
                 <div className="mt-10">
-                  <Comments animeId={a.id} episode={episode.number} heading={`Episode ${episode.number} discussion`} />
+                  <Comments animeId={a.id} episode={episode.number} heading={t('Episode {p0} discussion', { p0: episode.number })} />
                 </div>
               )}
 
@@ -231,10 +232,10 @@ export default function WatchPage() {
           </div>
 
           {/* Desktop episode sidebar */}
-          <aside className="hidden lg:block" aria-label="Episodes">
+          <aside className="hidden lg:block" aria-label={t('Episodes')}>
             <div className="sticky top-[calc(var(--header-h)+1.5rem)] rounded-2xl border border-line bg-surface p-4">
               <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-base font-semibold text-fg">Episodes</h2>
+                <h2 className="text-base font-semibold text-fg">{t('Episodes')}</h2>
                 <span className="text-xs text-fg-subtle">
                   {list.filter((e) => !e.locked).length} / {a.episodes ?? list.length} available
                 </span>
@@ -247,8 +248,8 @@ export default function WatchPage() {
 
       {recs.data && recs.data.length > 0 && (
         <section aria-labelledby="more-heading" className="container-app mt-14">
-          <SectionHeader id="more-heading" title="More Like This" />
-          <ScrollRow label="More like this">
+          <SectionHeader id="more-heading" title={t('More Like This')} />
+          <ScrollRow label={t('More like this')}>
             {recs.data.map((r) => (
               <AnimeCard key={r.id} anime={r} />
             ))}
@@ -256,13 +257,13 @@ export default function WatchPage() {
         </section>
       )}
 
-      <Drawer open={drawer} onClose={() => setDrawer(false)} side="bottom" title={`Episodes · ${a.title}`}>
+      <Drawer open={drawer} onClose={() => setDrawer(false)} side="bottom" title={t('Episodes · {p0}', { p0: a.title })}>
         <div className="px-4 pb-6">
           <EpisodeList animeId={a.id} episodes={list} activeEpisodeId={episode?.id} layout="compact" />
         </div>
       </Drawer>
       <ShareDialog title={a.title} path={`/anime/${a.id}`} image={a.poster} open={share} onClose={() => setShare(false)} />
-      <ReportDialog open={report} onClose={() => setReport(false)} subject={episode ? `${a.title} · Episode ${episode.number}` : a.title} />
+      <ReportDialog open={report} onClose={() => setReport(false)} subject={episode ? t('{p0} · Episode {p1}', { p0: a.title, p1: episode.number }) : a.title} />
     </div>
   )
 }

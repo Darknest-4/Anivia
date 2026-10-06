@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { cn } from '@/lib/cn'
@@ -62,7 +63,7 @@ export function ScrollRow({ children, label, className, itemClassName = 'w-[42%]
             key={dir}
             type="button"
             onClick={() => scroll(dir as 1 | -1)}
-            aria-label={dir === -1 ? `Scroll ${label} left` : `Scroll ${label} right`}
+            aria-label={dir === -1 ? t('Scroll {p0} left', { p0: label }) : t('Scroll {p0} right', { p0: label })}
             tabIndex={enabled ? 0 : -1}
             className={cn(
               'absolute top-[32%] z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-line-strong bg-surface-2/90 text-fg shadow-pop backdrop-blur-md transition-[opacity,transform] duration-base hover:scale-105 lg:flex',

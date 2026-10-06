@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Search, UserX } from 'lucide-react'
 import { useState } from 'react'
 import { CharacterCard } from '@/components/anime'
@@ -11,7 +12,7 @@ import type { Character } from '@/types'
 type Role = 'all' | Character['role']
 
 export default function CharactersPage() {
-  useDocumentMeta({ title: 'Characters', description: 'Meet the heroes, rivals and villains of the ANIVIA catalog.' })
+  useDocumentMeta({ title: t('Characters'), description: t('Meet the heroes, rivals and villains of the ANIVIA catalog.') })
   const [text, setText] = useState('')
   const [role, setRole] = useState<Role>('all')
   const [animeId, setAnimeId] = useState('')
@@ -26,24 +27,24 @@ export default function CharactersPage() {
 
   return (
     <div className="container-app">
-      <PageHeader crumbs={[{ label: 'Home', to: '/' }, { label: 'Characters' }]} eyebrow="Directory" title="Characters" description="Heroes, rivals and villains — search the full cast directory." />
+      <PageHeader crumbs={[{ label: t('Home'), to: '/' }, { label: t('Characters') }]} eyebrow={t('Directory')} title={t('Characters')} description={t('Heroes, rivals and villains — search the full cast directory.')} />
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
         <div className="flex-1">
-          <Input type="search" value={text} onChange={(e) => setText(e.target.value)} placeholder="Search characters, voice actors or anime…" aria-label="Search characters" leftIcon={<Search />} />
+          <Input type="search" value={text} onChange={(e) => setText(e.target.value)} placeholder={t('Search characters, voice actors or anime…')} aria-label={t('Search characters')} leftIcon={<Search />} />
         </div>
-        <Select aria-label="Filter by anime" value={animeId} onChange={(e) => setAnimeId(e.target.value)} placeholder="All anime" options={animeWithCast} className="lg:w-64" />
+        <Select aria-label={t('Filter by anime')} value={animeId} onChange={(e) => setAnimeId(e.target.value)} placeholder={t('All anime')} options={animeWithCast} className="lg:w-64" />
       </div>
       <Tabs
         className="mt-4"
         items={[
-          { value: 'all', label: 'All roles' },
-          { value: 'Main', label: 'Main' },
-          { value: 'Supporting', label: 'Supporting' },
-          { value: 'Antagonist', label: 'Antagonist' },
+          { value: 'all', label: t('All roles') },
+          { value: 'Main', label: t('Main') },
+          { value: 'Supporting', label: t('Supporting') },
+          { value: 'Antagonist', label: t('Antagonist') },
         ]}
         value={role}
         onChange={setRole}
-        label="Role"
+        label={t('Role')}
         variant="pill"
         idPrefix="char-role"
       />
@@ -57,7 +58,7 @@ export default function CharactersPage() {
             ))}
           </div>
         ) : !data?.length ? (
-          <EmptyState icon={<UserX />} title="No characters found" description="Try a different name, role or anime." />
+          <EmptyState icon={<UserX />} title={t('No characters found')} description={t('Try a different name, role or anime.')} />
         ) : (
           <ul className="grid grid-cols-2 gap-x-4 gap-y-6 xs:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             {data.map((c) => (

@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import type { WatchlistStatus } from '@/types'
 import { emitActivity } from './activity'
 import { watchlistStore } from './stores'
@@ -28,11 +29,11 @@ export const watchlistService = {
 }
 
 export const WATCHLIST_STATUSES: { value: WatchlistStatus; label: string }[] = [
-  { value: 'watching', label: 'Watching' },
-  { value: 'planning', label: 'Plan to Watch' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'on-hold', label: 'On Hold' },
-  { value: 'dropped', label: 'Dropped' },
+  { value: 'watching', label: t('Watching') },
+  { value: 'planning', label: t('Plan to Watch') },
+  { value: 'completed', label: t('Completed') },
+  { value: 'on-hold', label: t('On Hold') },
+  { value: 'dropped', label: t('Dropped') },
 ]
 
 export const watchlistStatusLabel = Object.fromEntries(WATCHLIST_STATUSES.map((s) => [s.value, s.label])) as Record<

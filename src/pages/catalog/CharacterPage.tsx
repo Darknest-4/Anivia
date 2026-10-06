@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Heart, Mic, Ruler, Shield, Sparkle } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import { AnimeCardHorizontal, CharacterCard } from '@/components/anime'
@@ -18,7 +19,7 @@ export default function CharacterPage() {
   const favs = useFavoriteCharacters()
   const liked = character ? favs.isFavorite(character.id) : false
   const toast = useToast()
-  useDocumentMeta({ title: character?.name ?? 'Character', description: character?.description, type: 'profile' })
+  useDocumentMeta({ title: character?.name ?? t('Character'), description: character?.description, type: 'profile' })
 
   if (isLoading)
     return (
@@ -39,14 +40,14 @@ export default function CharacterPage() {
   if (!character) return <NotFoundPage />
 
   const facts = [
-    { icon: Sparkle, label: 'Age', value: character.age },
-    { icon: Ruler, label: 'Height', value: character.height },
-    { icon: Shield, label: 'Affiliation', value: character.affiliation },
+    { icon: Sparkle, label: t('Age'), value: character.age },
+    { icon: Ruler, label: t('Height'), value: character.height },
+    { icon: Shield, label: t('Affiliation'), value: character.affiliation },
   ].filter((f) => f.value)
 
   return (
     <div className="container-app">
-      <Breadcrumbs className="pb-6 pt-8 sm:pt-10" items={[{ label: 'Home', to: '/' }, { label: 'Characters', to: '/characters' }, { label: character.name }]} />
+      <Breadcrumbs className="pb-6 pt-8 sm:pt-10" items={[{ label: t('Home'), to: '/' }, { label: t('Characters'), to: '/characters' }, { label: character.name }]} />
       <div className="grid gap-8 md:grid-cols-[260px_minmax(0,1fr)] lg:grid-cols-[300px_minmax(0,1fr)]">
         <div className="mx-auto w-full max-w-[280px] md:max-w-none">
           <img src={character.image} alt={`Portrait of ${character.name}`} className="aspect-[3/4] w-full rounded-2xl object-cover shadow-pop ring-1 ring-line" />
@@ -56,7 +57,7 @@ export default function CharacterPage() {
             leftIcon={<Heart className={liked ? 'h-4 w-4 fill-current' : 'h-4 w-4'} />}
             onClick={() => {
               favs.toggle(character.id)
-              toast({ title: liked ? 'Removed from favorites' : 'Added to favorite characters', description: character.name, icon: Heart })
+              toast({ title: liked ? t('Removed from favorites') : t('Added to favorite characters'), description: character.name, icon: Heart })
             }}
             aria-pressed={liked}
           >
@@ -65,7 +66,7 @@ export default function CharacterPage() {
         </div>
         <div className="min-w-0">
           <Badge variant={character.role === 'Main' ? 'accent' : character.role === 'Antagonist' ? 'danger' : 'default'} size="md">
-            {character.role} character
+            {t('{p0} character', { p0: t(character.role) })}
           </Badge>
           <h1 className="mt-3 text-3xl font-bold text-fg sm:text-4xl">{character.name}</h1>
           {character.nativeName && <p className="mt-1 text-fg-subtle">{character.nativeName}</p>}
@@ -75,7 +76,7 @@ export default function CharacterPage() {
             <div className="rounded-2xl border border-line bg-surface p-4">
               <dt className="flex items-center gap-1.5 text-xs text-fg-subtle">
                 <Mic className="h-3.5 w-3.5" />
-                Voice actor (Japanese)
+                {t('Voice actor (Japanese)')}
               </dt>
               <dd className="mt-1 font-semibold text-fg">{character.voiceActor}</dd>
             </div>
@@ -83,7 +84,7 @@ export default function CharacterPage() {
               <div className="rounded-2xl border border-line bg-surface p-4">
                 <dt className="flex items-center gap-1.5 text-xs text-fg-subtle">
                   <Mic className="h-3.5 w-3.5" />
-                  Voice actor (English)
+                  {t('Voice actor (English)')}
                 </dt>
                 <dd className="mt-1 font-semibold text-fg">{character.voiceActorEn}</dd>
               </div>
@@ -101,7 +102,7 @@ export default function CharacterPage() {
 
           <section aria-labelledby="appears-heading" className="mt-8">
             <h2 id="appears-heading" className="mb-3 text-lg font-semibold text-fg">
-              Appears in
+              {t('Appears in')}
             </h2>
             {anime.data ? <AnimeCardHorizontal anime={anime.data} /> : <Skeleton className="h-40 rounded-2xl" />}
           </section>
@@ -116,7 +117,7 @@ export default function CharacterPage() {
             </h2>
             {anime.data && (
               <Link to={`/anime/${anime.data.id}?tab=characters`} className="text-sm font-semibold text-fg-muted hover:text-fg">
-                Full cast
+                {t('Full cast')}
               </Link>
             )}
           </div>

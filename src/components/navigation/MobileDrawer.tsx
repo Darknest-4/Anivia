@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { LogIn, LogOut, ShieldCheck, UserPlus } from 'lucide-react'
 import { useEffect } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
@@ -49,15 +50,15 @@ export function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => 
       open={open}
       onClose={onClose}
       side="left"
-      title="Menu"
+      title={t('Menu')}
       footer={
         isGuest ? (
           <div className="grid grid-cols-2 gap-2">
             <ButtonLink to="/login" variant="secondary" size="md" leftIcon={<LogIn className="h-4 w-4" />}>
-              Sign in
+              {t('Sign in')}
             </ButtonLink>
             <ButtonLink to="/register" size="md" leftIcon={<UserPlus className="h-4 w-4" />}>
-              Join free
+              {t('Join free')}
             </ButtonLink>
           </div>
         ) : signedIn ? (
@@ -83,13 +84,13 @@ export function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => 
     >
       <div className="px-6 pb-4">
         <Logo />
-        <p className="mt-2 text-xs text-fg-subtle">Discover. Watch. Remember.</p>
+        <p className="mt-2 text-xs text-fg-subtle">{t('Discover. Watch. Remember.')}</p>
       </div>
-      <Section title="Discover" items={[...primaryNav, ...discoverNav]} />
-      <Section title="Library" items={libraryNavWithUpgrade} />
-      {isStaff && <Section title="Staff" items={[{ to: '/admin', label: 'Admin dashboard', icon: ShieldCheck }]} />}
+      <Section title={t('Discover')} items={[...primaryNav, ...discoverNav]} />
+      <Section title={t('Library')} items={libraryNavWithUpgrade} />
+      {isStaff && <Section title={t('Staff')} items={[{ to: '/admin', label: t('Admin dashboard'), icon: ShieldCheck }]} />}
       <div className="px-6 py-4">
-        <p className="eyebrow pb-2">Appearance</p>
+        <p className="eyebrow pb-2">{t('Appearance')}</p>
         <ThemeSegmented />
       </div>
     </Drawer>

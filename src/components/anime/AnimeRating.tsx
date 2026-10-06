@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Star } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { usePreferences } from '@/hooks/useUserData'
@@ -23,7 +24,7 @@ export function AnimeRating({ rating, className, variant = 'plain', size = 'sm' 
         variant === 'plain' && 'text-fg',
         className,
       )}
-      aria-label={`Rated ${formatRating(rating)} out of ${prefs.ratingScale}`}
+      aria-label={t('Rated {p0} out of {p1}', { p0: formatRating(rating), p1: prefs.ratingScale })}
     >
       <Star className={cn('fill-warning text-warning', size === 'sm' ? 'h-3 w-3' : 'h-4 w-4')} aria-hidden />
       {formatRating(rating)}

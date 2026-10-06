@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import type { Anime } from '@/types'
 
 /** Horizontal bar breakdown of the genres in a user's library. */
@@ -6,7 +7,7 @@ export function GenreBreakdown({ anime }: { anime: Anime[] }) {
   for (const a of anime) for (const g of a.genres) counts.set(g.slug, { name: g.name, hue: g.hue, count: (counts.get(g.slug)?.count ?? 0) + 1 })
   const rows = [...counts.values()].sort((a, b) => b.count - a.count).slice(0, 6)
   const max = rows[0]?.count ?? 1
-  if (!rows.length) return <p className="text-sm text-fg-subtle">Add titles to your library to see your genre profile.</p>
+  if (!rows.length) return <p className="text-sm text-fg-subtle">{t('Add titles to your library to see your genre profile.')}</p>
   return (
     <ul className="space-y-3">
       {rows.map((r) => (

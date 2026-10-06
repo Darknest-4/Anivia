@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { AlertTriangle, PlugZap, RefreshCw } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/cn'
@@ -42,12 +43,12 @@ export function ErrorState({ title, description, onRetry, className, variant = '
     <EmptyState
       className={className}
       icon={isApi ? <PlugZap /> : <AlertTriangle />}
-      title={title ?? (isApi ? 'No API configured' : 'Something went wrong.')}
+      title={title ?? (isApi ? t('No API configured') : t('Something went wrong.'))}
       description={
         description ??
         (isApi
-          ? 'Set VITE_API_BASE_URL and register your AnimeProvider to load live data.'
-          : 'Please try again. If the problem persists, check your connection or API configuration.')
+          ? t('Set VITE_API_BASE_URL and register your AnimeProvider to load live data.')
+          : t('Please try again. If the problem persists, check your connection or API configuration.'))
       }
       action={
         <div className="flex flex-col items-center gap-3">
@@ -60,12 +61,12 @@ export function ErrorState({ title, description, onRetry, className, variant = '
           <div className="flex flex-wrap justify-center gap-2">
             {onRetry && (
               <Button variant="secondary" onClick={onRetry} leftIcon={<RefreshCw className="h-4 w-4" />}>
-                Try again
+                {t('Try again')}
               </Button>
             )}
             {!isApi && (
               <ButtonLink to="/status" variant="ghost">
-                Run diagnostics
+                {t('Run diagnostics')}
               </ButtonLink>
             )}
           </div>

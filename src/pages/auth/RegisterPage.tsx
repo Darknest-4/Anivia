@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { MailCheck } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
@@ -13,7 +14,7 @@ import { safeRedirect } from './LoginPage'
 type Errors = Partial<Record<'name' | 'email' | 'password' | 'confirm' | 'terms' | 'form', string>>
 
 export default function RegisterPage() {
-  useDocumentMeta({ title: 'Create account', noindex: true })
+  useDocumentMeta({ title: t('Create account'), noindex: true })
   const auth = useAuth()
   const toast = useToast()
   const navigate = useNavigate()
@@ -32,11 +33,11 @@ export default function RegisterPage() {
   const submit = async (e: FormEvent) => {
     e.preventDefault()
     const v: Errors = {
-      name: form.name.trim().length < 2 ? 'Please enter your name.' : undefined,
-      email: !isEmail(form.email) ? 'Enter a valid email address.' : undefined,
-      password: form.password.length < 8 ? 'Use at least 8 characters.' : undefined,
-      confirm: form.confirm !== form.password ? 'Passwords do not match.' : undefined,
-      terms: !terms ? 'You must accept the terms to continue.' : undefined,
+      name: form.name.trim().length < 2 ? t('Please enter your name.') : undefined,
+      email: !isEmail(form.email) ? t('Enter a valid email address.') : undefined,
+      password: form.password.length < 8 ? t('Use at least 8 characters.') : undefined,
+      confirm: form.confirm !== form.password ? t('Passwords do not match.') : undefined,
+      terms: !terms ? t('You must accept the terms to continue.') : undefined,
     }
     setErrors(v)
     if (Object.values(v).some(Boolean)) return
@@ -45,7 +46,7 @@ export default function RegisterPage() {
       const { needsConfirmation } = await auth.signUp(form.email.trim(), form.password, form.name.trim())
       if (needsConfirmation) setSentTo(form.email.trim())
       else {
-        toast({ title: 'Welcome to ANIVIA!', description: 'Your account is ready.' })
+        toast({ title: t('Welcome to ANIVIA!'), description: t('Your account is ready.') })
         navigate(next, { replace: true })
       }
     } catch (err) {
@@ -61,12 +62,12 @@ export default function RegisterPage() {
         <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-success/15 text-success">
           <MailCheck className="h-8 w-8" />
         </span>
-        <h1 className="mt-6 text-2xl font-bold text-fg">Confirm your email</h1>
+        <h1 className="mt-6 text-2xl font-bold text-fg">{t('Confirm your email')}</h1>
         <p className="mt-2 text-sm text-fg-muted">
           We sent a confirmation link to <span className="font-semibold text-fg">{sentTo}</span>. Click it to activate your account.
         </p>
         <Link to="/login" className="mt-6 inline-block text-sm font-semibold text-accent-soft hover:underline">
-          Back to sign in
+          {t('Back to sign in')}
         </Link>
       </div>
     )
@@ -74,18 +75,18 @@ export default function RegisterPage() {
   if (!registrationOpen)
     return (
       <div className="animate-fade-up text-center">
-        <h1 className="text-2xl font-bold text-fg">Sign-ups are paused</h1>
-        <p className="mt-2 text-sm text-fg-muted">New accounts can’t be created right now. Please check back later.</p>
+        <h1 className="text-2xl font-bold text-fg">{t('Sign-ups are paused')}</h1>
+        <p className="mt-2 text-sm text-fg-muted">{t('New accounts can’t be created right now. Please check back later.')}</p>
         <Link to="/login" className="mt-6 inline-block text-sm font-semibold text-accent-soft hover:underline">
-          Already have an account? Sign in
+          {t('Already have an account? Sign in')}
         </Link>
       </div>
     )
 
   return (
     <div className="animate-fade-up">
-      <AuthHeading title="Create your account" description="Join free — your watchlist and history follow you on every device." />
-      <AniListButton intent="login" label="Sign up with AniList" returnTo={next} className="mb-3" />
+      <AuthHeading title={t('Create your account')} description={t('Join free — your watchlist and history follow you on every device.')} />
+      <AniListButton intent="login" label={t('Sign up with AniList')} returnTo={next} className="mb-3" />
       <SocialButtons />
       <form onSubmit={submit} noValidate className="space-y-4">
         {errors.form && (
@@ -93,22 +94,22 @@ export default function RegisterPage() {
             {errors.form}
           </p>
         )}
-        <Field label="Name" error={errors.name}>
-          {(p) => <Input {...p} autoComplete="name" placeholder="Your name" value={form.name} onChange={set('name')} maxLength={48} />}
+        <Field label={t('Name')} error={errors.name}>
+          {(p) => <Input {...p} autoComplete="name" placeholder={t('Your name')} value={form.name} onChange={set('name')} maxLength={48} />}
         </Field>
-        <Field label="Email" error={errors.email}>
-          {(p) => <Input {...p} type="email" autoComplete="email" placeholder="you@example.com" value={form.email} onChange={set('email')} />}
+        <Field label={t('Email')} error={errors.email}>
+          {(p) => <Input {...p} type="email" autoComplete="email" placeholder={t('you@example.com')} value={form.email} onChange={set('email')} />}
         </Field>
-        <Field label="Password" error={errors.password}>
+        <Field label={t('Password')} error={errors.password}>
           {(p) => (
             <>
-              <PasswordInput {...p} autoComplete="new-password" placeholder="At least 8 characters" value={form.password} onChange={set('password')} />
+              <PasswordInput {...p} autoComplete="new-password" placeholder={t('At least 8 characters')} value={form.password} onChange={set('password')} />
               <StrengthMeter password={form.password} />
             </>
           )}
         </Field>
-        <Field label="Confirm password" error={errors.confirm}>
-          {(p) => <PasswordInput {...p} autoComplete="new-password" placeholder="Repeat password" value={form.confirm} onChange={set('confirm')} />}
+        <Field label={t('Confirm password')} error={errors.confirm}>
+          {(p) => <PasswordInput {...p} autoComplete="new-password" placeholder={t('Repeat password')} value={form.confirm} onChange={set('confirm')} />}
         </Field>
         <div>
           <Checkbox
@@ -118,11 +119,11 @@ export default function RegisterPage() {
               <>
                 I agree to the{' '}
                 <Link to="/terms" className="font-semibold text-accent-soft hover:underline">
-                  Terms of Service
+                  {t('Terms of Service')}
                 </Link>{' '}
                 and{' '}
                 <Link to="/privacy" className="font-semibold text-accent-soft hover:underline">
-                  Privacy Policy
+                  {t('Privacy Policy')}
                 </Link>
                 .
               </>
@@ -131,13 +132,13 @@ export default function RegisterPage() {
           {errors.terms && <p className="mt-1.5 text-xs text-danger">{errors.terms}</p>}
         </div>
         <Button type="submit" size="lg" className="w-full" loading={loading} disabled={auth.status === 'disabled'}>
-          Create account
+          {t('Create account')}
         </Button>
       </form>
       <p className="mt-6 text-center text-sm text-fg-muted">
         Already have an account?{' '}
         <Link to="/login" className="font-semibold text-accent-soft hover:underline">
-          Sign in
+          {t('Sign in')}
         </Link>
       </p>
     </div>

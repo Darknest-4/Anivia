@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { BellRing, CalendarX2, Play } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Badge, EmptyState } from '@/components/ui'
@@ -10,10 +11,10 @@ import type { ScheduleItem, ScheduleStatus } from '@/types'
 import { thumb } from '@/lib/images'
 
 const statusMeta: Record<ScheduleStatus, { label: string; variant: 'success' | 'accent' | 'info' | 'warning' }> = {
-  aired: { label: 'Aired', variant: 'success' },
-  'airing-soon': { label: 'Airing soon', variant: 'accent' },
-  upcoming: { label: 'Upcoming', variant: 'info' },
-  delayed: { label: 'Delayed', variant: 'warning' },
+  aired: { label: t('Aired'), variant: 'success' },
+  'airing-soon': { label: t('Airing soon'), variant: 'accent' },
+  upcoming: { label: t('Upcoming'), variant: 'info' },
+  delayed: { label: t('Delayed'), variant: 'warning' },
 }
 
 function ScheduleRow({ item }: { item: ScheduleItem }) {
@@ -35,8 +36,7 @@ function ScheduleRow({ item }: { item: ScheduleItem }) {
             {item.anime.title}
           </Link>
           <p className="mt-0.5 text-xs text-fg-subtle">
-            Episode {item.episode}
-            {item.anime.episodes ? ` of ${item.anime.episodes}` : ''} · {item.anime.genres[0]?.name}
+            {item.anime.episodes ? t('Episode {p0} of {p1}', { p0: item.episode, p1: item.anime.episodes }) : t('Episode {p0}', { p0: item.episode })} · {item.anime.genres[0]?.name}
           </p>
           <div className="mt-1.5 flex items-center gap-2 sm:hidden">
             <Badge variant={meta.variant}>{meta.label}</Badge>
@@ -54,11 +54,11 @@ function ScheduleRow({ item }: { item: ScheduleItem }) {
             <button
               type="button"
               aria-pressed={Boolean(entry)}
-              aria-label={entry ? 'Reminder on' : `Remind me about ${item.anime.title}`}
+              aria-label={entry ? t('Reminder on') : t('Remind me about {p0}', { p0: item.anime.title })}
               onClick={() => {
                 if (entry) return
                 watchlistService.add(item.animeId, 'watching')
-                toast({ title: 'Reminder set', description: `${item.anime.title} · Episode ${item.episode} at ${item.time}`, icon: BellRing })
+                toast({ title: t('Reminder set'), description: t('{p0} · Episode {p1} at {p2}', { p0: item.anime.title, p1: item.episode, p2: item.time }), icon: BellRing })
               }}
               className={cn('inline-flex h-9 w-9 items-center justify-center rounded-lg transition-colors', entry ? 'bg-accent/15 text-accent-soft' : 'bg-surface-3 text-fg-muted hover:text-fg')}
             >
@@ -79,7 +79,7 @@ export function ScheduleList({ title, date, items }: { title: string; date: Date
         <span className="text-sm text-fg-subtle">{formatDate(date.toISOString(), { month: 'long', day: 'numeric' })}</span>
       </div>
       {items.length === 0 ? (
-        <EmptyState compact icon={<CalendarX2 />} title="No broadcasts scheduled" description="Nothing airs on this day. Check another day of the week." />
+        <EmptyState compact icon={<CalendarX2 />} title={t('No broadcasts scheduled')} description={t('Nothing airs on this day. Check another day of the week.')} />
       ) : (
         <ol className="relative space-y-3 before:absolute before:bottom-2 before:left-[4.35rem] before:top-2 before:hidden before:w-px before:bg-line sm:before:block sm:before:left-[5.6rem]">
           {items.map((item) => (

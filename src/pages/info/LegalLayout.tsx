@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import type { ReactNode } from 'react'
 import { PageHeader } from '@/components/common/PageHeader'
 
@@ -11,9 +12,9 @@ interface LegalSection {
 export function LegalLayout({ title, updated, intro, sections }: { title: string; updated: string; intro: string; sections: LegalSection[] }) {
   return (
     <div className="container-app">
-      <PageHeader crumbs={[{ label: 'Home', to: '/' }, { label: title }]} eyebrow={`Last updated ${updated}`} title={title} description={intro} />
+      <PageHeader crumbs={[{ label: t('Home'), to: '/' }, { label: title }]} eyebrow={t('Last updated {p0}', { p0: updated })} title={title} description={intro} />
       <div className="grid gap-10 lg:grid-cols-[220px_minmax(0,1fr)]">
-        <nav aria-label="On this page" className="hidden lg:block">
+        <nav aria-label={t('On this page')} className="hidden lg:block">
           <ol className="sticky top-[calc(var(--header-h)+1.5rem)] space-y-1 border-l border-line">
             {sections.map((s, i) => (
               <li key={s.id}>

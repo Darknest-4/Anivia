@@ -11,6 +11,7 @@ Ez a lista végigvezet mindenen, amit **a Supabase és a Cloudflare felületén 
    - `supabase/migrations/0003_anivia_platform.sql` (jogosultságok/szerepkörök, feature flagek, látogatottsági statisztika, anime-adatok tárolása, AniList-fiók összekötés, admin funkciók)
    - `supabase/migrations/0004_anivia_oauth_flags.sql` (kapcsolók a Google / Discord / GitHub belépőgombokhoz)
    - `supabase/migrations/0005_anivia_profile_images.sql` (profilkép anime-karakterből és profilbanner — a nyilvános profilon is látszik)
+   - `supabase/migrations/0006_anivia_community.sql` (követés + hírfolyam, értékelések, hozzászólások, saját listák, közösségi pontszám, hibanapló, push-feliratkozások)
 3. Alternatíva a saját gépedről: hozz létre egy `supabase/.env.local` fájlt (nem kerül a repóba):
    ```
    SUPABASE_DB_URL=postgresql://postgres:JELSZÓ@db.wnmvktajokjhufuzpamy.supabase.co:5432/postgres
@@ -46,12 +47,24 @@ Telepítés a saját gépedről (egyszer kell bejelentkezni: `npx supabase login
 npx supabase link --project-ref wnmvktajokjhufuzpamy
 npx supabase functions deploy anilist-auth --no-verify-jwt
 npx supabase functions deploy anilist-proxy --no-verify-jwt
+npx supabase functions deploy send-push --no-verify-jwt
 ```
 Vagy a Supabase felületén: **Edge Functions → Deploy a new function → Via Editor**, név: `anilist-auth`, másold be a `supabase/functions/anilist-auth/index.ts` tartalmát, és kapcsold **ki** a *Verify JWT* opciót. Ugyanígy az `anilist-proxy`-val.
 
 Ellenőrzés: nyisd meg a `https://anivia.animehub.hu/status` oldalt — a „Supabase anime store”, „AniList sign-in function” és „Database” soroknak OK-nak kell lennie.
 
 A beérkezett üzeneteket és hibajelentéseket az **Admin dashboard → Inbox** fülön (vagy a Supabase Table Editorban) látod.
+
+## 1c. Push-értesítés (új epizód akkor is, ha az oldal zárva van) — opcionális
+
+1. Kulcspár készítése a saját gépeden: `npx web-push generate-vapid-keys`
+2. Supabase → **Edge Functions → Secrets** (vagy `npx supabase secrets set ...`):
+   - `VAPID_PUBLIC_KEY` = a kapott *Public Key*
+   - `VAPID_PRIVATE_KEY` = a kapott *Private Key* (**soha ne tedd a repóba**)
+   - `VAPID_SUBJECT` = `mailto:te@example.com`
+   - `CRON_SECRET` = egy hosszú, véletlen szöveg (pl. `openssl rand -hex 32`)
+3. GitHub → repó → **Settings → Secrets and variables → Actions** → *New repository secret*: `CRON_SECRET` (ugyanaz az érték). A `.github/workflows/push-cron.yml` félóránként meghívja a `send-push` függvényt.
+4. Admin → Feature flags: `push_notifications` bekapcsolva. A felhasználók a **Beállítások → Értesítések** alatt kapcsolhatják be.
 
 ## 2. E-mail küldés — élesben kötelező
 
@@ -105,9 +118,13 @@ A gombok csak akkor jelennek meg a belépés/regisztráció oldalon, ha a kapcso
 
 Minden feltöltésnél automatikusan lefut: típusellenőrzés, egységtesztek, build és a Worker ellenőrzése (`.github/workflows/ci.yml`). Ha piros, a GitHub „Actions” fülén látod, mi romlott el.
 
+**Heti adatbázis-mentés** (`.github/workflows/backup.yml`): add hozzá a `SUPABASE_DB_URL` GitHub secretet (a fenti `postgresql://…` cím). Minden vasárnap készül egy `pg_dump`, amit az Actions futás *Artifacts* részéből tölthetsz le (30 napig marad meg).
+
+## 8. Nyelv
+
+A felület magyar és angol. Alapból a böngésző nyelvét követi; átállítható: **Beállítások → Megjelenés → Nyelv**. A fordítások a `src/i18n/hu.ts` fájlban vannak (kulcs = az angol szöveg).
+
 ## Ami még nincs kész (külön döntést igényel)
 
 - **Fizetés (Stripe)**: a Pricing oldal alapból rejtve van (`VITE_ENABLE_PRICING=false`), amíg nincs fizetési rendszer és döntés arról, mit kap az előfizető.
-- **Magyar felület**: a felület jelenleg angol; a fordítás (react-i18next) nagyobb, külön munka.
-- **Push-értesítés zárt böngészőnél**: most az értesítések az app megnyitásakor / nyitott fülnél jelennek meg. Háttérben érkező push-hoz Edge Function + VAPID kulcs kell.
 - **Jogi szövegek**: a Privacy és Terms oldal a valós működést írja le, de élesítés előtt nézesd át jogásszal.

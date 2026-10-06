@@ -1,9 +1,10 @@
+import { t } from '@/i18n'
 import { ExternalLink, Tv } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import type { WatchLink } from '@/types'
 
 /** “Where to watch” buttons linking to licensed streaming services. */
-export function WatchLinks({ links, className, title = 'Where to watch' }: { links?: WatchLink[]; className?: string; title?: string }) {
+export function WatchLinks({ links, className, title = t('Where to watch') }: { links?: WatchLink[]; className?: string; title?: string }) {
   if (!links?.length) return null
   return (
     <section aria-label={title} className={cn('rounded-2xl border border-line bg-surface p-5', className)}>
@@ -11,7 +12,7 @@ export function WatchLinks({ links, className, title = 'Where to watch' }: { lin
         <Tv className="h-4 w-4 text-accent-soft" />
         {title}
       </h2>
-      <p className="mt-1 text-xs text-fg-subtle">Official, licensed streaming services. Availability depends on your region.</p>
+      <p className="mt-1 text-xs text-fg-subtle">{t('Official, licensed streaming services. Availability depends on your region.')}</p>
       <ul className="mt-4 flex flex-wrap gap-2">
         {links.map((l) => (
           <li key={l.url}>

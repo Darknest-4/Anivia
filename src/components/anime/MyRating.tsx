@@ -1,10 +1,11 @@
+import { t } from '@/i18n'
 import { Star, X } from 'lucide-react'
 import { useState } from 'react'
 import { useMyRating } from '@/hooks/useUserData'
 import { cn } from '@/lib/cn'
 import { useToast } from '@/providers/ToastProvider'
 
-const LABELS = ['', 'Appalling', 'Horrible', 'Very bad', 'Bad', 'Average', 'Fine', 'Good', 'Very good', 'Great', 'Masterpiece']
+const LABELS = ['', 'Appalling', 'Horrible', 'Very bad', 'Bad', 'Average', 'Fine', 'Good', 'Very good', 'Great', 'Masterpiece'].map((l) => (l ? t(l) : l))
 
 /** The visitor's personal 1–10 score (stored locally, synced to the account). */
 export function MyRating({ animeId, title, className }: { animeId: string; title: string; className?: string }) {
@@ -13,13 +14,13 @@ export function MyRating({ animeId, title, className }: { animeId: string; title
   const toast = useToast()
   const shown = hover ?? value ?? 0
   return (
-    <section aria-label="Your score" className={cn('rounded-2xl border border-line bg-surface p-5', className)}>
+    <section aria-label={t('Your score')} className={cn('rounded-2xl border border-line bg-surface p-5', className)}>
       <div className="flex items-center justify-between">
-        <h2 className="text-base font-semibold text-fg">Your score</h2>
+        <h2 className="text-base font-semibold text-fg">{t('Your score')}</h2>
         {value !== undefined && (
-          <button type="button" onClick={() => set(null)} className="-my-2 inline-flex items-center gap-1 rounded-md px-1.5 py-2 text-xs font-semibold text-fg-subtle hover:text-fg" aria-label="Remove your score">
+          <button type="button" onClick={() => set(null)} className="-my-2 inline-flex items-center gap-1 rounded-md px-1.5 py-2 text-xs font-semibold text-fg-subtle hover:text-fg" aria-label={t('Remove your score')}>
             <X className="h-3.5 w-3.5" />
-            Clear
+            {t('Clear')}
           </button>
         )}
       </div>
@@ -36,7 +37,7 @@ export function MyRating({ animeId, title, className }: { animeId: string; title
             onBlur={() => setHover(null)}
             onClick={() => {
               set(n)
-              toast({ title: `Rated ${n}/10`, description: title })
+              toast({ title: t('Rated {p0}/10', { p0: n }), description: title })
             }}
             className="rounded p-0.5 transition-transform hover:scale-110"
           >
@@ -45,7 +46,7 @@ export function MyRating({ animeId, title, className }: { animeId: string; title
         ))}
       </div>
       <p className="mt-2 h-4 text-xs font-medium text-fg-muted" aria-live="polite">
-        {shown ? `${shown}/10 · ${LABELS[shown]}` : 'Tap a star to rate'}
+        {shown ? `${shown}/10 · ${LABELS[shown]}` : t('Tap a star to rate')}
       </p>
     </section>
   )

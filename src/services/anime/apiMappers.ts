@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 /**
  * Mapping layer between YOUR API's response shapes and ANIVIA's domain models.
  * The `Api*` interfaces below describe an example snake_case backend — edit them
@@ -154,7 +155,7 @@ export const mapEpisode = (e: ApiEpisode): Episode => ({
   animeId: String(e.anime_id),
   number: e.number,
   season: e.season ?? 1,
-  title: e.title ?? `Episode ${e.number}`,
+  title: e.title ?? t('Episode {p0}', { p0: e.number }),
   synopsis: e.synopsis ?? '',
   airDate: e.air_date ?? '',
   duration: e.duration_seconds ?? 1440,

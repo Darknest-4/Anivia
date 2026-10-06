@@ -69,6 +69,12 @@ async function rpc<T>(fn: string, args: Record<string, unknown> = {}): Promise<T
   return data as T
 }
 
+/** List RPCs: anything that isn't an array (null, an error object from a proxy…) becomes []. */
+async function rpcList<T>(fn: string, args: Record<string, unknown> = {}): Promise<T[]> {
+  const data = await rpc<unknown>(fn, args)
+  return Array.isArray(data) ? (data as T[]) : []
+}
+
 async function table() {
   return getSupabase()
 }
@@ -76,7 +82,7 @@ async function table() {
 export const community = {
   communityScore: (animeId: string) => rpc<{ average: number | null; count: number }>('anime_community_score', { p_anime: animeId }),
 
-  reviews: (animeId: string) => rpc<Review[]>('anime_reviews', { p_anime: animeId, p_limit: 30 }),
+  reviews: (animeId: string) => rpcList<Review>('anime_reviews', { p_anime: animeId, p_limit: 30 }),
   async saveReview(animeId: string, input: { body: string; score: number | null; spoiler: boolean }) {
     const c = await table()
     const { data: s } = await c.auth.getSession()
@@ -90,7 +96,7 @@ export const community = {
     if (error) throw new Error(friendly(error.message))
   },
 
-  comments: (animeId: string, episode: number | null) => rpc<Comment[]>('anime_comments', { p_anime: animeId, p_episode: episode, p_limit: 100 }),
+  comments: (animeId: string, episode: number | null) => rpcList<Comment>('anime_comments', { p_anime: animeId, p_episode: episode, p_limit: 100 }),
   async addComment(animeId: string, episode: number | null, body: string, spoiler: boolean, parentId: number | null = null) {
     const c = await table()
     const { data: s } = await c.auth.getSession()
@@ -114,8 +120,8 @@ export const community = {
       : await c.from('follows').delete().eq('follower', s.session.user.id).eq('followee', userId)
     if (error && !/duplicate key/i.test(error.message)) throw new Error(friendly(error.message))
   },
-  feed: (before?: string) => rpc<Activity[]>('activity_feed', { p_before: before ?? new Date().toISOString(), p_limit: 40 }),
-  profileActivity: (userId: string) => rpc<Activity[]>('profile_activity', { p_user: userId, p_limit: 20 }),
+  feed: (before?: string) => rpcList<Activity>('activity_feed', { p_before: before ?? new Date().toISOString(), p_limit: 40 }),
+  profileActivity: (userId: string) => rpcList<Activity>('profile_activity', { p_user: userId, p_limit: 20 }),
   async logActivity(kind: Activity['kind'], animeId: string | undefined, data: Record<string, unknown> = {}) {
     const c = await table()
     const { data: s } = await c.auth.getSession()
@@ -131,7 +137,7 @@ export const community = {
     if (error) throw new Error(friendly(error.message))
     return (data ?? []) as AnimeList[]
   },
-  publicLists: () => rpc<ListSummary[]>('recent_public_lists', { p_limit: 24 }),
+  publicLists: () => rpcList<ListSummary>('recent_public_lists', { p_limit: 24 }),
   list: (id: string) => rpc<{ list: AnimeList; author: Author; mine: boolean } | null>('list_with_author', { p_id: id }),
   async createList(input: { title: string; description?: string; is_public?: boolean; items?: string[] }) {
     const c = await table()

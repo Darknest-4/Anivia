@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { KeyRound } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -9,7 +10,7 @@ import { useToast } from '@/providers/ToastProvider'
 
 /** Landing page for the password-reset email link (Supabase signs the user in via the link). */
 export default function ResetPasswordPage() {
-  useDocumentMeta({ title: 'Choose a new password', noindex: true })
+  useDocumentMeta({ title: t('Choose a new password'), noindex: true })
   const auth = useAuth()
   const toast = useToast()
   const navigate = useNavigate()
@@ -25,10 +26,10 @@ export default function ResetPasswordPage() {
         <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-warning/15 text-warning">
           <KeyRound className="h-8 w-8" />
         </span>
-        <h1 className="mt-6 text-2xl font-bold text-fg">This reset link is invalid or expired</h1>
-        <p className="mt-2 text-sm text-fg-muted">Request a new link and open it on this device.</p>
+        <h1 className="mt-6 text-2xl font-bold text-fg">{t('This reset link is invalid or expired')}</h1>
+        <p className="mt-2 text-sm text-fg-muted">{t('Request a new link and open it on this device.')}</p>
         <Link to="/forgot-password" className="mt-6 inline-block text-sm font-semibold text-accent-soft hover:underline">
-          Send a new link
+          {t('Send a new link')}
         </Link>
       </div>
     )
@@ -41,7 +42,7 @@ export default function ResetPasswordPage() {
     setLoading(true)
     try {
       await auth.updatePassword(password)
-      toast({ title: 'Password updated', description: 'You’re signed in with your new password.' })
+      toast({ title: t('Password updated'), description: t('You’re signed in with your new password.') })
       navigate('/', { replace: true })
     } catch (err) {
       setError((err as Error).message)
@@ -52,9 +53,9 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="animate-fade-up">
-      <AuthHeading title="Choose a new password" description={`For ${auth.email ?? 'your account'}`} />
+      <AuthHeading title={t('Choose a new password')} description={t('For {p0}', { p0: auth.email ?? 'your account' })} />
       <form onSubmit={submit} noValidate className="space-y-4">
-        <Field label="New password" error={error}>
+        <Field label={t('New password')} error={error}>
           {(p) => (
             <>
               <PasswordInput {...p} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
@@ -62,9 +63,9 @@ export default function ResetPasswordPage() {
             </>
           )}
         </Field>
-        <Field label="Confirm new password">{(p) => <PasswordInput {...p} autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} />}</Field>
+        <Field label={t('Confirm new password')}>{(p) => <PasswordInput {...p} autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} />}</Field>
         <Button type="submit" size="lg" className="w-full" loading={loading}>
-          Update password
+          {t('Update password')}
         </Button>
       </form>
     </div>

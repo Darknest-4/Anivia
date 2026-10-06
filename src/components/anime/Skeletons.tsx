@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Skeleton, SkeletonText } from '@/components/ui'
 import { cn } from '@/lib/cn'
 
@@ -33,7 +34,7 @@ export function AnimeRowSkeleton({ count = 6 }: { count?: number }) {
 
 export function HeroSkeleton() {
   return (
-    <div className="relative h-[78svh] min-h-[540px] w-full overflow-hidden bg-surface lg:h-[86vh] lg:max-h-[860px]" aria-busy="true" aria-label="Loading featured anime">
+    <div className="relative h-[78svh] min-h-[540px] w-full overflow-hidden bg-surface lg:h-[86vh] lg:max-h-[860px]" aria-busy="true" aria-label={t('Loading featured anime')}>
       <Skeleton className="absolute inset-0 rounded-none" />
       <div className="container-app relative flex h-full flex-col justify-end pb-20 lg:justify-center lg:pb-0">
         <Skeleton className="h-4 w-32" />
@@ -51,7 +52,7 @@ export function HeroSkeleton() {
 
 export function DetailsSkeleton() {
   return (
-    <div aria-busy="true" aria-label="Loading anime details">
+    <div aria-busy="true" aria-label={t('Loading anime details')}>
       <Skeleton className="h-[42vh] min-h-[300px] w-full rounded-none" />
       <div className="container-app -mt-40 flex flex-col gap-6 md:flex-row">
         <Skeleton className="aspect-[2/3] w-40 shrink-0 rounded-2xl md:w-60" />
@@ -71,7 +72,7 @@ export function DetailsSkeleton() {
 
 export function EpisodeSkeleton({ count = 6 }: { count?: number }) {
   return (
-    <div className="space-y-3" aria-busy="true" aria-label="Loading episodes">
+    <div className="space-y-3" aria-busy="true" aria-label={t('Loading episodes')}>
       {Array.from({ length: count }, (_, i) => (
         <div key={i} className="flex gap-3 rounded-xl p-2">
           <Skeleton className="aspect-video w-32 shrink-0 rounded-lg sm:w-40" />
@@ -88,7 +89,7 @@ export function EpisodeSkeleton({ count = 6 }: { count?: number }) {
 
 export function PageSkeleton() {
   return (
-    <div className="container-app py-10" aria-busy="true" aria-label="Loading page">
+    <div className="container-app py-10" aria-busy="true" aria-label={t('Loading page')}>
       <Skeleton className="h-4 w-28" />
       <Skeleton className="mt-4 h-10 w-72" />
       <Skeleton className="mt-3 h-4 w-96 max-w-full" />

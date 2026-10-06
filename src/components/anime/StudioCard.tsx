@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { ArrowUpRight, Film, MapPin } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { cn } from '@/lib/cn'
@@ -39,11 +40,11 @@ export function StudioCard({ studio, posters = [], className }: { studio: Studio
             {studio.country}
           </span>
         )}
-        {studio.founded ? <span>Est. {studio.founded}</span> : null}
+        {studio.founded ? <span>{t('Est. {p0}', { p0: studio.founded })}</span> : null}
         {studio.animeCount !== undefined && (
           <span className="inline-flex items-center gap-1">
             <Film className="h-3.5 w-3.5" />
-            {studio.animeCount} titles
+            {t('{p0} titles', { p0: studio.animeCount })}
           </span>
         )}
       </div>

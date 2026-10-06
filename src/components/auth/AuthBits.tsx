@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Eye, EyeOff, GitBranch, Loader2, MessageCircle } from 'lucide-react'
 import { forwardRef, useState, type InputHTMLAttributes } from 'react'
 import { Input } from '@/components/ui'
@@ -39,9 +40,9 @@ export function SocialButtons() {
   const [busy, setBusy] = useState<OAuthProvider | null>(null)
   const items = (
     [
-      { id: 'google', label: 'Google', icon: <span className="font-display text-base font-bold">G</span> },
-      { id: 'discord', label: 'Discord', icon: <MessageCircle className="h-4 w-4" /> },
-      { id: 'github', label: 'GitHub', icon: <GitBranch className="h-4 w-4" /> },
+      { id: 'google', label: t('Google'), icon: <span className="font-display text-base font-bold">G</span> },
+      { id: 'discord', label: t('Discord'), icon: <MessageCircle className="h-4 w-4" /> },
+      { id: 'github', label: t('GitHub'), icon: <GitBranch className="h-4 w-4" /> },
     ] as { id: OAuthProvider; label: string; icon: React.ReactNode }[]
   ).filter((i) => flag(`oauth_${i.id}`)) // enabled per provider in Admin → Feature flags
   // Nothing above the email form → no "or continue with email" divider either.
@@ -59,11 +60,11 @@ export function SocialButtons() {
               try {
                 await signInWithProvider(i.id)
               } catch (e) {
-                toast({ title: `${i.label} sign-in unavailable`, description: (e as Error).message, variant: 'error' })
+                toast({ title: t('{p0} sign-in unavailable', { p0: i.label }), description: (e as Error).message, variant: 'error' })
                 setBusy(null)
               }
             }}
-            aria-label={`Continue with ${i.label}`}
+            aria-label={t('Continue with {p0}', { p0: i.label })}
             className="flex h-11 items-center justify-center gap-2 rounded-lg border border-line bg-surface-2 text-[13px] font-semibold text-fg-muted transition-colors hover:border-line-strong hover:text-fg disabled:opacity-60"
           >
             {busy === i.id ? <Loader2 className="h-4 w-4 animate-spin" /> : i.icon}
@@ -73,7 +74,7 @@ export function SocialButtons() {
       </div>}
       <div className={cn('flex items-center gap-3 text-xs text-fg-subtle', items.length ? 'my-6' : 'mb-6 mt-3')}>
         <span className="h-px flex-1 bg-line" />
-        or continue with email
+        {t('or continue with email')}
         <span className="h-px flex-1 bg-line" />
       </div>
     </div>

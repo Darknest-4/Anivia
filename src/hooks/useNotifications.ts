@@ -1,3 +1,4 @@
+import { locale, t } from '@/i18n'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo } from 'react'
 import { anilistAuthed } from '@/services/anilistAccount/api'
@@ -35,8 +36,8 @@ export function buildNotifications(list: Anime[], now = Date.now()): AppNotifica
           id: `ep:${a.id}:${a.episodesAired}`,
           kind: 'episode',
           anime: a,
-          title: 'New episode',
-          body: `${a.title} · Episode ${a.episodesAired} is out.`,
+          title: t('New episode'),
+          body: t('{p0} · Episode {p1} is out.', { p0: a.title, p1: a.episodesAired }),
           at: new Date(lastAired).toISOString(),
           to: `/anime/${a.id}/watch?ep=${a.episodesAired}`,
         })
@@ -46,8 +47,8 @@ export function buildNotifications(list: Anime[], now = Date.now()): AppNotifica
         id: `soon:${a.id}:${(a.episodesAired ?? 0) + 1}`,
         kind: 'soon',
         anime: a,
-        title: 'Airing soon',
-        body: `${a.title} · Episode ${(a.episodesAired ?? 0) + 1} airs ${new Date(next).toLocaleString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' })}.`,
+        title: t('Airing soon'),
+        body: t('{p0} · Episode {p1} airs {p2}.', { p0: a.title, p1: (a.episodesAired ?? 0) + 1, p2: new Date(next).toLocaleString(locale, { weekday: 'short', hour: '2-digit', minute: '2-digit' }) }),
         at: new Date(next).toISOString(),
         to: `/anime/${a.id}`,
       })
@@ -58,8 +59,8 @@ export function buildNotifications(list: Anime[], now = Date.now()): AppNotifica
           id: `premiere:${a.id}`,
           kind: 'premiere',
           anime: a,
-          title: 'Premiere coming up',
-          body: `${a.title} premieres ${new Date(start).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}.`,
+          title: t('Premiere coming up'),
+          body: t('{p0} premieres {p1}.', { p0: a.title, p1: new Date(start).toLocaleDateString(locale, { month: 'short', day: 'numeric' }) }),
           at: new Date(start).toISOString(),
           to: `/anime/${a.id}`,
         })
@@ -86,8 +87,8 @@ function fromAniList(n: AlNote): AppNotification | null {
   const anime = { id: String(n.media.id), slug: String(n.media.id), title, description: '', poster: n.media.coverImage.large ?? '', popularity: 0, status: 'airing', type: 'TV', genres: [], studios: [], languages: [], updatedAt: '' } as Anime
   const at = new Date(n.createdAt * 1000).toISOString()
   return n.type === 'AIRING'
-    ? { id: `ep:${anime.id}:${n.episode}`, kind: 'episode', anime, title: 'New episode', body: `${title} · Episode ${n.episode} aired.`, at, to: `/anime/${anime.id}/watch?ep=${n.episode}` }
-    : { id: `al:${n.id}`, kind: 'related', anime, title: 'New related anime', body: `${title} was added to AniList.`, at, to: `/anime/${anime.id}` }
+    ? { id: `ep:${anime.id}:${n.episode}`, kind: 'episode', anime, title: t('New episode'), body: t('{p0} · Episode {p1} aired.', { p0: title, p1: n.episode }), at, to: `/anime/${anime.id}/watch?ep=${n.episode}` }
+    : { id: `al:${n.id}`, kind: 'related', anime, title: t('New related anime'), body: t('{p0} was added to AniList.', { p0: title }), at, to: `/anime/${anime.id}` }
 }
 
 /** The connected AniList account's own airing / related-media notifications. */

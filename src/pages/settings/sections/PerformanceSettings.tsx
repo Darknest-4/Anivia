@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { useQueryClient } from '@tanstack/react-query'
 import { Database, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -26,31 +27,31 @@ export function PerformanceSettings({ prefs, set }: { prefs: Preferences; set: S
 
   return (
     <>
-      <Card title="Speed" description="Tune how aggressively ANIVIA loads data ahead of time.">
+      <Card title={t('Speed')} description={t('Tune how aggressively ANIVIA loads data ahead of time.')}>
         <Row>
           <Switch
-            label="Offline cache"
-            description="Keep catalog data in this browser for instant reloads and offline browsing (24 h). Takes effect after a reload."
+            label={t('Offline cache')}
+            description={t('Keep catalog data in this browser for instant reloads and offline browsing (24 h). Takes effect after a reload.')}
             checked={prefs.offlineCache}
             onChange={(v) => set('offlineCache', v)}
           />
         </Row>
         <Row>
-          <Switch label="Prefetch on hover" description="Start loading a title’s page as soon as you point at it." checked={prefs.prefetchOnHover} onChange={(v) => set('prefetchOnHover', v)} />
+          <Switch label={t('Prefetch on hover')} description={t('Start loading a title’s page as soon as you point at it.')} checked={prefs.prefetchOnHover} onChange={(v) => set('prefetchOnHover', v)} />
         </Row>
         <Row>
           <Switch
-            label="Data saver"
-            description="Smaller images, no prefetching, no autoplaying trailers or spotlight rotation."
+            label={t('Data saver')}
+            description={t('Smaller images, no prefetching, no autoplaying trailers or spotlight rotation.')}
             checked={prefs.dataSaver}
             onChange={(v) => set('dataSaver', v)}
           />
         </Row>
         <Row>
-          <Switch label="Autoplay trailers" description="Start a title’s official trailer automatically on its page." checked={prefs.autoplayTrailers} onChange={(v) => set('autoplayTrailers', v)} />
+          <Switch label={t('Autoplay trailers')} description={t('Start a title’s official trailer automatically on its page.')} checked={prefs.autoplayTrailers} onChange={(v) => set('autoplayTrailers', v)} />
         </Row>
       </Card>
-      <Card title="Storage">
+      <Card title={t('Storage')}>
         <Row>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
@@ -58,7 +59,7 @@ export function PerformanceSettings({ prefs, set }: { prefs: Preferences; set: S
                 <Database className="h-5 w-5" />
               </span>
               <div>
-                <p className="text-sm font-medium text-fg">Cached catalog data</p>
+                <p className="text-sm font-medium text-fg">{t('Cached catalog data')}</p>
                 <p className="text-[13px] text-fg-subtle">{size ? `${formatNumber(Math.round(size / 1024))} KB stored in this browser` : 'Nothing cached yet'}</p>
               </div>
             </div>
@@ -74,10 +75,10 @@ export function PerformanceSettings({ prefs, set }: { prefs: Preferences; set: S
                   /* ignore */
                 }
                 setSize(0)
-                toast({ title: 'Cache cleared', description: 'Fresh data will be loaded as you browse.', variant: 'info' })
+                toast({ title: t('Cache cleared'), description: t('Fresh data will be loaded as you browse.'), variant: 'info' })
               }}
             >
-              Clear cache
+              {t('Clear cache')}
             </Button>
           </div>
         </Row>

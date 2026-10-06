@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { useQueries } from '@tanstack/react-query'
 import { Sparkles } from 'lucide-react'
 import { useMemo } from 'react'
@@ -13,7 +14,7 @@ import { ratingsStore } from '@/services/user/stores'
 
 /** "What should I watch?" — personal picks from your scores, favourites and library. */
 export default function ForYouPage() {
-  useDocumentMeta({ title: 'For you', description: 'Personal anime recommendations based on your scores and library.', noindex: true })
+  useDocumentMeta({ title: t('For you'), description: t('Personal anime recommendations based on your scores and library.'), noindex: true })
   const ratings = useStore(ratingsStore)
   const { ids: favorites } = useFavorites()
   const { items: watchlist } = useWatchlist()
@@ -40,14 +41,14 @@ export default function ForYouPage() {
   return (
     <div className="pb-10">
       <PageHeader
-        eyebrow="Discover"
-        title="What should I watch?"
-        description={seeds.length ? 'Picked from the titles you scored highly, favourited and finished — the more you rate, the better it gets.' : 'Rate a few titles or add them to your watchlist and this page learns your taste.'}
+        eyebrow={t('Discover')}
+        title={t('What should I watch?')}
+        description={seeds.length ? t('Picked from the titles you scored highly, favourited and finished — the more you rate, the better it gets.') : t('Rate a few titles or add them to your watchlist and this page learns your taste.')}
       />
       {!seeds.length ? (
         <>
-          <EmptyState icon={<Sparkles />} title="Tell us what you like" description="Score some anime you’ve seen (1–10) or add favourites — recommendations appear here." action={<ButtonLink to="/browse?sort=rating">Find titles to rate</ButtonLink>} />
-          <h2 className="mb-4 mt-10 text-lg font-semibold text-fg">Highest rated, meanwhile</h2>
+          <EmptyState icon={<Sparkles />} title={t('Tell us what you like')} description={t('Score some anime you’ve seen (1–10) or add favourites — recommendations appear here.')} action={<ButtonLink to="/browse?sort=rating">{t('Find titles to rate')}</ButtonLink>} />
+          <h2 className="mb-4 mt-10 text-lg font-semibold text-fg">{t('Highest rated, meanwhile')}</h2>
           <ul className={gridClasses.dense}>
             {(fallback.data ?? []).slice(0, 12).map((a) => (
               <li key={a.id}>

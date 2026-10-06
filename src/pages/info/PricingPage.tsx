@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Check, Minus, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -8,9 +9,9 @@ import { cn } from '@/lib/cn'
 type Billing = 'monthly' | 'yearly'
 
 const plans = [
-  { id: 'free', name: 'Free', price: 0, tagline: 'Start exploring the catalog.', features: ['Full catalog browsing', 'Watchlist & history', 'HD streaming with ads', '1 screen'], cta: 'Current plan' },
-  { id: 'plus', name: 'Plus', price: 6.99, tagline: 'Ad-free viewing for every fan.', features: ['Everything in Free', 'No ads', 'Full HD 1080p', '2 screens at once', 'New episodes 1 hour after Japan'], cta: 'Choose Plus', popular: true },
-  { id: 'pro', name: 'Pro', price: 11.99, tagline: 'The ultimate anime experience.', features: ['Everything in Plus', '4K Ultra HD where available', '4 screens at once', 'Offline downloads', 'Early access to premieres'], cta: 'Choose Pro' },
+  { id: 'free', name: t('Free'), price: 0, tagline: t('Start exploring the catalog.'), features: ['Full catalog browsing', 'Watchlist & history', 'HD streaming with ads', '1 screen'], cta: t('Current plan') },
+  { id: 'plus', name: t('Plus'), price: 6.99, tagline: t('Ad-free viewing for every fan.'), features: ['Everything in Free', 'No ads', 'Full HD 1080p', '2 screens at once', 'New episodes 1 hour after Japan'], cta: t('Choose Plus'), popular: true },
+  { id: 'pro', name: t('Pro'), price: 11.99, tagline: t('The ultimate anime experience.'), features: ['Everything in Plus', '4K Ultra HD where available', '4 screens at once', 'Offline downloads', 'Early access to premieres'], cta: t('Choose Pro') },
 ]
 
 const comparison: [string, (string | boolean)[]][] = [
@@ -30,23 +31,23 @@ const faqs = [
 ]
 
 export default function PricingPage() {
-  useDocumentMeta({ title: 'Pricing', description: 'Compare ANIVIA plans — Free, Plus and Pro.' })
+  useDocumentMeta({ title: t('Pricing'), description: t('Compare ANIVIA plans — Free, Plus and Pro.') })
   const [billing, setBilling] = useState<Billing>('monthly')
   const [selected, setSelected] = useState<string | null>(null)
   const price = (p: number) => (billing === 'yearly' ? p * 10 : p)
 
   return (
     <div className="container-app">
-      <PageHeader className="text-center [&>div]:items-center [&>div]:justify-center [&_p]:mx-auto" eyebrow="Plans" title="Pick the plan that fits your watchlist" description="Simple pricing. Upgrade, downgrade or cancel anytime." />
+      <PageHeader className="text-center [&>div]:items-center [&>div]:justify-center [&_p]:mx-auto" eyebrow={t('Plans')} title={t('Pick the plan that fits your watchlist')} description={t('Simple pricing. Upgrade, downgrade or cancel anytime.')} />
       <div className="flex justify-center">
         <Tabs
           items={[
-            { value: 'monthly', label: 'Monthly' },
-            { value: 'yearly', label: <span className="flex items-center gap-1.5">Yearly <Badge variant="success">2 months free</Badge></span> },
+            { value: 'monthly', label: t('Monthly') },
+            { value: 'yearly', label: <span className="flex items-center gap-1.5">{t('Yearly')}{' '}<Badge variant="success">{t('2 months free')}</Badge></span> },
           ]}
           value={billing}
           onChange={setBilling}
-          label="Billing period"
+          label={t('Billing period')}
           variant="segmented"
           idPrefix="billing"
         />
@@ -86,7 +87,7 @@ export default function PricingPage() {
 
       <section aria-labelledby="compare-heading" className="mx-auto mt-20 max-w-5xl">
         <h2 id="compare-heading" className="mb-6 text-center text-2xl font-bold text-fg">
-          Compare features
+          {t('Compare features')}
         </h2>
         {/* Desktop table */}
         <div className="hidden overflow-hidden rounded-2xl border border-line md:block">
@@ -94,7 +95,7 @@ export default function PricingPage() {
             <thead className="bg-surface-2 text-fg">
               <tr>
                 <th scope="col" className="px-5 py-3 font-semibold">
-                  Feature
+                  {t('Feature')}
                 </th>
                 {plans.map((p) => (
                   <th key={p.id} scope="col" className="px-5 py-3 text-center font-semibold">
@@ -111,7 +112,7 @@ export default function PricingPage() {
                   </th>
                   {values.map((v, i) => (
                     <td key={i} className="px-5 py-3.5 text-center text-fg">
-                      {v === true ? <Check className="mx-auto h-4 w-4 text-success" aria-label="Included" /> : v === false ? <Minus className="mx-auto h-4 w-4 text-fg-subtle" aria-label="Not included" /> : v}
+                      {v === true ? <Check className="mx-auto h-4 w-4 text-success" aria-label={t('Included')} /> : v === false ? <Minus className="mx-auto h-4 w-4 text-fg-subtle" aria-label={t('Not included')} /> : v}
                     </td>
                   ))}
                 </tr>
@@ -139,7 +140,7 @@ export default function PricingPage() {
 
       <section aria-labelledby="faq-heading" className="mx-auto mt-20 max-w-3xl">
         <h2 id="faq-heading" className="mb-6 text-center text-2xl font-bold text-fg">
-          Frequently asked questions
+          {t('Frequently asked questions')}
         </h2>
         <div className="space-y-3">
           {faqs.map(([q, a]) => (
@@ -159,13 +160,13 @@ export default function PricingPage() {
       <Dialog
         open={Boolean(selected)}
         onClose={() => setSelected(null)}
-        title={`Upgrade to ${selected}`}
-        description="Payments are not processed in this template."
+        title={t('Upgrade to {p0}', { p0: selected })}
+        description={t('Payments are not processed in this template.')}
         icon={<Sparkles className="h-5 w-5" />}
-        footer={<Button onClick={() => setSelected(null)}>Got it</Button>}
+        footer={<Button onClick={() => setSelected(null)}>{t('Got it')}</Button>}
       >
         <p className="text-sm leading-relaxed text-fg-muted">
-          ANIVIA is a frontend template — no checkout, billing or subscription logic is included. Connect your preferred payment provider and subscription backend to complete this flow.
+          {t('ANIVIA is a frontend template — no checkout, billing or subscription logic is included. Connect your preferred payment provider and subscription backend to complete this flow.')}
         </p>
       </Dialog>
     </div>

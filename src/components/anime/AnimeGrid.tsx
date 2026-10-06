@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { usePreferences } from '@/hooks/useUserData'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/cn'
@@ -27,7 +28,7 @@ export function AnimeGrid({ items, loading, skeletonCount = 12, empty, className
   const density = densityProp ?? (prefs.density === 'compact' ? 'dense' : 'comfortable')
   if (loading && !items?.length) {
     return (
-      <div className={cn(gridClasses[density], className)} aria-busy="true" aria-label="Loading anime">
+      <div className={cn(gridClasses[density], className)} aria-busy="true" aria-label={t('Loading anime')}>
         {Array.from({ length: skeletonCount }, (_, i) => (
           <AnimeCardSkeleton key={i} />
         ))}

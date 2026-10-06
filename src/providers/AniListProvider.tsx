@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '@/hooks/useUserData'
@@ -54,20 +55,20 @@ export function AniListProvider({ children }: { children: ReactNode }) {
             setLinked(true)
             toast(
               res.mode === 'signed-in'
-                ? { title: res.created ? 'Welcome to ANIVIA!' : 'Signed in with AniList', description: res.created ? 'Your account was created from your AniList profile.' : 'Your AniList list is syncing now.' }
-                : { title: 'AniList connected', description: 'Saved to your account — it stays connected on every device until you disconnect it.' },
+                ? { title: res.created ? t('Welcome to ANIVIA!') : t('Signed in with AniList'), description: res.created ? t('Your account was created from your AniList profile.') : t('Your AniList list is syncing now.') }
+                : { title: t('AniList connected'), description: t('Saved to your account — it stays connected on every device until you disconnect it.') },
             )
           } catch (err) {
             toast(
               intent === 'login'
-                ? { title: 'AniList sign-in failed', description: (err as Error).message, variant: 'error' }
-                : { title: 'AniList connected on this device', description: (err as Error).message, variant: 'info' },
+                ? { title: t('AniList sign-in failed'), description: (err as Error).message, variant: 'error' }
+                : { title: t('AniList connected on this device'), description: (err as Error).message, variant: 'info' },
             )
           }
-        } else toast({ title: 'AniList connected', description: 'Your list is syncing now.' })
+        } else toast({ title: t('AniList connected'), description: t('Your list is syncing now.') })
         navigate(back, { replace: true })
       } catch (err) {
-        toast({ title: 'AniList connection failed', description: (err as Error).message, variant: 'error' })
+        toast({ title: t('AniList connection failed'), description: (err as Error).message, variant: 'error' })
       } finally {
         setConnecting(false)
       }
@@ -144,8 +145,8 @@ export function AniListProvider({ children }: { children: ReactNode }) {
             // AniList was the only sign-in on this device → treat it like signing out.
             const { clearAccountData } = await import('@/services/user/clearLocal')
             clearAccountData()
-            toast({ title: 'Signed out of AniList', description: 'Your data was removed from this device. It’s still on AniList.', variant: 'info' })
-          } else toast({ title: 'AniList disconnected', description: 'Your ANIVIA library is kept.', variant: 'info' })
+            toast({ title: t('Signed out of AniList'), description: t('Your data was removed from this device. It’s still on AniList.'), variant: 'info' })
+          } else toast({ title: t('AniList disconnected'), description: t('Your ANIVIA library is kept.'), variant: 'info' })
         },
         syncNow,
       }}

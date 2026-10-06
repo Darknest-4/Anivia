@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { LayoutGrid, List } from 'lucide-react'
 import { cn } from '@/lib/cn'
 
@@ -5,11 +6,11 @@ export type ViewMode = 'grid' | 'list'
 
 export function ViewToggle({ value, onChange }: { value: ViewMode; onChange: (v: ViewMode) => void }) {
   return (
-    <div role="radiogroup" aria-label="View mode" className="inline-flex rounded-lg border border-line bg-surface-2 p-0.5">
+    <div role="radiogroup" aria-label={t('View mode')} className="inline-flex rounded-lg border border-line bg-surface-2 p-0.5">
       {(
         [
-          { v: 'grid', icon: LayoutGrid, label: 'Grid view' },
-          { v: 'list', icon: List, label: 'List view' },
+          { v: 'grid', icon: LayoutGrid, label: t('Grid view') },
+          { v: 'list', icon: List, label: t('List view') },
         ] as const
       ).map(({ v, icon: Icon, label }) => (
         <button

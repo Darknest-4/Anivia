@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ListPlus, Lock } from 'lucide-react'
 import { useState } from 'react'
@@ -27,7 +28,7 @@ function Covers({ ids }: { ids: string[] }) {
 
 /** Your lists and the newest public lists from the community. */
 export default function ListsPage() {
-  useDocumentMeta({ title: 'Lists', description: 'Custom anime lists made by ANIVIA members.' })
+  useDocumentMeta({ title: t('Lists'), description: t('Custom anime lists made by ANIVIA members.') })
   const { status } = useAuth()
   const navigate = useNavigate()
   const toast = useToast()
@@ -43,30 +44,30 @@ export default function ListsPage() {
       void client.invalidateQueries({ queryKey: ['lists'] })
       navigate(`/lists/${list.id}`)
     },
-    onError: (e: Error) => toast({ title: 'Couldn’t create the list', description: e.message, variant: 'error' }),
+    onError: (e: Error) => toast({ title: t('Couldn’t create the list'), description: e.message, variant: 'error' }),
   })
 
   return (
     <div className="container-app pb-10">
       <PageHeader
-        eyebrow="Community"
-        title="Lists"
-        description="Make your own lists — “Best isekai”, “Cozy winter anime” — and share them."
+        eyebrow={t('Community')}
+        title={t('Lists')}
+        description={t('Make your own lists — “Best isekai”, “Cozy winter anime” — and share them.')}
         actions={
           status === 'signed-in' ? (
             <Button leftIcon={<ListPlus className="h-4 w-4" />} onClick={() => setOpen(true)}>
-              New list
+              {t('New list')}
             </Button>
           ) : undefined
         }
       />
       {status === 'signed-in' && (
         <section className="mb-10">
-          <h2 className="mb-4 text-lg font-semibold text-fg">Your lists</h2>
+          <h2 className="mb-4 text-lg font-semibold text-fg">{t('Your lists')}</h2>
           {mine.isLoading ? (
             <Skeleton className="h-28 rounded-2xl" />
           ) : !mine.data?.length ? (
-            <EmptyState compact icon={<ListPlus />} title="No lists yet" description="Create one, then add titles from any anime page." />
+            <EmptyState compact icon={<ListPlus />} title={t('No lists yet')} description={t('Create one, then add titles from any anime page.')} />
           ) : (
             <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {mine.data.map((l) => (
@@ -78,7 +79,7 @@ export default function ListsPage() {
                         {!l.is_public && <Lock className="h-3.5 w-3.5 text-fg-subtle" />}
                         {l.title}
                       </p>
-                      <p className="text-xs text-fg-subtle">{l.items.length} titles</p>
+                      <p className="text-xs text-fg-subtle">{t('{p0} titles', { p0: l.items.length })}</p>
                     </div>
                   </Link>
                 </li>
@@ -88,11 +89,11 @@ export default function ListsPage() {
         </section>
       )}
       <section>
-        <h2 className="mb-4 text-lg font-semibold text-fg">From the community</h2>
+        <h2 className="mb-4 text-lg font-semibold text-fg">{t('From the community')}</h2>
         {recent.isLoading ? (
           <Skeleton className="h-28 rounded-2xl" />
         ) : !recent.data?.length ? (
-          <EmptyState compact icon={<ListPlus />} title="No public lists yet" description={recent.isError ? (recent.error as Error).message : 'Be the first to make one.'} />
+          <EmptyState compact icon={<ListPlus />} title={t('No public lists yet')} description={recent.isError ? (recent.error as Error).message: t('Be the first to make one.')} />
         ) : (
           <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {recent.data.map((l) => (
@@ -102,7 +103,7 @@ export default function ListsPage() {
                   <div className="min-w-0">
                     <p className="font-semibold text-fg">{l.title}</p>
                     <p className="line-clamp-2 text-xs text-fg-muted">{l.description}</p>
-                    <p className="mt-1 text-xs text-fg-subtle">{l.items.length} titles</p>
+                    <p className="mt-1 text-xs text-fg-subtle">{t('{p0} titles', { p0: l.items.length })}</p>
                   </div>
                 </Link>
                 <AuthorLine author={l.author} at={l.updated_at} className="mt-3" />
@@ -114,22 +115,22 @@ export default function ListsPage() {
       <Dialog
         open={open}
         onClose={() => setOpen(false)}
-        title="New list"
+        title={t('New list')}
         footer={
           <>
             <Button variant="ghost" onClick={() => setOpen(false)}>
-              Cancel
+              {t('Cancel')}
             </Button>
             <Button loading={create.isPending} disabled={!form.title.trim()} onClick={() => create.mutate()}>
-              Create
+              {t('Create')}
             </Button>
           </>
         }
       >
         <div className="space-y-4">
-          <Field label="Title">{(p) => <Input {...p} maxLength={80} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="e.g. Cozy winter anime" />}</Field>
-          <Field label="Description">{(p) => <Textarea {...p} maxLength={500} rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />}</Field>
-          <Switch label="Public" description="Anyone with the link can see it, and it appears under “From the community”." checked={form.is_public} onChange={(v) => setForm({ ...form, is_public: v })} />
+          <Field label={t('Title')}>{(p) => <Input {...p} maxLength={80} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder={t('e.g. Cozy winter anime')} />}</Field>
+          <Field label={t('Description')}>{(p) => <Textarea {...p} maxLength={500} rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />}</Field>
+          <Switch label={t('Public')} description={t('Anyone with the link can see it, and it appears under “From the community”.')} checked={form.is_public} onChange={(v) => setForm({ ...form, is_public: v })} />
         </div>
       </Dialog>
     </div>

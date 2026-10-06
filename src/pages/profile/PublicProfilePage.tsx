@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { useQuery } from '@tanstack/react-query'
 import { CalendarDays, Lock, Star, UserX } from 'lucide-react'
 import { useMemo, useState } from 'react'
@@ -35,7 +36,7 @@ export default function PublicProfilePage() {
   if (!profilesOn)
     return (
       <div className="container-app py-16">
-        <EmptyState icon={<UserX />} title="Public profiles are turned off" description="Profile pages are temporarily unavailable." />
+        <EmptyState icon={<UserX />} title={t('Public profiles are turned off')} description={t('Profile pages are temporarily unavailable.')} />
       </div>
     )
   if (query.isLoading)
@@ -56,7 +57,7 @@ export default function PublicProfilePage() {
     return (
       <div className="container-app py-16">
         <h1 className="sr-only">@{username}</h1>
-        <EmptyState icon={<Lock />} title="This profile is private or doesn’t exist" description={`@${username} hasn’t shared a public profile.`} />
+        <EmptyState icon={<Lock />} title={t('This profile is private or doesn’t exist')} description={t('@{p0} hasn’t shared a public profile.', { p0: username })} />
       </div>
     )
 
@@ -64,11 +65,11 @@ export default function PublicProfilePage() {
   const counts: Record<string, number> = {}
   for (const w of data.watchlist) counts[w.status] = (counts[w.status] ?? 0) + 1
   const tabs = [
-    { value: 'watchlist' as const, label: 'Watchlist', count: data.watchlist.length },
-    { value: 'favorites' as const, label: 'Favorites', count: data.favorites.length },
-    { value: 'rated' as const, label: 'Rated', count: ratedIds.length },
-    ...(p.show_history ? [{ value: 'history' as const, label: 'Recently watched', count: historyIds.length }] : []),
-    ...(socialOn ? [{ value: 'activity' as const, label: 'Activity' }] : []),
+    { value: 'watchlist' as const, label: t('Watchlist'), count: data.watchlist.length },
+    { value: 'favorites' as const, label: t('Favorites'), count: data.favorites.length },
+    { value: 'rated' as const, label: t('Rated'), count: ratedIds.length },
+    ...(p.show_history ? [{ value: 'history' as const, label: t('Recently watched'), count: historyIds.length }] : []),
+    ...(socialOn ? [{ value: 'activity' as const, label: t('Activity') }] : []),
   ]
 
   return (
@@ -82,12 +83,12 @@ export default function PublicProfilePage() {
           {p.bio && <p className="mt-3 max-w-2xl text-sm leading-relaxed text-fg-muted">{p.bio}</p>}
           <p className="mt-3 inline-flex items-center gap-1.5 text-xs text-fg-subtle">
             <CalendarDays className="h-3.5 w-3.5" />
-            Member since {formatDate(p.created_at, { month: 'long', year: 'numeric' })}
+            {t('Member since {p0}', { p0: formatDate(p.created_at, { month: 'long', year: 'numeric' }) })}
           </p>
           {socialOn && <FollowStats userId={p.id} />}
         </div>
         <Button variant="secondary" onClick={() => setShare(true)}>
-          Share profile
+          {t('Share profile')}
         </Button>
       </header>
 
@@ -103,19 +104,19 @@ export default function PublicProfilePage() {
             <Star className="h-5 w-5 fill-warning text-warning" />
             {ratedIds.length ? (Object.values(data.ratings).reduce((a, b) => a + b, 0) / ratedIds.length).toFixed(1) : '—'}
           </p>
-          <p className="text-xs text-fg-subtle">Average score</p>
+          <p className="text-xs text-fg-subtle">{t('Average score')}</p>
         </li>
       </ul>
 
-      <Tabs className="mt-10" items={tabs} value={tab} onChange={setTab} label="Profile lists" idPrefix="pub" />
+      <Tabs className="mt-10" items={tabs} value={tab} onChange={setTab} label={t('Profile lists')} idPrefix="pub" />
       <div className="pt-6" role="tabpanel" id={`pub-panel-${tab}`}>
         {tab === 'activity' ? (
-          activity.data?.length ? <ActivityList items={activity.data} showAuthor={false} /> : <EmptyState compact icon={<Star />} title={activity.isLoading ? 'Loading…' : 'No activity yet'} />
+          activity.data?.length ? <ActivityList items={activity.data} showAuthor={false} /> : <EmptyState compact icon={<Star />} title={activity.isLoading ? t('Loading…') : t('No activity yet')} />
         ) : (
-          <AnimeGrid items={anime.data} loading={anime.isLoading && ids.length > 0} density="dense" empty={<EmptyState compact icon={<Star />} title="Nothing here yet" />} />
+          <AnimeGrid items={anime.data} loading={anime.isLoading && ids.length > 0} density="dense" empty={<EmptyState compact icon={<Star />} title={t('Nothing here yet')} />} />
         )}
       </div>
-      <ShareDialog heading="Share profile" title={`${p.display_name} (@${p.username})`} path={`/u/${p.username}`} open={share} onClose={() => setShare(false)} />
+      <ShareDialog heading={t('Share profile')} title={`${p.display_name} (@${p.username})`} path={`/u/${p.username}`} open={share} onClose={() => setShare(false)} />
     </div>
   )
 }

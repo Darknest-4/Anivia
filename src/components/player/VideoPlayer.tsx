@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import {
   ListVideo,
   Maximize,
@@ -258,7 +259,7 @@ export function VideoPlayer(props: VideoPlayerProps) {
       )}
       onMouseMove={poke}
       onMouseLeave={() => !state.paused && setControlsVisible(false)}
-      aria-label={`Video player: ${title}`}
+      aria-label={t('Video player: {p0}', { p0: title })}
       role="region"
     >
       {/* Stage */}
@@ -295,7 +296,7 @@ export function VideoPlayer(props: VideoPlayerProps) {
         <button
           type="button"
           onClick={controls.play}
-          aria-label="Play"
+          aria-label={t('Play')}
           className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-accent text-white shadow-glow transition-transform hover:scale-105 sm:h-20 sm:w-20"
         >
           <Play className="ml-1 h-7 w-7 fill-current sm:h-8 sm:w-8" />
@@ -342,17 +343,17 @@ export function VideoPlayer(props: VideoPlayerProps) {
             <SeekBar currentTime={state.currentTime} duration={state.duration} buffered={state.buffered} onSeek={(t) => controls.seek(t)} markers={state.duration > 600 ? [90, state.duration - 90] : []} />
           </div>
           <div className="mt-0.5 flex items-center gap-0.5 sm:gap-1">
-            <IconBtn label={state.paused ? 'Play (k)' : 'Pause (k)'} onClick={controls.toggle}>
+            <IconBtn label={state.paused ? t('Play (k)') : t('Pause (k)')} onClick={controls.toggle}>
               {state.paused ? <Play className="h-5 w-5 fill-current" /> : <Pause className="h-5 w-5 fill-current" />}
             </IconBtn>
-            <IconBtn label="Previous episode" onClick={() => props.onPrev?.()} className={cn('hidden sm:inline-flex', !props.hasPrev && 'pointer-events-none opacity-35')}>
+            <IconBtn label={t('Previous episode')} onClick={() => props.onPrev?.()} className={cn('hidden sm:inline-flex', !props.hasPrev && 'pointer-events-none opacity-35')}>
               <SkipBack className="h-5 w-5" />
             </IconBtn>
-            <IconBtn label="Next episode (n)" onClick={() => props.onNext?.()} className={cn(!props.hasNext && 'pointer-events-none opacity-35')}>
+            <IconBtn label={t('Next episode (n)')} onClick={() => props.onNext?.()} className={cn(!props.hasNext && 'pointer-events-none opacity-35')}>
               <SkipForward className="h-5 w-5" />
             </IconBtn>
             <div className="group/vol hidden items-center sm:flex">
-              <IconBtn label={muted ? 'Unmute (m)' : 'Mute (m)'} onClick={() => setMuted((m) => !m)}>
+              <IconBtn label={muted ? t('Unmute (m)') : t('Mute (m)')} onClick={() => setMuted((m) => !m)}>
                 <VolumeIcon className="h-5 w-5" />
               </IconBtn>
               <input
@@ -365,7 +366,7 @@ export function VideoPlayer(props: VideoPlayerProps) {
                   setVolume(Number(e.target.value))
                   setMuted(Number(e.target.value) === 0)
                 }}
-                aria-label="Volume"
+                aria-label={t('Volume')}
                 className="range-track h-1 w-0 rounded-full bg-white/30 opacity-0 transition-all duration-base group-focus-within/vol:w-20 group-focus-within/vol:opacity-100 group-hover/vol:w-20 group-hover/vol:opacity-100"
                 style={{ background: `linear-gradient(to right, white ${(muted ? 0 : volume) * 100}%, rgba(255,255,255,.3) 0)` }}
               />
@@ -374,11 +375,11 @@ export function VideoPlayer(props: VideoPlayerProps) {
               {formatClock(state.currentTime)} <span className="hidden text-white/45 xs:inline">/ {formatClock(state.duration)}</span>
             </span>
             <div className="ml-auto flex items-center gap-0.5 sm:gap-1">
-              <IconBtn label="Subtitles (c)" pressed={Boolean(subtitleTrack)} onClick={() => setSubtitleTrack((s) => (s ? null : 'en'))} className="hidden xs:inline-flex">
+              <IconBtn label={t('Subtitles (c)')} pressed={Boolean(subtitleTrack)} onClick={() => setSubtitleTrack((s) => (s ? null : 'en'))} className="hidden xs:inline-flex">
                 <Subtitles className={cn('h-5 w-5', subtitleTrack && 'text-accent-soft')} />
               </IconBtn>
               <div className="relative">
-                <IconBtn label="Settings" pressed={settingsOpen} onClick={() => setSettingsOpen((o) => !o)}>
+                <IconBtn label={t('Settings')} pressed={settingsOpen} onClick={() => setSettingsOpen((o) => !o)}>
                   <Settings className={cn('h-5 w-5 transition-transform duration-base', settingsOpen && 'rotate-45')} />
                 </IconBtn>
                 {settingsOpen && (
@@ -399,11 +400,11 @@ export function VideoPlayer(props: VideoPlayerProps) {
                 )}
               </div>
               {props.onOpenEpisodes && (
-                <IconBtn label="Episodes" onClick={props.onOpenEpisodes} className="lg:hidden">
+                <IconBtn label={t('Episodes')} onClick={props.onOpenEpisodes} className="lg:hidden">
                   <ListVideo className="h-5 w-5" />
                 </IconBtn>
               )}
-              <IconBtn label={isFs ? 'Exit fullscreen (f)' : 'Fullscreen (f)'} onClick={toggleFullscreen}>
+              <IconBtn label={isFs ? t('Exit fullscreen (f)') : t('Fullscreen (f)')} onClick={toggleFullscreen}>
                 {isFs ? <Minimize className="h-5 w-5" /> : <Maximize className="h-5 w-5" />}
               </IconBtn>
             </div>
@@ -418,14 +419,14 @@ export function VideoPlayer(props: VideoPlayerProps) {
           onClick={() => controls.seek(90)}
           className={cn('absolute right-3 rounded-lg border border-white/25 bg-black/60 px-4 py-2 text-sm font-semibold text-white backdrop-blur-md transition-[bottom] duration-base hover:bg-black/80 sm:right-5', showChrome ? 'bottom-24 sm:bottom-28' : 'bottom-6')}
         >
-          Skip intro
+          {t('Skip intro')}
         </button>
       )}
 
       {/* Quality badge */}
       {ready && showChrome && !effective && (
         <span className="pointer-events-none absolute right-3 top-12 rounded bg-black/50 px-1.5 py-0.5 text-2xs font-bold text-white/80 sm:right-5 sm:top-16">
-          {quality === 'auto' ? `AUTO · ${source?.qualities[0] ?? 'HD'}` : quality}
+          {quality === 'auto' ? t('AUTO · {p0}', { p0: source?.qualities[0] ?? 'HD' }) : quality}
         </span>
       )}
     </div>

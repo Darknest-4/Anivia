@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import { formatClock } from '@/lib/format'
 
@@ -52,7 +53,7 @@ export function SeekBar({ currentTime, duration, buffered, onSeek, markers = [] 
       ref={ref}
       role="slider"
       tabIndex={0}
-      aria-label="Seek"
+      aria-label={t('Seek')}
       aria-valuemin={0}
       aria-valuemax={Math.round(duration)}
       aria-valuenow={Math.round(shown)}

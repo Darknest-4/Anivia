@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Play, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Progress } from '@/components/ui'
@@ -36,7 +37,7 @@ export function AnimeCardContinueWatching({ anime, entry, onRemove, className }:
           <button
             type="button"
             onClick={onRemove}
-            aria-label={`Remove ${anime.title} from continue watching`}
+            aria-label={t('Remove {p0} from continue watching', { p0: anime.title })}
             className="absolute right-2 top-2 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white/90 ring-1 ring-inset ring-white/15 backdrop-blur-md transition-colors hover:bg-black/80 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100"
           >
             <X className="h-4 w-4" />
@@ -45,8 +46,8 @@ export function AnimeCardContinueWatching({ anime, entry, onRemove, className }:
         <div className="pointer-events-none absolute inset-x-3 bottom-3">
           {upNext ? (
             <div className="flex items-center justify-between text-2xs font-semibold text-white/85">
-              <span className="rounded bg-accent px-1.5 py-0.5 text-accent-fg">Up next · EP {episode}</span>
-              <span>Watched EP {entry.episodeNumber}</span>
+              <span className="rounded bg-accent px-1.5 py-0.5 text-accent-fg">{t('Up next · EP {p0}', { p0: episode })}</span>
+              <span>{t('Watched EP {p0}', { p0: entry.episodeNumber })}</span>
             </div>
           ) : (
             <>
@@ -54,7 +55,7 @@ export function AnimeCardContinueWatching({ anime, entry, onRemove, className }:
                 <span>EP {entry.episodeNumber}</span>
                 <span className="tabular-nums">{Math.round(pct * 100)}% · {formatClock(remaining)} left</span>
               </div>
-              <Progress value={pct} size="xs" label={`${anime.title} progress`} />
+              <Progress value={pct} size="xs" label={t('{p0} progress', { p0: anime.title })} />
             </>
           )}
         </div>
@@ -66,10 +67,10 @@ export function AnimeCardContinueWatching({ anime, entry, onRemove, className }:
               {anime.title}
             </Link>
           </h3>
-          <p className="text-xs text-fg-subtle">Watched {formatRelative(entry.lastWatched)}</p>
+          <p className="text-xs text-fg-subtle">{t('Watched {p0}', { p0: formatRelative(entry.lastWatched) })}</p>
         </div>
         <Link to={href} className="shrink-0 rounded-md px-2 py-1 text-xs font-semibold text-accent-soft transition-colors hover:bg-accent/10">
-          {upNext ? 'Next episode' : 'Continue'}
+          {upNext ? t('Next episode') : t('Continue')}
         </Link>
       </div>
     </article>

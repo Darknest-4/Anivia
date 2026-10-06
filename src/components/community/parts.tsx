@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Avatar } from '@/components/ui'
@@ -33,7 +34,7 @@ export function SpoilerText({ text, spoiler, className }: { text: string; spoile
   if (!shown)
     return (
       <button type="button" onClick={() => setShown(true)} className={cn('rounded-lg bg-warning/10 px-3 py-2 text-left text-sm font-medium text-warning ring-1 ring-inset ring-warning/25', className)}>
-        Contains spoilers — tap to show
+        {t('Contains spoilers — tap to show')}
       </button>
     )
   return <p className={cn('whitespace-pre-wrap break-words text-sm leading-relaxed text-fg-muted', className)}>{text}</p>

@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { ArrowDownUp, Search } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { EmptyState, Input, Select } from '@/components/ui'
@@ -30,7 +31,7 @@ export function EpisodeList({ animeId, episodes, loading, activeEpisodeId, layou
     const list = episodes ?? []
     if (list.length <= RANGE * 1.5) return []
     const out: { value: string; label: string }[] = []
-    for (let i = 0; i < list.length; i += RANGE) out.push({ value: String(i), label: `Episodes ${i + 1}–${Math.min(list.length, i + RANGE)}` })
+    for (let i = 0; i < list.length; i += RANGE) out.push({ value: String(i), label: t('Episodes {p0}–{p1}', { p0: i + 1, p1: Math.min(list.length, i + RANGE) }) })
     return out
   }, [episodes])
   const activeIndex = episodes?.findIndex((e) => e.id === activeEpisodeId) ?? -1
@@ -73,8 +74,8 @@ export function EpisodeList({ animeId, episodes, loading, activeEpisodeId, layou
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search episodes…"
-            aria-label="Search episodes"
+            placeholder={t('Search episodes…')}
+            aria-label={t('Search episodes')}
             leftIcon={<Search />}
             className="h-10"
           />
@@ -82,24 +83,24 @@ export function EpisodeList({ animeId, episodes, loading, activeEpisodeId, layou
         {seasons.length > 1 && (
           <Select
             size="sm"
-            aria-label="Season"
+            aria-label={t('Season')}
             value={season}
             onChange={(e) => setSeason(e.target.value)}
-            options={[{ value: 'all', label: 'All seasons' }, ...seasons.map((s) => ({ value: String(s), label: `Season ${s}` }))]}
+            options={[{ value: 'all', label: t('All seasons') }, ...seasons.map((s) => ({ value: String(s), label: t('Season {p0}', { p0: s }) }))]}
             className="w-36"
           />
         )}
         {ranges.length > 0 && season === 'all' && !query && (
-          <Select size="sm" aria-label="Episode range" value={range} onChange={(e) => setRange(e.target.value)} options={ranges} className="w-44" />
+          <Select size="sm" aria-label={t('Episode range')} value={range} onChange={(e) => setRange(e.target.value)} options={ranges} className="w-44" />
         )}
         <button
           type="button"
           onClick={() => setDesc((d) => !d)}
           className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-line bg-surface-2 px-3 text-[13px] font-semibold text-fg-muted transition-colors hover:text-fg"
-          aria-label={desc ? 'Sort oldest first' : 'Sort newest first'}
+          aria-label={desc ? t('Sort oldest first') : t('Sort newest first')}
         >
           <ArrowDownUp className="h-4 w-4" />
-          {desc ? 'Newest' : 'Oldest'}
+          {desc ? t('Newest') : t('Oldest')}
         </button>
       </div>
 
@@ -107,7 +108,7 @@ export function EpisodeList({ animeId, episodes, loading, activeEpisodeId, layou
         {loading ? (
           <EpisodeSkeleton />
         ) : visible.length === 0 ? (
-          <EmptyState compact icon={<Search />} title="No episodes found" description="Try a different episode number or title." />
+          <EmptyState compact icon={<Search />} title={t('No episodes found')} description={t('Try a different episode number or title.')} />
         ) : (
           <ul className="space-y-1.5">
             {visible.map((ep) => (

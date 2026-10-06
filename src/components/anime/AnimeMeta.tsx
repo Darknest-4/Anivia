@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { cn } from '@/lib/cn'
 import { statusLabel } from '@/lib/format'
 import type { Anime, AnimeStatus } from '@/types'
@@ -10,10 +11,10 @@ interface AnimeMetaProps {
 }
 
 export function episodeLabel(anime: Anime) {
-  if (anime.type === 'Movie') return 'Movie'
-  if (anime.status === 'airing') return anime.episodesAired ? `${anime.episodesAired}/${anime.episodes ?? '?'} eps` : anime.episodes ? `${anime.episodes} eps` : 'Airing'
-  if (!anime.episodes) return 'TBA'
-  return `${anime.episodes} ${anime.episodes === 1 ? 'ep' : 'eps'}`
+  if (anime.type === 'Movie') return t('Movie')
+  if (anime.status === 'airing') return anime.episodesAired ? t('{p0}/{p1} eps', { p0: anime.episodesAired, p1: anime.episodes ?? '?' }) : anime.episodes ? t('{p0} eps', { p0: anime.episodes }) : t('Airing')
+  if (!anime.episodes) return t('TBA')
+  return anime.episodes === 1 ? t('1 ep') : t('{p0} eps', { p0: anime.episodes })
 }
 
 /** Dot-separated compact metadata line, e.g. "TV · 2026 · 24 eps". */
@@ -23,7 +24,7 @@ export function AnimeMeta({ anime, className, show = ['type', 'year', 'episodes'
     if (key === 'type') parts.push(anime.type)
     if (key === 'year' && anime.year) parts.push(String(anime.year))
     if (key === 'episodes' && anime.type !== 'Movie') parts.push(episodeLabel(anime))
-    if (key === 'duration' && anime.duration) parts.push(`${anime.duration} min`)
+    if (key === 'duration' && anime.duration) parts.push(t('{p0} min', { p0: anime.duration }))
     if (key === 'status') parts.push(statusLabel[anime.status])
     if (key === 'season' && anime.season) parts.push(`${anime.season[0].toUpperCase()}${anime.season.slice(1)} ${anime.year ?? ''}`.trim())
   }

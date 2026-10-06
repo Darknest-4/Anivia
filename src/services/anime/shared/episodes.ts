@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import type { Anime, Episode } from '@/types'
 import { weeklyDate } from './dates'
 
@@ -29,7 +30,7 @@ export function buildEpisodes(anime: Anime, hints: Map<number, EpisodeHint>, max
       animeId: anime.id,
       number: n,
       season: 1,
-      title: hint?.title || (anime.type === 'Movie' && total === 1 ? anime.title : `Episode ${n}`),
+      title: hint?.title || (anime.type === 'Movie' && total === 1 ? anime.title : t('Episode {p0}', { p0: n })),
       synopsis: hint?.synopsis ?? '',
       airDate: hint?.airDate || weeklyDate(anime.airedFrom, n - 1),
       duration: hint?.duration ?? (anime.duration ?? 24) * 60,

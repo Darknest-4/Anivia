@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { BookmarkCheck, BookmarkPlus, Check, ChevronDown, Heart, Trash2 } from 'lucide-react'
 import { useState, type MouseEvent } from 'react'
 import { Button, Dialog, MenuItem, Popover, type ButtonSize, type ButtonVariant } from '@/components/ui'
@@ -25,14 +26,14 @@ export function WatchlistIconButton({ anime, className }: { anime: Pick<Anime, '
         stop(e)
         if (inList) {
           watchlistService.remove(anime.id)
-          toast({ title: 'Removed from watchlist', description: anime.title, variant: 'info', action: { label: 'Undo', onClick: () => watchlistService.add(anime.id, entry?.status) } })
+          toast({ title: t('Removed from watchlist'), description: anime.title, variant: 'info', action: { label: t('Undo'), onClick: () => watchlistService.add(anime.id, entry?.status) } })
         } else {
           watchlistService.add(anime.id)
-          toast({ title: 'Added to watchlist', description: anime.title })
+          toast({ title: t('Added to watchlist'), description: anime.title })
         }
       }}
       aria-pressed={inList}
-      aria-label={inList ? `Remove ${anime.title} from watchlist` : `Add ${anime.title} to watchlist`}
+      aria-label={inList ? t('Remove {p0} from watchlist', { p0: anime.title }) : t('Add {p0} to watchlist', { p0: anime.title })}
       className={cn(
         'inline-flex h-9 w-9 items-center justify-center rounded-lg backdrop-blur-md transition-colors',
         inList ? 'bg-accent text-white' : 'bg-black/55 text-white ring-1 ring-inset ring-white/15 hover:bg-black/75',
@@ -54,10 +55,10 @@ export function FavoriteButton({ anime, className, size = 'sm' }: { anime: Pick<
       onClick={(e) => {
         stop(e)
         const now = toggle(anime.id)
-        toast({ title: now ? 'Added to favorites' : 'Removed from favorites', description: anime.title, variant: now ? 'success' : 'info', icon: Heart })
+        toast({ title: now ? t('Added to favorites') : t('Removed from favorites'), description: anime.title, variant: now ? 'success' : 'info', icon: Heart })
       }}
       aria-pressed={fav}
-      aria-label={fav ? `Remove ${anime.title} from favorites` : `Add ${anime.title} to favorites`}
+      aria-label={fav ? t('Remove {p0} from favorites', { p0: anime.title }) : t('Add {p0} to favorites', { p0: anime.title })}
       className={cn(
         'inline-flex items-center justify-center rounded-full backdrop-blur-md transition-[transform,background-color] active:scale-90',
         size === 'sm' ? 'h-8 w-8' : 'h-11 w-11',
@@ -88,7 +89,7 @@ export function WatchlistButton({ anime, variant = 'secondary', size = 'lg', cla
     return (
       <>
         <Button variant={variant} size={size} className={className} leftIcon={<BookmarkPlus className="h-[18px] w-[18px]" />} onClick={() => setAdding(true)}>
-          Add to Watchlist
+          {t('Add to Watchlist')}
         </Button>
         <AddToWatchlistDialog anime={anime} open={adding} onClose={() => setAdding(false)} />
       </>
@@ -116,7 +117,7 @@ export function WatchlistButton({ anime, variant = 'secondary', size = 'lg', cla
       >
         {(close) => (
           <>
-            <p className="eyebrow px-3 pb-1 pt-2">Set status</p>
+            <p className="eyebrow px-3 pb-1 pt-2">{t('Set status')}</p>
             {WATCHLIST_STATUSES.map((s) => (
               <MenuItem
                 key={s.value}
@@ -124,7 +125,7 @@ export function WatchlistButton({ anime, variant = 'secondary', size = 'lg', cla
                 icon={<Check className={cn('h-4 w-4', entry.status === s.value ? 'opacity-100' : 'opacity-0')} />}
                 onClick={() => {
                   watchlistService.setStatus(anime.id, s.value)
-                  toast({ title: 'Watchlist updated', description: `${anime.title} · ${s.label}` })
+                  toast({ title: t('Watchlist updated'), description: `${anime.title} · ${s.label}` })
                   close()
                 }}
               >
@@ -139,7 +140,7 @@ export function WatchlistButton({ anime, variant = 'secondary', size = 'lg', cla
                 setConfirm(true)
               }}
             >
-              Remove from watchlist
+              {t('Remove from watchlist')}
             </MenuItem>
           </>
         )}
@@ -149,22 +150,22 @@ export function WatchlistButton({ anime, variant = 'secondary', size = 'lg', cla
         onClose={() => setConfirm(false)}
         size="sm"
         icon={<Trash2 className="h-5 w-5" />}
-        title="Remove from watchlist?"
-        description={`“${anime.title}” will be removed from your watchlist. Your watch history is kept.`}
+        title={t('Remove from watchlist?')}
+        description={t('“{p0}” will be removed from your watchlist. Your watch history is kept.', { p0: anime.title })}
         footer={
           <>
             <Button variant="ghost" onClick={() => setConfirm(false)}>
-              Cancel
+              {t('Cancel')}
             </Button>
             <Button
               variant="danger"
               onClick={() => {
                 watchlistService.remove(anime.id)
                 setConfirm(false)
-                toast({ title: 'Removed from watchlist', description: anime.title, variant: 'info' })
+                toast({ title: t('Removed from watchlist'), description: anime.title, variant: 'info' })
               }}
             >
-              Remove
+              {t('Remove')}
             </Button>
           </>
         }

@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Play } from 'lucide-react'
 import { memo } from 'react'
 import { Link } from 'react-router-dom'
@@ -24,11 +25,11 @@ interface AnimeCardProps {
 }
 
 function EpisodeBadge({ anime }: { anime: Anime }) {
-  if (anime.status === 'upcoming') return <Badge variant="glass">Coming {anime.year}</Badge>
-  if (anime.type === 'Movie') return <Badge variant="glass">Movie</Badge>
+  if (anime.status === 'upcoming') return <Badge variant="glass">{t('Coming {p0}', { p0: anime.year })}</Badge>
+  if (anime.type === 'Movie') return <Badge variant="glass">{t('Movie')}</Badge>
   if (!anime.episodes) return null
-  if (anime.status === 'airing') return <Badge variant="solid">{anime.episodesAired ? `EP ${anime.episodesAired}` : 'Airing'}</Badge>
-  return <Badge variant="glass">{anime.episodes} EPS</Badge>
+  if (anime.status === 'airing') return <Badge variant="solid">{anime.episodesAired ? `EP ${anime.episodesAired}` : t('Airing')}</Badge>
+  return <Badge variant="glass">{t('{p0} EPS', { p0: anime.episodes })}</Badge>
 }
 
 /**
@@ -71,15 +72,15 @@ export const AnimeCard = memo(function AnimeCard({ anime, className, priority, r
                 .map((g) => g.name)
                 .join(' · ')}
             </p>
-            {anime.status === 'airing' && anime.episodesAired ? <p className="mt-1 text-2xs font-semibold text-accent-soft">Latest: Episode {anime.episodesAired}</p> : null}
+            {anime.status === 'airing' && anime.episodesAired ? <p className="mt-1 text-2xs font-semibold text-accent-soft">{t('Latest: Episode {p0}', { p0: anime.episodesAired })}</p> : null}
             <div className="pointer-events-auto mt-3 flex items-center gap-2">
               <Link
                 to={anime.status === 'upcoming' ? href : `${href}/watch`}
                 className="inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-lg bg-white text-[13px] font-semibold text-black transition-colors hover:bg-white/90"
-                aria-label={anime.status === 'upcoming' ? `View ${anime.title}` : `Watch ${anime.title}`}
+                aria-label={anime.status === 'upcoming' ? t('View {p0}', { p0: anime.title }) : t('Watch {p0}', { p0: anime.title })}
               >
                 <Play className="h-4 w-4 fill-current" />
-                {anime.status === 'upcoming' ? 'Details' : 'Watch'}
+                {anime.status === 'upcoming' ? t('Details') : t('Watch')}
               </Link>
               <WatchlistIconButton anime={anime} />
             </div>

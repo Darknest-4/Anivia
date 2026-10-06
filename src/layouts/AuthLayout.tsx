@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { ArrowLeft } from 'lucide-react'
 import { Suspense } from 'react'
 import { Link, Outlet } from 'react-router-dom'
@@ -13,12 +14,12 @@ export function AuthLayout() {
     <div className="grid min-h-dvh lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
       <div className="flex flex-col px-4 py-6 sm:px-10 lg:px-16">
         <div className="flex items-center justify-between">
-          <Link to="/" aria-label="ANIVIA home">
+          <Link to="/" aria-label={t('ANIVIA home')}>
             <Logo />
           </Link>
           <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-medium text-fg-muted hover:text-fg">
             <ArrowLeft className="h-4 w-4" />
-            Back to site
+            {t('Back to site')}
           </Link>
         </div>
         <main id="main" className="mx-auto flex w-full max-w-[420px] flex-1 flex-col justify-center py-10">
@@ -26,7 +27,7 @@ export function AuthLayout() {
             <Outlet />
           </Suspense>
         </main>
-        <p className="text-center text-xs text-fg-subtle">Secured by Supabase Auth. Your password is never stored by ANIVIA.</p>
+        <p className="text-center text-xs text-fg-subtle">{t('Secured by Supabase Auth. Your password is never stored by ANIVIA.')}</p>
       </div>
       <div data-theme="dark" className="relative hidden overflow-hidden bg-bg lg:block" aria-hidden>
         <div className="absolute inset-0 grid rotate-[-8deg] scale-125 grid-cols-3 gap-4 opacity-80">
@@ -41,11 +42,11 @@ export function AuthLayout() {
         <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-bg/30" />
         <div className="absolute inset-x-12 bottom-14">
           <p className="font-display text-4xl font-extrabold leading-tight text-fg">
-            Discover. Watch.
+            {t('Discover. Watch.')}
             <br />
-            <span className="text-gradient-accent">Remember.</span>
+            <span className="text-gradient-accent">{t('Remember.')}</span>
           </p>
-          <p className="mt-3 max-w-md text-sm text-fg-muted">Track every series, never miss a release and pick up exactly where you left off — on every device.</p>
+          <p className="mt-3 max-w-md text-sm text-fg-muted">{t('Track every series, never miss a release and pick up exactly where you left off — on every device.')}</p>
         </div>
       </div>
     </div>

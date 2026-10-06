@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Building2, CalendarDays, ExternalLink, Film, Heart, MapPin, Users } from 'lucide-react'
 import { useParams } from 'react-router-dom'
 import { AnimeCardFeatured, AnimeGrid, StudioMark } from '@/components/anime'
@@ -12,7 +13,7 @@ export default function StudioPage() {
   const { id } = useParams()
   const { data: studio, isLoading, isError, refetch } = useStudio(id)
   const works = useBrowse({ studio: id, perPage: 48, sort: 'popularity' })
-  useDocumentMeta({ title: studio?.name ?? 'Studio', description: studio?.description })
+  useDocumentMeta({ title: studio?.name ?? t('Studio'), description: studio?.description })
 
   if (isLoading)
     return (
@@ -30,19 +31,19 @@ export default function StudioPage() {
   const items = works.data?.items ?? []
   // Only facts the data source actually provides — no placeholder dashes.
   const stats = [
-    { icon: Film, label: 'Anime', value: formatNumber(studio.animeCount ?? works.data?.total ?? items.length) },
-    { icon: Heart, label: 'Favorites', value: studio.favorites ? formatNumber(studio.favorites) : null },
-    { icon: CalendarDays, label: 'Founded', value: studio.founded ? String(studio.founded) : null },
-    { icon: MapPin, label: 'Country', value: studio.country ?? null },
-    { icon: Users, label: 'Staff', value: studio.employees ? formatNumber(studio.employees) : null },
+    { icon: Film, label: t('Anime'), value: formatNumber(studio.animeCount ?? works.data?.total ?? items.length) },
+    { icon: Heart, label: t('Favorites'), value: studio.favorites ? formatNumber(studio.favorites) : null },
+    { icon: CalendarDays, label: t('Founded'), value: studio.founded ? String(studio.founded) : null },
+    { icon: MapPin, label: t('Country'), value: studio.country ?? null },
+    { icon: Users, label: t('Staff'), value: studio.employees ? formatNumber(studio.employees) : null },
   ].filter((s) => s.value !== null)
   const link = studio.website ?? studio.siteUrl
-  const linkLabel = studio.website ? 'Official website' : link?.includes('anilist.co') ? 'View on AniList' : 'View on MyAnimeList'
+  const linkLabel = studio.website ? t('Official website') : link?.includes('anilist.co') ? t('View on AniList') : t('View on MyAnimeList')
 
   return (
     <div className="container-app">
       <PageHeader
-        crumbs={[{ label: 'Home', to: '/' }, { label: 'Studios', to: '/studios' }, { label: studio.name }]}
+        crumbs={[{ label: t('Home'), to: '/' }, { label: t('Studios'), to: '/studios' }, { label: studio.name }]}
         title={
           <span className="flex items-center gap-4">
             <StudioMark studio={studio} className="h-14 w-14 text-lg sm:h-16 sm:w-16 sm:text-xl" />
@@ -70,12 +71,12 @@ export default function StudioPage() {
           </div>
         ))}
       </dl>
-      {items[0] && <AnimeCardFeatured anime={items[0]} label="Most popular work" className="mt-10" />}
+      {items[0] && <AnimeCardFeatured anime={items[0]} label={t('Most popular work')} className="mt-10" />}
       <section aria-labelledby="works-heading" className="mt-10">
         <h2 id="works-heading" className="mb-5 text-xl font-bold text-fg">
-          Popular works
+          {t('Popular works')}
         </h2>
-        <AnimeGrid items={items} loading={works.isLoading} showGenres empty={<EmptyState icon={<Building2 />} title="No titles yet" description="This studio has no titles in the catalog." />} />
+        <AnimeGrid items={items} loading={works.isLoading} showGenres empty={<EmptyState icon={<Building2 />} title={t('No titles yet')} description={t('This studio has no titles in the catalog.')} />} />
       </section>
     </div>
   )

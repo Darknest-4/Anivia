@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Plus } from 'lucide-react'
 import { useHistory } from '@/hooks/useUserData'
 import { cn } from '@/lib/cn'
@@ -24,9 +25,9 @@ export function EpisodeStepper({ anime, className }: { anime: Anime; className?:
         disabled={finished}
         onClick={() => {
           const n = historyService.increment(anime.id, anime.duration ?? 24)
-          toast({ title: `Episode ${n} watched`, description: anime.title, duration: 2000 })
+          toast({ title: t('Episode {p0} watched', { p0: n }), description: anime.title, duration: 2000 })
         }}
-        aria-label={`Mark episode ${done + 1} of ${anime.title} as watched`}
+        aria-label={t('Mark episode {p0} of {p1} as watched', { p0: done + 1, p1: anime.title })}
         className="inline-flex h-7 items-center gap-1 rounded-md bg-accent/15 px-2 font-semibold text-accent-soft transition-colors hover:bg-accent/25 disabled:opacity-40"
       >
         <Plus className="h-3.5 w-3.5" />1

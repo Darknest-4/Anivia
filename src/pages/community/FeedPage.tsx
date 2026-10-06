@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { Rss, Users } from 'lucide-react'
 import { ActivityList } from '@/components/community'
@@ -9,7 +10,7 @@ import { community } from '@/services/community'
 
 /** What the people you follow have been watching, rating and reviewing. */
 export default function FeedPage() {
-  useDocumentMeta({ title: 'Feed', noindex: true })
+  useDocumentMeta({ title: t('Feed'), noindex: true })
   const { status } = useAuth()
   const q = useInfiniteQuery({
     queryKey: ['feed'],
@@ -22,11 +23,11 @@ export default function FeedPage() {
 
   return (
     <div className="pb-10">
-      <PageHeader eyebrow="Community" title="Feed" description="Activity from the people you follow. Follow someone from their public profile." />
+      <PageHeader eyebrow={t('Community')} title={t('Feed')} description={t('Activity from the people you follow. Follow someone from their public profile.')} />
       {status !== 'signed-in' ? (
-        <EmptyState icon={<Rss />} title="Sign in to see your feed" description="Follow other fans and see what they watch, rate and review." action={<ButtonLink to="/login?redirect=%2Ffeed">Sign in</ButtonLink>} />
+        <EmptyState icon={<Rss />} title={t('Sign in to see your feed')} description={t('Follow other fans and see what they watch, rate and review.')} action={<ButtonLink to="/login?redirect=%2Ffeed">{t('Sign in')}</ButtonLink>} />
       ) : q.isError ? (
-        <ErrorState title="The feed is unavailable" description={(q.error as Error).message} onRetry={() => q.refetch()} />
+        <ErrorState title={t('The feed is unavailable')} description={(q.error as Error).message} onRetry={() => q.refetch()} />
       ) : q.isLoading ? (
         <div className="space-y-2">
           {Array.from({ length: 5 }, (_, i) => (
@@ -34,14 +35,14 @@ export default function FeedPage() {
           ))}
         </div>
       ) : !items.length ? (
-        <EmptyState icon={<Users />} title="Nothing here yet" description="Follow people from their profile pages (e.g. from reviews and comments) — their activity shows up here." action={<ButtonLink to="/lists">Browse lists</ButtonLink>} />
+        <EmptyState icon={<Users />} title={t('Nothing here yet')} description={t('Follow people from their profile pages (e.g. from reviews and comments) — their activity shows up here.')} action={<ButtonLink to="/lists">{t('Browse lists')}</ButtonLink>} />
       ) : (
         <>
           <ActivityList items={items} />
           {q.hasNextPage && (
             <div className="mt-6 flex justify-center">
               <Button variant="secondary" loading={q.isFetchingNextPage} onClick={() => q.fetchNextPage()}>
-                Load more
+                {t('Load more')}
               </Button>
             </div>
           )}

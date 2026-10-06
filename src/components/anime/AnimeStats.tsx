@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Award, Heart, Star, TrendingUp } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { formatCompact, formatRating, scoresHidden } from '@/lib/format'
@@ -6,18 +7,18 @@ import type { Anime } from '@/types'
 export function AnimeStats({ anime, className }: { anime: Anime; className?: string }) {
   const all = [
     {
-      label: 'Score',
+      label: t('Score'),
       value: anime.rating ? formatRating(anime.rating) : '—',
-      sub: anime.ratingCount ? `${formatCompact(anime.ratingCount)} votes` : anime.rating ? 'average score' : 'not rated yet',
+      sub: anime.ratingCount ? t('{p0} votes', { p0: formatCompact(anime.ratingCount) }) : anime.rating ? t('average score') : 'not rated yet',
       icon: Star,
       tone: 'text-warning bg-warning/12',
     },
-    { label: 'Ranked', value: anime.rank ? `#${anime.rank}` : null, sub: 'by score', icon: Award, tone: 'text-accent-soft bg-accent/12' },
-    { label: 'Popularity', value: anime.popularity ? formatCompact(anime.popularity) : null, sub: 'members', icon: TrendingUp, tone: 'text-info bg-info/12' },
-    { label: 'Favorites', value: anime.favorites ? formatCompact(anime.favorites) : null, sub: 'users', icon: Heart, tone: 'text-danger bg-danger/12' },
+    { label: t('Ranked'), value: anime.rank ? `#${anime.rank}` : null, sub: t('by score'), icon: Award, tone: 'text-accent-soft bg-accent/12' },
+    { label: t('Popularity'), value: anime.popularity ? formatCompact(anime.popularity) : null, sub: t('members'), icon: TrendingUp, tone: 'text-info bg-info/12' },
+    { label: t('Favorites'), value: anime.favorites ? formatCompact(anime.favorites) : null, sub: t('users'), icon: Heart, tone: 'text-danger bg-danger/12' },
   ]
   // Only real numbers — unknown stats are left out instead of showing placeholders.
-  const stats = all.filter((s) => s.value !== null && !(scoresHidden() && (s.label === 'Score' || s.label === 'Ranked')))
+  const stats = all.filter((s) => s.value !== null && !(scoresHidden() && (s.label === t('Score') || s.label === t('Ranked'))))
   if (!stats.length) return null
   return (
     <ul className={cn('grid grid-cols-2 gap-3', stats.length === 3 ? 'sm:grid-cols-3' : stats.length >= 4 && 'sm:grid-cols-4', className)}>

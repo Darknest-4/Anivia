@@ -1,8 +1,9 @@
+import { locale, t } from '@/i18n'
 import { preferencesStore } from '@/services/user/stores'
 import type { AnimeStatus, SeasonName } from '@/types'
 
-const compact = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 })
-const full = new Intl.NumberFormat('en')
+const compact = new Intl.NumberFormat(locale, { notation: 'compact', maximumFractionDigits: 1 })
+const full = new Intl.NumberFormat(locale)
 
 export const formatCompact = (n: number) => compact.format(n)
 export const formatNumber = (n: number) => full.format(n)
@@ -26,16 +27,16 @@ export function formatDate(iso: string | undefined, opts: Intl.DateTimeFormatOpt
   if (!iso) return '—'
   const date = new Date(iso)
   if (Number.isNaN(date.getTime())) return '—'
-  return date.toLocaleDateString('en-US', opts)
+  return date.toLocaleDateString(locale, opts)
 }
 
 /** "24 min", "1h 52m" */
 export function formatMinutes(minutes?: number) {
   if (!minutes) return '—'
-  if (minutes < 60) return `${minutes} min`
+  if (minutes < 60) return t('{p0} min', { p0: minutes })
   const h = Math.floor(minutes / 60)
   const m = minutes % 60
-  return m ? `${h}h ${m}m` : `${h}h`
+  return m ? `${h}${t('h')} ${m}${t('m')}` : `${h}${t('h')}`
 }
 
 /** Total watch time: 6120 → "1h 42m", 300 → "5m", 0 → "0m". */
@@ -43,7 +44,7 @@ export function formatWatchTime(totalSeconds: number) {
   const minutes = Math.floor(Math.max(0, totalSeconds) / 60)
   const h = Math.floor(minutes / 60)
   const m = minutes % 60
-  return h ? `${h}h ${m}m` : `${m}m`
+  return h ? `${h}${t('h')} ${m}${t('m')}` : `${m}${t('m')}`
 }
 
 /** Media clock: 83 → "1:23", 3723 → "1:02:03" */
@@ -55,7 +56,7 @@ export function formatClock(totalSeconds: number) {
   return h ? `${h}:${String(m).padStart(2, '0')}:${sec}` : `${m}:${sec}`
 }
 
-const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' })
+const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
 
 export function formatRelative(iso: string, now = Date.now()) {
   const diff = new Date(iso).getTime() - now
@@ -71,21 +72,21 @@ export function formatRelative(iso: string, now = Date.now()) {
   for (const [unit, ms] of units) {
     if (abs >= ms) return rtf.format(Math.round(diff / ms), unit)
   }
-  return 'just now'
+  return t('just now')
 }
 
 export const statusLabel: Record<AnimeStatus, string> = {
-  airing: 'Airing',
-  finished: 'Finished',
-  upcoming: 'Upcoming',
-  hiatus: 'On Hiatus',
+  airing: t('Airing'),
+  finished: t('Finished'),
+  upcoming: t('Upcoming'),
+  hiatus: t('On Hiatus'),
 }
 
 export const seasonLabel: Record<SeasonName, string> = {
-  winter: 'Winter',
-  spring: 'Spring',
-  summer: 'Summer',
-  fall: 'Fall',
+  winter: t('Winter'),
+  spring: t('Spring'),
+  summer: t('Summer'),
+  fall: t('Fall'),
 }
 
 export const pad2 = (n: number) => String(n).padStart(2, '0')

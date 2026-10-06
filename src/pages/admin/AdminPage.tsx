@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Activity, Bug, CheckCircle2, Clock, Database, Eye, Flag, Inbox, Search, ShieldCheck, Trash2, Users } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
@@ -22,7 +23,7 @@ async function rpc<T>(fn: string, args: Record<string, unknown> = {}): Promise<T
 
 /** Staff dashboard: analytics, feature flags, roles, inbox and the anime data store. */
 export default function AdminPage() {
-  useDocumentMeta({ title: 'Admin', noindex: true })
+  useDocumentMeta({ title: t('Admin'), noindex: true })
   const { status } = useAuth()
   const { can, role } = usePlatform()
   const [params, setParams] = useSearchParams()
@@ -33,25 +34,25 @@ export default function AdminPage() {
   if (!can('admin.access'))
     return (
       <div className="container-app py-16">
-        <EmptyState icon={<ShieldCheck />} title="Staff only" description="Your account doesn’t have access to the admin area." />
+        <EmptyState icon={<ShieldCheck />} title={t('Staff only')} description={t('Your account doesn’t have access to the admin area.')} />
       </div>
     )
 
   const items: { value: Tab; label: string; perm: Permission }[] = [
-    { value: 'overview', label: 'Analytics', perm: 'analytics.view' },
-    { value: 'errors', label: 'Errors', perm: 'analytics.view' },
-    { value: 'flags', label: 'Feature flags', perm: 'flags.manage' },
-    { value: 'users', label: 'Users & roles', perm: 'users.manage' },
-    { value: 'inbox', label: 'Inbox', perm: 'reports.manage' },
-    { value: 'data', label: 'Anime data', perm: 'cache.manage' },
+    { value: 'overview', label: t('Analytics'), perm: 'analytics.view' },
+    { value: 'errors', label: t('Errors'), perm: 'analytics.view' },
+    { value: 'flags', label: t('Feature flags'), perm: 'flags.manage' },
+    { value: 'users', label: t('Users & roles'), perm: 'users.manage' },
+    { value: 'inbox', label: t('Inbox'), perm: 'reports.manage' },
+    { value: 'data', label: t('Anime data'), perm: 'cache.manage' },
   ]
   const visible = items.filter((i) => can(i.perm))
   const active = visible.some((i) => i.value === tab) ? tab : visible[0]?.value
 
   return (
     <div className="container-app pb-16">
-      <PageHeader eyebrow={`Staff area · signed in as ${role}`} title="Dashboard" description="Visitors, features, people and data — all stored in Supabase." />
-      <Tabs items={visible} value={active} onChange={(t) => setParams(t === 'overview' ? {} : { tab: t }, { replace: true })} label="Admin sections" idPrefix="admin" />
+      <PageHeader eyebrow={t('Staff area · signed in as {p0}', { p0: role })} title={t('Dashboard')} description={t('Visitors, features, people and data — all stored in Supabase.')} />
+      <Tabs items={visible} value={active} onChange={(t) => setParams(t === 'overview' ? {} : { tab: t }, { replace: true })} label={t('Admin sections')} idPrefix="admin" />
       <div className="mt-6">
         {active === 'overview' && <Overview />}
         {active === 'errors' && <ErrorsPanel />}
@@ -115,7 +116,7 @@ function Panel({ title, children }: { title: string; children: ReactNode }) {
 function Overview() {
   const [days, setDays] = useState('14')
   const q = useQuery({ queryKey: ['admin', 'overview', days], queryFn: () => rpc<Overview>('analytics_overview', { p_days: Number(days) }), refetchInterval: 60_000 })
-  if (q.isError) return <ErrorState title="Couldn’t load analytics" description={(q.error as Error).message} onRetry={() => q.refetch()} />
+  if (q.isError) return <ErrorState title={t('Couldn’t load analytics')} description={(q.error as Error).message} onRetry={() => q.refetch()} />
   const d = q.data
   const max = Math.max(1, ...(d?.daily ?? []).map((x) => x.pageviews))
   return (
@@ -123,15 +124,15 @@ function Overview() {
       <div className="flex justify-end">
         <Select
           size="sm"
-          aria-label="Period"
+          aria-label={t('Period')}
           value={days}
           onChange={(e) => setDays(e.target.value)}
           options={[
-            { value: '1', label: 'Last 24 hours' },
-            { value: '7', label: 'Last 7 days' },
-            { value: '14', label: 'Last 14 days' },
-            { value: '30', label: 'Last 30 days' },
-            { value: '90', label: 'Last 90 days' },
+            { value: '1', label: t('Last 24 hours') },
+            { value: '7', label: t('Last 7 days') },
+            { value: '14', label: t('Last 14 days') },
+            { value: '30', label: t('Last 30 days') },
+            { value: '90', label: t('Last 90 days') },
           ]}
         />
       </div>
@@ -140,16 +141,16 @@ function Overview() {
       ) : (
         <>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <Stat icon={<Activity />} label="Online now" value={formatNumber(d.online_now)} hint="active in the last 5 minutes" />
-            <Stat icon={<Users />} label="Visitors today" value={formatNumber(d.visitors_today)} hint={`${formatNumber(d.pageviews_today)} page views`} />
-            <Stat icon={<Eye />} label="Visitors (period)" value={formatNumber(d.visitors_period)} hint={`${formatNumber(d.pageviews_period)} page views`} />
-            <Stat icon={<Clock />} label="Avg. time on page" value={duration(d.avg_time_on_page_seconds)} hint={`avg. visit ${duration(d.avg_session_seconds)}`} />
-            <Stat icon={<ShieldCheck />} label="Accounts" value={formatNumber(d.total_users)} hint={`+${formatNumber(d.new_users_period)} in this period`} />
-            <Stat icon={<Users />} label="Signed-in visits" value={`${d.signed_in_share}%`} />
+            <Stat icon={<Activity />} label={t('Online now')} value={formatNumber(d.online_now)} hint={t('active in the last 5 minutes')} />
+            <Stat icon={<Users />} label={t('Visitors today')} value={formatNumber(d.visitors_today)} hint={t('{p0} page views', { p0: formatNumber(d.pageviews_today) })} />
+            <Stat icon={<Eye />} label={t('Visitors (period)')} value={formatNumber(d.visitors_period)} hint={t('{p0} page views', { p0: formatNumber(d.pageviews_period) })} />
+            <Stat icon={<Clock />} label={t('Avg. time on page')} value={duration(d.avg_time_on_page_seconds)} hint={t('avg. visit {p0}', { p0: duration(d.avg_session_seconds) })} />
+            <Stat icon={<ShieldCheck />} label={t('Accounts')} value={formatNumber(d.total_users)} hint={t('+{p0} in this period', { p0: formatNumber(d.new_users_period) })} />
+            <Stat icon={<Users />} label={t('Signed-in visits')} value={`${d.signed_in_share}%`} />
           </div>
-          <Panel title="Daily traffic">
+          <Panel title={t('Daily traffic')}>
             {d.daily.length === 0 ? (
-              <p className="text-sm text-fg-subtle">No data yet.</p>
+              <p className="text-sm text-fg-subtle">{t('No data yet.')}</p>
             ) : (
               <>
                 <div className="flex h-40 items-end gap-1" role="img" aria-label={`Page views per day, peak ${formatNumber(max)}`}>
@@ -181,10 +182,10 @@ function Overview() {
             )}
           </Panel>
           <div className="grid gap-6 lg:grid-cols-2">
-            <Panel title="Top pages">
+            <Panel title={t('Top pages')}>
               <Table head={['Page', 'Views', 'Avg. time']} rows={d.top_pages.map((p) => [<code key="p" className="text-xs">{p.path}</code>, formatNumber(p.views), duration(p.avg_seconds)])} />
             </Panel>
-            <Panel title="Most viewed anime">
+            <Panel title={t('Most viewed anime')}>
               <Table
                 head={['Anime', 'Views', 'Visitors']}
                 rows={d.top_anime.map((a) => [
@@ -196,10 +197,10 @@ function Overview() {
                 ])}
               />
             </Panel>
-            <Panel title="Devices">
+            <Panel title={t('Devices')}>
               <Table head={['Device', 'Visits']} rows={d.devices.map((x) => [x.device, formatNumber(x.sessions)])} />
             </Panel>
-            <Panel title="Traffic sources">
+            <Panel title={t('Traffic sources')}>
               <Table head={['Source', 'Visits']} rows={d.referrers.map((x) => [x.source, formatNumber(x.sessions)])} />
             </Panel>
           </div>
@@ -210,7 +211,7 @@ function Overview() {
 }
 
 function Table({ head, rows }: { head: string[]; rows: ReactNode[][] }) {
-  if (!rows.length) return <p className="text-sm text-fg-subtle">No data yet.</p>
+  if (!rows.length) return <p className="text-sm text-fg-subtle">{t('No data yet.')}</p>
   return (
     <div className="-mx-1 overflow-x-auto">
       <table className="w-full text-left text-sm">
@@ -251,9 +252,9 @@ function Flags() {
       if (error) throw new Error(error.message)
     },
     onSuccess: () => refreshFlags(),
-    onError: (e: Error) => toast({ title: 'Couldn’t save the flag', description: e.message, variant: 'error' }),
+    onError: (e: Error) => toast({ title: t('Couldn’t save the flag'), description: e.message, variant: 'error' }),
   })
-  if (!flags.length) return <EmptyState icon={<Flag />} title="No flags found" description="Run supabase/migrations/0003_anivia_platform.sql to create them." />
+  if (!flags.length) return <EmptyState icon={<Flag />} title={t('No flags found')} description={t('Run supabase/migrations/0003_anivia_platform.sql to create them.')} />
   return (
     <ul className="space-y-3">
       {flags.map((f) => (
@@ -278,22 +279,22 @@ function FlagRow({ flag, onSave }: { flag: FeatureFlag; onSave: (patch: Partial<
           <p className="mt-1 text-[13px] text-fg-subtle">{flag.description}</p>
           {flag.updated_at && <p className="mt-1 text-2xs text-fg-subtle">updated {formatRelative(flag.updated_at)}</p>}
         </div>
-        <Switch label={`Toggle ${flag.key}`} hideLabel checked={flag.enabled} onChange={(v) => onSave({ enabled: v })} />
+        <Switch label={t('Toggle {p0}', { p0: flag.key })} hideLabel checked={flag.enabled} onChange={(v) => onSave({ enabled: v })} />
       </div>
       <div className="mt-3 grid gap-3 sm:grid-cols-[10rem_8rem_minmax(0,1fr)]">
         <Select
           size="sm"
-          aria-label="Audience"
+          aria-label={t('Audience')}
           value={flag.audience}
           onChange={(e) => onSave({ audience: e.target.value as FeatureFlag['audience'] })}
           options={[
-            { value: 'all', label: 'Everyone' },
-            { value: 'signed_in', label: 'Signed-in users' },
-            { value: 'staff', label: 'Staff only' },
+            { value: 'all', label: t('Everyone') },
+            { value: 'signed_in', label: t('Signed-in users') },
+            { value: 'staff', label: t('Staff only') },
           ]}
         />
         <Input
-          aria-label="Rollout percentage"
+          aria-label={t('Rollout percentage')}
           type="number"
           min={0}
           max={100}
@@ -304,7 +305,7 @@ function FlagRow({ flag, onSave }: { flag: FeatureFlag; onSave: (patch: Partial<
         />
         {payloadKeys.length > 0 && (
           <Input
-            aria-label="Payload (JSON)"
+            aria-label={t('Payload (JSON)')}
             value={payload}
             onChange={(e) => setPayload(e.target.value)}
             onBlur={() => {
@@ -346,10 +347,10 @@ function UsersPanel() {
   const setRole = useMutation({
     mutationFn: ({ id, role }: { id: string; role: Role }) => rpc('admin_set_role', { p_user: id, p_role: role }),
     onSuccess: () => {
-      toast({ title: 'Role updated' })
+      toast({ title: t('Role updated') })
       void client.invalidateQueries({ queryKey: ['admin', 'users'] })
     },
-    onError: (e: Error) => toast({ title: 'Couldn’t change the role', description: e.message, variant: 'error' }),
+    onError: (e: Error) => toast({ title: t('Couldn’t change the role'), description: e.message, variant: 'error' }),
   })
   return (
     <div className="space-y-4">
@@ -360,13 +361,13 @@ function UsersPanel() {
         }}
         className="flex max-w-md gap-2"
       >
-        <Input aria-label="Search users" placeholder="Email, name or username" value={search} onChange={(e) => setSearch(e.target.value)} leftIcon={<Search className="h-4 w-4" />} />
+        <Input aria-label={t('Search users')} placeholder={t('Email, name or username')} value={search} onChange={(e) => setSearch(e.target.value)} leftIcon={<Search className="h-4 w-4" />} />
         <Button type="submit" variant="secondary">
-          Search
+          {t('Search')}
         </Button>
       </form>
       {q.isError ? (
-        <ErrorState title="Couldn’t load users" description={(q.error as Error).message} onRetry={() => q.refetch()} />
+        <ErrorState title={t('Couldn’t load users')} description={(q.error as Error).message} onRetry={() => q.refetch()} />
       ) : !q.data ? (
         <Skeleton className="h-64 rounded-2xl" />
       ) : (
@@ -374,11 +375,11 @@ function UsersPanel() {
           <table className="w-full min-w-[640px] text-left text-sm">
             <thead className="border-b border-line text-xs text-fg-subtle">
               <tr>
-                <th className="px-4 py-3 font-semibold">User</th>
-                <th className="px-4 py-3 font-semibold">AniList</th>
-                <th className="px-4 py-3 font-semibold">Joined</th>
-                <th className="px-4 py-3 font-semibold">Last sign-in</th>
-                <th className="px-4 py-3 font-semibold">Role</th>
+                <th className="px-4 py-3 font-semibold">{t('User')}</th>
+                <th className="px-4 py-3 font-semibold">{t('AniList')}</th>
+                <th className="px-4 py-3 font-semibold">{t('Joined')}</th>
+                <th className="px-4 py-3 font-semibold">{t('Last sign-in')}</th>
+                <th className="px-4 py-3 font-semibold">{t('Role')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-line/60">
@@ -404,14 +405,14 @@ function UsersPanel() {
                   <td className="px-4 py-3">
                     <Select
                       size="sm"
-                      aria-label={`Role of ${u.email ?? u.id}`}
+                      aria-label={t('Role of {p0}', { p0: u.email ?? u.id })}
                       value={u.role}
                       disabled={u.id === session?.user.id || setRole.isPending}
                       onChange={(e) => setRole.mutate({ id: u.id, role: e.target.value as Role })}
                       options={[
-                        { value: 'user', label: 'User' },
-                        { value: 'moderator', label: 'Moderator' },
-                        { value: 'admin', label: 'Admin' },
+                        { value: 'user', label: t('User') },
+                        { value: 'moderator', label: t('Moderator') },
+                        { value: 'admin', label: t('Admin') },
                       ]}
                     />
                   </td>
@@ -419,10 +420,10 @@ function UsersPanel() {
               ))}
             </tbody>
           </table>
-          {q.data.length === 0 && <p className="p-6 text-center text-sm text-fg-subtle">No users found.</p>}
+          {q.data.length === 0 && <p className="p-6 text-center text-sm text-fg-subtle">{t('No users found.')}</p>}
         </div>
       )}
-      <p className="text-xs text-fg-subtle">Moderators can see analytics and handle the inbox. Admins can also manage flags, roles and the data cache.</p>
+      <p className="text-xs text-fg-subtle">{t('Moderators can see analytics and handle the inbox. Admins can also manage flags, roles and the data cache.')}</p>
     </div>
   )
 }
@@ -476,20 +477,20 @@ function InboxPanel() {
         variant="segmented"
         size="sm"
         items={[
-          { value: 'messages', label: 'Contact messages' },
-          { value: 'reports', label: 'Reports' },
+          { value: 'messages', label: t('Contact messages') },
+          { value: 'reports', label: t('Reports') },
         ]}
         value={kind}
         onChange={setKind}
-        label="Inbox type"
+        label={t('Inbox type')}
         idPrefix="inbox"
       />
       {q.isError ? (
-        <ErrorState title="Couldn’t load the inbox" description={(q.error as Error).message} onRetry={() => q.refetch()} />
+        <ErrorState title={t('Couldn’t load the inbox')} description={(q.error as Error).message} onRetry={() => q.refetch()} />
       ) : !q.data ? (
         <Skeleton className="h-64 rounded-2xl" />
       ) : q.data.length === 0 ? (
-        <EmptyState icon={<Inbox />} title="Inbox zero" description="Nothing here yet." />
+        <EmptyState icon={<Inbox />} title={t('Inbox zero')} description={t('Nothing here yet.')} />
       ) : (
         <ul className="space-y-3">
           {q.data.map((m) => (
@@ -507,7 +508,7 @@ function InboxPanel() {
                   )}
                   <p className="text-xs text-fg-subtle">{formatRelative(m.created_at)}</p>
                 </div>
-                <Select size="sm" aria-label="Status" value={m.status} onChange={(e) => update.mutate({ id: m.id, status: e.target.value })} options={statuses.map((s) => ({ value: s, label: s }))} />
+                <Select size="sm" aria-label={t('Status')} value={m.status} onChange={(e) => update.mutate({ id: m.id, status: e.target.value })} options={statuses.map((s) => ({ value: s, label: s }))} />
               </div>
               <p className="mt-3 whitespace-pre-wrap text-sm text-fg-muted">{'message' in m ? m.message : m.details || '—'}</p>
               {'page_url' in m && m.page_url && (
@@ -538,26 +539,26 @@ function DataPanel() {
   const clear = useMutation({
     mutationFn: () => rpc('admin_clear_cache'),
     onSuccess: () => {
-      toast({ title: 'Cache cleared', description: 'Fresh data will be fetched from AniList.' })
+      toast({ title: t('Cache cleared'), description: t('Fresh data will be fetched from AniList.') })
       void q.refetch()
     },
   })
-  if (q.isError) return <ErrorState title="Couldn’t load cache stats" description={(q.error as Error).message} onRetry={() => q.refetch()} />
+  if (q.isError) return <ErrorState title={t('Couldn’t load cache stats')} description={(q.error as Error).message} onRetry={() => q.refetch()} />
   const d = q.data
   return (
     <div className="space-y-6">
       <div className="grid gap-3 sm:grid-cols-3">
-        <Stat icon={<Database />} label="Titles in database" value={d ? formatNumber(d.catalog_titles) : '…'} hint={d?.catalog_updated ? `last update ${formatRelative(d.catalog_updated)}` : 'filled by the anilist-proxy function'} />
-        <Stat icon={<Database />} label="Cached responses" value={d ? formatNumber(d.cached_responses) : '…'} hint={d ? `${formatNumber(d.expired_responses)} expired` : undefined} />
+        <Stat icon={<Database />} label={t('Titles in database')} value={d ? formatNumber(d.catalog_titles) : '…'} hint={d?.catalog_updated ? t('last update {p0}', { p0: formatRelative(d.catalog_updated) }) : 'filled by the anilist-proxy function'} />
+        <Stat icon={<Database />} label={t('Cached responses')} value={d ? formatNumber(d.cached_responses) : '…'} hint={d ? t('{p0} expired', { p0: formatNumber(d.expired_responses) }) : undefined} />
         <div className="flex items-center rounded-2xl border border-line bg-surface p-4">
           <Button variant="secondary" leftIcon={<Trash2 className="h-4 w-4" />} loading={clear.isPending} onClick={() => clear.mutate()}>
-            Clear response cache
+            {t('Clear response cache')}
           </Button>
         </div>
       </div>
       <p className="text-sm text-fg-muted">
-        Anime data is fetched through the <code>anilist-proxy</code> Edge Function, cached in <code>api_cache</code> and every title is stored in{' '}
-        <code>anime_catalog</code>. Episode titles and artwork come from ani.zip. See <Link to="/status" className="text-accent-soft hover:underline">/status</Link> for live checks.
+        Anime data is fetched through the <code>{t('anilist-proxy')}</code>{' '}{t('Edge Function, cached in')}{' '}<code>{t('api_cache')}</code> and every title is stored in{' '}
+        <code>{t('anime_catalog')}</code>{t('. Episode titles and artwork come from ani.zip. See')}{' '}<Link to="/status" className="text-accent-soft hover:underline">{t('/status')}</Link> for live checks.
       </p>
     </div>
   )
@@ -589,7 +590,7 @@ function ErrorsPanel() {
       let req = c.from('error_logs').select('*').order('last_seen', { ascending: false }).limit(100)
       if (!showResolved) req = req.eq('resolved', false)
       const { data, error } = await req
-      if (error) throw new Error(/does not exist|schema cache/.test(error.message) ? 'Run supabase/migrations/0006_anivia_community.sql first.' : error.message)
+      if (error) throw new Error(/does not exist|schema cache/.test(error.message) ? t('Run supabase/migrations/0006_anivia_community.sql first.') : error.message)
       return data as ErrorRow[]
     },
     refetchInterval: 60_000,
@@ -605,15 +606,15 @@ function ErrorsPanel() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-fg-muted">Errors that happened in visitors’ browsers. Identical errors are grouped and counted.</p>
-        <Switch label="Show resolved" checked={showResolved} onChange={setShowResolved} />
+        <p className="text-sm text-fg-muted">{t('Errors that happened in visitors’ browsers. Identical errors are grouped and counted.')}</p>
+        <Switch label={t('Show resolved')} checked={showResolved} onChange={setShowResolved} />
       </div>
       {q.isError ? (
-        <ErrorState title="Couldn’t load errors" description={(q.error as Error).message} onRetry={() => q.refetch()} />
+        <ErrorState title={t('Couldn’t load errors')} description={(q.error as Error).message} onRetry={() => q.refetch()} />
       ) : !q.data ? (
         <Skeleton className="h-40 rounded-2xl" />
       ) : q.data.length === 0 ? (
-        <EmptyState icon={<CheckCircle2 />} title="No errors" description="Nothing has gone wrong in anyone’s browser. 🎉" />
+        <EmptyState icon={<CheckCircle2 />} title={t('No errors')} description={t('Nothing has gone wrong in anyone’s browser. 🎉')} />
       ) : (
         <ul className="space-y-3">
           {q.data.map((e) => (
@@ -631,10 +632,10 @@ function ErrorsPanel() {
                 <div className="flex gap-1">
                   {!e.resolved && (
                     <Button size="sm" variant="secondary" onClick={() => act.mutate({ id: e.id, op: 'resolve' })}>
-                      Resolve
+                      {t('Resolve')}
                     </Button>
                   )}
-                  <Button size="icon-sm" variant="ghost" aria-label="Delete" onClick={() => act.mutate({ id: e.id, op: 'delete' })}>
+                  <Button size="icon-sm" variant="ghost" aria-label={t('Delete')} onClick={() => act.mutate({ id: e.id, op: 'delete' })}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
@@ -642,10 +643,10 @@ function ErrorsPanel() {
               {open === e.id && (
                 <div className="mt-3 space-y-2 text-xs text-fg-muted">
                   <p>
-                    <strong className="text-fg">Browser:</strong> {e.user_agent}
+                    <strong className="text-fg">{t('Browser:')}</strong> {e.user_agent}
                   </p>
                   <p>
-                    <strong className="text-fg">Release:</strong> {e.release}
+                    <strong className="text-fg">{t('Release:')}</strong> {e.release}
                   </p>
                   {e.stack && <pre className="max-h-64 overflow-auto rounded-lg bg-surface-2 p-3 font-mono text-2xs leading-relaxed">{e.stack}</pre>}
                 </div>

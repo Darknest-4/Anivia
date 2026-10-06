@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Flag } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Button, Dialog, Textarea } from '@/components/ui'
@@ -21,19 +22,19 @@ export function ReportDialog({ open, onClose, subject }: { open: boolean; onClos
       await backend.sendReport({ subject, reason, details: details.trim(), page_url: window.location.pathname + window.location.search })
       setDetails('')
       onClose()
-      toast({ title: 'Report submitted', description: 'Thanks! Our team will review it shortly.' })
+      toast({ title: t('Report submitted'), description: t('Thanks! Our team will review it shortly.') })
     } catch (err) {
-      toast({ title: 'Report not sent', description: (err as Error).message, variant: 'error' })
+      toast({ title: t('Report not sent'), description: (err as Error).message, variant: 'error' })
     } finally {
       setSending(false)
     }
   }
 
   return (
-    <Dialog open={open} onClose={onClose} title="Report an issue" description={subject} icon={<Flag className="h-5 w-5" />}>
+    <Dialog open={open} onClose={onClose} title={t('Report an issue')} description={subject} icon={<Flag className="h-5 w-5" />}>
       <form id="report-form" onSubmit={submit} className="space-y-5">
         <fieldset>
-          <legend className="mb-2 text-[13px] font-medium text-fg">What’s wrong?</legend>
+          <legend className="mb-2 text-[13px] font-medium text-fg">{t('What’s wrong?')}</legend>
           <div className="grid gap-2 sm:grid-cols-2">
             {reasons.map((r) => (
               <label
@@ -51,16 +52,16 @@ export function ReportDialog({ open, onClose, subject }: { open: boolean; onClos
         </fieldset>
         <div>
           <label htmlFor="report-details" className="mb-1.5 block text-[13px] font-medium text-fg">
-            Details <span className="font-normal text-fg-subtle">(optional)</span>
+            Details <span className="font-normal text-fg-subtle">{t('(optional)')}</span>
           </label>
-          <Textarea id="report-details" value={details} onChange={(e) => setDetails(e.target.value)} placeholder="Tell us a little more…" maxLength={500} />
+          <Textarea id="report-details" value={details} onChange={(e) => setDetails(e.target.value)} placeholder={t('Tell us a little more…')} maxLength={500} />
         </div>
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button variant="ghost" onClick={onClose}>
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button type="submit" loading={sending}>
-            Submit report
+            {t('Submit report')}
           </Button>
         </div>
       </form>

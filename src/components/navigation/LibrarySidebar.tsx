@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { NavLink } from 'react-router-dom'
 import { Avatar } from '@/components/ui'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
@@ -13,14 +14,14 @@ export function LibrarySidebar() {
   const counts: Record<string, number> = { '/watchlist': items.length, '/history': history.length }
 
   return (
-    <aside className="sticky top-[calc(var(--header-h)+1.5rem)] hidden h-fit w-60 shrink-0 lg:block" aria-label="Library">
+    <aside className="sticky top-[calc(var(--header-h)+1.5rem)] hidden h-fit w-60 shrink-0 lg:block" aria-label={t('Library')}>
       <div className="flex items-center gap-3 rounded-2xl border border-line bg-surface p-3">
         <Avatar name={user.displayName} hue={user.avatarHue} src={user.avatarUrl} />
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-fg">{user.displayName}</p>
           {isGuest ? (
             <NavLink to="/login" className="text-xs font-semibold text-accent-soft hover:underline">
-              Sign in to sync
+              {t('Sign in to sync')}
             </NavLink>
           ) : (
             <p className="truncate text-xs text-fg-subtle">@{user.username}</p>
@@ -29,8 +30,8 @@ export function LibrarySidebar() {
       </div>
       <nav className="mt-4 space-y-6">
         {[
-          { title: 'Library', items: libraryNavWithUpgrade },
-          { title: 'Discover', items: discoverNav },
+          { title: t('Library'), items: libraryNavWithUpgrade },
+          { title: t('Discover'), items: discoverNav },
         ].map((section) => (
           <div key={section.title}>
             <p className="eyebrow px-3 pb-2">{section.title}</p>

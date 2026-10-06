@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Link } from 'react-router-dom'
 import { cn } from '@/lib/cn'
 import type { Genre } from '@/types'
@@ -25,7 +26,7 @@ export function GenreTile({ genre, posters = [], className, size = 'sm' }: Genre
       <div className="absolute inset-0 z-20 bg-gradient-to-r from-black/55 via-black/25 to-transparent" aria-hidden />
       <div className={cn('relative z-30 flex flex-col justify-end', size === 'sm' ? 'max-w-[60%]' : 'max-w-[58%]')}>
         <h3 className={cn('font-display font-bold text-white', size === 'sm' ? 'text-base sm:text-lg' : 'text-2xl')}>{genre.name}</h3>
-        {genre.animeCount !== undefined && <p className="text-xs font-medium text-white/70">{genre.animeCount} titles</p>}
+        {genre.animeCount !== undefined && <p className="text-xs font-medium text-white/70">{t('{p0} titles', { p0: genre.animeCount })}</p>}
         {size === 'lg' && <p className="mt-2 line-clamp-2 text-[13px] leading-snug text-white/75">{genre.description}</p>}
       </div>
       <div className={cn('absolute bottom-0 top-3 flex items-end', size === 'sm' ? '-right-2' : '-right-4 top-6')} aria-hidden>

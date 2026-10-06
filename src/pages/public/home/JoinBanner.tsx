@@ -1,12 +1,13 @@
+import { t } from '@/i18n'
 import { BellRing, Bookmark, MonitorSmartphone, Sparkles } from 'lucide-react'
 import { ButtonLink } from '@/components/ui'
 import { config } from '@/config'
 
 const perks = [
-  { icon: Bookmark, title: 'Smart watchlist', body: 'Track status, favorites and progress.' },
-  { icon: BellRing, title: 'Release reminders', body: 'Never miss a new episode again.' },
-  { icon: MonitorSmartphone, title: 'Any screen', body: 'Designed for phone, tablet and TV-size displays.' },
-  { icon: Sparkles, title: 'Up to 4K', body: 'Cinematic quality on supported titles.' },
+  { icon: Bookmark, title: t('Smart watchlist'), body: t('Track status, favorites and progress.') },
+  { icon: BellRing, title: t('Release reminders'), body: t('Never miss a new episode again.') },
+  { icon: MonitorSmartphone, title: t('Any screen'), body: t('Designed for phone, tablet and TV-size displays.') },
+  { icon: Sparkles, title: t('Up to 4K'), body: t('Cinematic quality on supported titles.') },
 ]
 
 export function JoinBanner() {
@@ -17,22 +18,22 @@ export function JoinBanner() {
         <div className="absolute -bottom-32 left-1/3 -z-10 h-72 w-72 rounded-full bg-info/10 blur-3xl" aria-hidden />
         <div className="grid items-center gap-10 lg:grid-cols-[1fr_1.2fr]">
           <div>
-            <p className="eyebrow text-accent-soft">Your anime universe</p>
+            <p className="eyebrow text-accent-soft">{t('Your anime universe')}</p>
             <h2 id="join-heading" className="mt-2 text-3xl font-bold leading-tight text-fg sm:text-4xl">
-              Everything you watch.
+              {t('Everything you watch.')}
               <br />
-              <span className="text-gradient-accent">Remembered.</span>
+              <span className="text-gradient-accent">{t('Remembered.')}</span>
             </h2>
             <p className="mt-3 max-w-md text-sm leading-relaxed text-fg-muted sm:text-[15px]">
-              Create a free account to sync your watchlist, history and preferences — then pick up right where you left off.
+              {t('Create a free account to sync your watchlist, history and preferences — then pick up right where you left off.')}
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <ButtonLink to="/register" size="lg">
-                Create free account
+                {t('Create free account')}
               </ButtonLink>
               {config.enablePricing && (
                 <ButtonLink to="/pricing" size="lg" variant="outline">
-                See plans
+                {t('See plans')}
               </ButtonLink>
               )}
             </div>

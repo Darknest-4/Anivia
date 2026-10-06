@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { BookmarkPlus, Check } from 'lucide-react'
 import { useState } from 'react'
 import { Button, Dialog } from '@/components/ui'
@@ -22,26 +23,26 @@ export function AddToWatchlistDialog({ anime, open, onClose }: Props) {
       onClose={onClose}
       size="sm"
       icon={<BookmarkPlus className="h-5 w-5" />}
-      title="Add to watchlist"
+      title={t('Add to watchlist')}
       description={anime.title}
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button
             onClick={() => {
               watchlistService.add(anime.id, status)
-              toast({ title: 'Added to watchlist', description: `${anime.title} · ${WATCHLIST_STATUSES.find((s) => s.value === status)?.label}` })
+              toast({ title: t('Added to watchlist'), description: `${anime.title} · ${WATCHLIST_STATUSES.find((s) => s.value === status)?.label}` })
               onClose()
             }}
           >
-            Add to list
+            {t('Add to list')}
           </Button>
         </>
       }
     >
-      <div role="radiogroup" aria-label="List status" className="space-y-1.5">
+      <div role="radiogroup" aria-label={t('List status')} className="space-y-1.5">
         {WATCHLIST_STATUSES.map((s) => (
           <button
             key={s.value}

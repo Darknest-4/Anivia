@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { cn } from '@/lib/cn'
 import { useAniList } from '@/providers/AniListProvider'
 import { useFlag } from '@/providers/PlatformProvider'
@@ -13,7 +14,7 @@ export function AniListMark({ className }: { className?: string }) {
 }
 
 /** `intent="login"` signs in to ANIVIA with AniList (creating the account on first use); `connect` only links the list. */
-export function AniListButton({ label = 'Continue with AniList', returnTo, className, intent = 'connect' }: { label?: string; returnTo?: string; className?: string; intent?: AniListIntent }) {
+export function AniListButton({ label = t('Continue with AniList'), returnTo, className, intent = 'connect' }: { label?: string; returnTo?: string; className?: string; intent?: AniListIntent }) {
   const { connect, connecting, account } = useAniList()
   const loginOn = useFlag('anilist_login')
   if (account && intent === 'connect') return null
@@ -29,7 +30,7 @@ export function AniListButton({ label = 'Continue with AniList', returnTo, class
       )}
     >
       <AniListMark className="h-6 w-6 text-sm" />
-      {connecting ? 'Connecting…' : label}
+      {connecting ? t('Connecting…') : label}
     </button>
   )
 }

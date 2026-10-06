@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Bell, Gauge, Link2, LayoutGrid, MonitorPlay, Palette, RotateCcw, Shield, UserRound } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
@@ -26,29 +27,29 @@ import type { Preferences, VideoQuality } from '@/types'
 type Section = 'appearance' | 'content' | 'playback' | 'performance' | 'notifications' | 'privacy' | 'connections' | 'account'
 
 const allSections: { value: Section; label: string; icon: typeof Palette; description: string }[] = [
-  { value: 'appearance', label: 'Appearance', icon: Palette, description: 'Theme and motion preferences.' },
-  { value: 'content', label: 'Content', icon: LayoutGrid, description: 'Data source, titles, scores and home layout.' },
-  { value: 'playback', label: 'Playback', icon: MonitorPlay, description: 'Autoplay, quality and subtitles.' },
-  { value: 'performance', label: 'Speed & data', icon: Gauge, description: 'Caching, prefetching and data saver.' },
-  { value: 'notifications', label: 'Notifications', icon: Bell, description: 'Choose what we notify you about.' },
-  { value: 'privacy', label: 'Privacy', icon: Shield, description: 'Control your data and visibility.' },
-  { value: 'connections', label: 'Connections', icon: Link2, description: 'AniList sync.' },
-  { value: 'account', label: 'Account', icon: UserRound, description: 'Profile, sign-in and sessions.' },
+  { value: 'appearance', label: t('Appearance'), icon: Palette, description: t('Theme and motion preferences.') },
+  { value: 'content', label: t('Content'), icon: LayoutGrid, description: t('Data source, titles, scores and home layout.') },
+  { value: 'playback', label: t('Playback'), icon: MonitorPlay, description: t('Autoplay, quality and subtitles.') },
+  { value: 'performance', label: t('Speed & data'), icon: Gauge, description: t('Caching, prefetching and data saver.') },
+  { value: 'notifications', label: t('Notifications'), icon: Bell, description: t('Choose what we notify you about.') },
+  { value: 'privacy', label: t('Privacy'), icon: Shield, description: t('Control your data and visibility.') },
+  { value: 'connections', label: t('Connections'), icon: Link2, description: t('AniList sync.') },
+  { value: 'account', label: t('Account'), icon: UserRound, description: t('Profile, sign-in and sessions.') },
 ]
 // Player settings only matter when a video provider is configured (trailers have their own switch).
 const sections = allSections.filter((s) => s.value !== 'playback' || hasVideoProvider)
 
 const LANGS = [
-  { value: 'en', label: 'English' },
-  { value: 'ja', label: '日本語 (Japanese)' },
-  { value: 'es', label: 'Español' },
-  { value: 'pt', label: 'Português' },
-  { value: 'fr', label: 'Français' },
-  { value: 'de', label: 'Deutsch' },
+  { value: 'en', label: t('English') },
+  { value: 'ja', label: t('日本語 (Japanese)') },
+  { value: 'es', label: t('Español') },
+  { value: 'pt', label: t('Português') },
+  { value: 'fr', label: t('Français') },
+  { value: 'de', label: t('Deutsch') },
 ]
 
 export default function SettingsPage() {
-  useDocumentMeta({ title: 'Settings', noindex: true })
+  useDocumentMeta({ title: t('Settings'), noindex: true })
   const [params, setParams] = useSearchParams()
   const requested = params.get('tab') as Section | null
   const section: Section = requested && sections.some((s) => s.value === requested) ? requested : 'appearance'
@@ -62,7 +63,7 @@ export default function SettingsPage() {
     update(key, value)
     if (Date.now() - lastToast.current > 3500) {
       lastToast.current = Date.now()
-      toast({ title: 'Preferences saved', description: 'Changes are stored on this device.', duration: 2200 })
+      toast({ title: t('Preferences saved'), description: t('Changes are stored on this device.'), duration: 2200 })
     }
   }
 
@@ -76,15 +77,15 @@ export default function SettingsPage() {
     clearAccountData()
     storage.clearAll()
     setResetOpen(false)
-    toast({ title: 'Local data cleared', description: 'Watchlist, history and preferences on this device were reset.' })
+    toast({ title: t('Local data cleared'), description: t('Watchlist, history and preferences on this device were reset.') })
   }
 
   return (
     <div>
-      <PageHeader eyebrow="Account" title="Settings" description="Personalize ANIVIA. Preferences are saved instantly in this browser." />
+      <PageHeader eyebrow={t('Account')} title={t('Settings')} description={t('Personalize ANIVIA. Preferences are saved instantly in this browser.')} />
 
       <div className="grid gap-6 xl:grid-cols-[220px_minmax(0,1fr)]">
-        <nav aria-label="Settings sections" className="scrollbar-none -mx-4 flex gap-1 overflow-x-auto px-4 xl:mx-0 xl:flex-col xl:overflow-visible xl:px-0">
+        <nav aria-label={t('Settings sections')} className="scrollbar-none -mx-4 flex gap-1 overflow-x-auto px-4 xl:mx-0 xl:flex-col xl:overflow-visible xl:px-0">
           {sections.map((s) => (
             <button
               key={s.value}
@@ -105,7 +106,7 @@ export default function SettingsPage() {
         <div className="min-w-0 space-y-6">
           {section === 'appearance' && (
             <>
-              <Card title="Theme" description="Dark mode is the signature ANIVIA experience.">
+              <Card title={t('Theme')} description={t('Dark mode is the signature ANIVIA experience.')}>
                 <Row>
                   <ThemeSegmented className="max-w-md" />
                   <div className="mt-5 grid max-w-xl grid-cols-3 gap-3" aria-hidden>
@@ -132,9 +133,9 @@ export default function SettingsPage() {
                 </Row>
               </Card>
               <AppearanceExtras prefs={prefs} set={set} />
-              <Card title="Motion">
+              <Card title={t('Motion')}>
                 <Row>
-                  <Switch label="Reduce motion" description="Minimize animations, carousels and transitions." checked={prefs.reduceMotion} onChange={(v) => set('reduceMotion', v)} />
+                  <Switch label={t('Reduce motion')} description={t('Minimize animations, carousels and transitions.')} checked={prefs.reduceMotion} onChange={(v) => set('reduceMotion', v)} />
                 </Row>
               </Card>
             </>
@@ -145,52 +146,52 @@ export default function SettingsPage() {
           {section === 'performance' && <PerformanceSettings prefs={prefs} set={set} />}
 
           {section === 'playback' && (
-            <Card title="Playback" description="Applied to the ANIVIA player on every device using this browser.">
+            <Card title={t('Playback')} description={t('Applied to the ANIVIA player on every device using this browser.')}>
               <Row>
-                <Switch label="Autoplay" description="Start playing as soon as an episode opens." checked={prefs.autoplay} onChange={(v) => set('autoplay', v)} />
+                <Switch label={t('Autoplay')} description={t('Start playing as soon as an episode opens.')} checked={prefs.autoplay} onChange={(v) => set('autoplay', v)} />
               </Row>
               <Row>
-                <Switch label="Auto-next episode" description="Automatically continue to the next episode." checked={prefs.autoNext} onChange={(v) => set('autoNext', v)} />
+                <Switch label={t('Auto-next episode')} description={t('Automatically continue to the next episode.')} checked={prefs.autoNext} onChange={(v) => set('autoNext', v)} />
               </Row>
               <Row>
-                <Switch label="Skip intro" description="Show a skip button during openings." checked={prefs.skipIntro} onChange={(v) => set('skipIntro', v)} />
+                <Switch label={t('Skip intro')} description={t('Show a skip button during openings.')} checked={prefs.skipIntro} onChange={(v) => set('skipIntro', v)} />
               </Row>
               <Row>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <Field label="Default quality">
+                  <Field label={t('Default quality')}>
                     {(p) => (
                       <Select
                         {...p}
                         value={prefs.defaultQuality}
                         onChange={(e) => set('defaultQuality', e.target.value as VideoQuality)}
                         options={[
-                          { value: 'auto', label: 'Auto (recommended)' },
+                          { value: 'auto', label: t('Auto (recommended)') },
                           { value: '1080p', label: '1080p' },
                           { value: '720p', label: '720p' },
                           { value: '480p', label: '480p' },
-                          { value: '360p', label: '360p (data saver)' },
+                          { value: '360p', label: t('360p (data saver)') },
                         ]}
                       />
                     )}
                   </Field>
-                  <Field label="Subtitle language">
+                  <Field label={t('Subtitle language')}>
                     {(p) => <Select {...p} value={prefs.subtitleLanguage} onChange={(e) => set('subtitleLanguage', e.target.value)} options={LANGS.filter((l) => l.value !== 'ja')} />}
                   </Field>
                 </div>
               </Row>
               <Row>
-                <Switch label="Subtitles" description="Show subtitles by default." checked={prefs.subtitles} onChange={(v) => set('subtitles', v)} />
+                <Switch label={t('Subtitles')} description={t('Show subtitles by default.')} checked={prefs.subtitles} onChange={(v) => set('subtitles', v)} />
               </Row>
             </Card>
           )}
 
           {section === 'notifications' && (
-            <Card title="Notifications" description="Alerts are generated from your watchlist and live airing data — see the bell icon.">
+            <Card title={t('Notifications')} description={t('Alerts are generated from your watchlist and live airing data — see the bell icon.')}>
               <Row>
-                <Switch label="New episodes" description="When a new episode of a show you’re watching or planning is out." checked={prefs.notifyNewEpisodes} onChange={(v) => set('notifyNewEpisodes', v)} />
+                <Switch label={t('New episodes')} description={t('When a new episode of a show you’re watching or planning is out.')} checked={prefs.notifyNewEpisodes} onChange={(v) => set('notifyNewEpisodes', v)} />
               </Row>
               <Row>
-                <Switch label="Airing reminders & premieres" description="Episodes airing within 24 hours and premieres within two weeks." checked={prefs.notifyReleases} onChange={(v) => set('notifyReleases', v)} />
+                <Switch label={t('Airing reminders & premieres')} description={t('Episodes airing within 24 hours and premieres within two weeks.')} checked={prefs.notifyReleases} onChange={(v) => set('notifyReleases', v)} />
               </Row>
               <Row>
                 <BrowserNotifications />
@@ -201,40 +202,40 @@ export default function SettingsPage() {
           {section === 'privacy' && (
             <>
               <PrivacySettings />
-              <Card title="Your data" description="Your library is stored in this browser and — when you’re signed in — in your account.">
+              <Card title={t('Your data')} description={t('Your library is stored in this browser and — when you’re signed in — in your account.')}>
                 <Row>
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                      <p className="text-sm font-medium text-fg">Watch history</p>
-                      <p className="text-[13px] text-fg-subtle">Remove all progress and Continue Watching entries.</p>
+                      <p className="text-sm font-medium text-fg">{t('Watch history')}</p>
+                      <p className="text-[13px] text-fg-subtle">{t('Remove all progress and Continue Watching entries.')}</p>
                     </div>
                     <Button
                       variant="secondary"
                       size="sm"
                       onClick={() => {
                         historyService.clear()
-                        toast({ title: 'Watch history cleared', variant: 'info' })
+                        toast({ title: t('Watch history cleared'), variant: 'info' })
                       }}
                     >
-                      Clear history
+                      {t('Clear history')}
                     </Button>
                   </div>
                 </Row>
                 <Row>
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                      <p className="text-sm font-medium text-fg">Search history</p>
-                      <p className="text-[13px] text-fg-subtle">Remove recent searches from this device.</p>
+                      <p className="text-sm font-medium text-fg">{t('Search history')}</p>
+                      <p className="text-[13px] text-fg-subtle">{t('Remove recent searches from this device.')}</p>
                     </div>
                     <Button
                       variant="secondary"
                       size="sm"
                       onClick={() => {
                         recentSearchesService.clear()
-                        toast({ title: 'Search history cleared', variant: 'info' })
+                        toast({ title: t('Search history cleared'), variant: 'info' })
                       }}
                     >
-                      Clear searches
+                      {t('Clear searches')}
                     </Button>
                   </div>
                 </Row>
@@ -246,17 +247,17 @@ export default function SettingsPage() {
             <>
               <AccountSettings />
               <section className="rounded-2xl border border-danger/30 bg-danger/[0.04] p-5">
-                <h2 className="text-base font-semibold text-fg">Reset this device</h2>
-                <p className="mt-1 text-[13px] text-fg-subtle">Clears the local library, preferences and cache in this browser. Your synced account data is not deleted.</p>
+                <h2 className="text-base font-semibold text-fg">{t('Reset this device')}</h2>
+                <p className="mt-1 text-[13px] text-fg-subtle">{t('Clears the local library, preferences and cache in this browser. Your synced account data is not deleted.')}</p>
                 <Button className="mt-4" variant="secondary" leftIcon={<RotateCcw className="h-4 w-4" />} onClick={() => setResetOpen(true)}>
-                  Reset local data
+                  {t('Reset local data')}
                 </Button>
               </section>
             </>
           )}
 
           {section === 'account' && auth.status === 'disabled' && (
-            <DemoNotice>Accounts are disabled. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY to enable sign-in and sync.</DemoNotice>
+            <DemoNotice>{t('Accounts are disabled. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY to enable sign-in and sync.')}</DemoNotice>
           )}
         </div>
       </div>
@@ -266,14 +267,14 @@ export default function SettingsPage() {
         onClose={() => setResetOpen(false)}
         size="sm"
         icon={<RotateCcw className="h-5 w-5" />}
-        title="Reset local data?"
-        description="Clears the watchlist, history and preferences stored on this device."
+        title={t('Reset local data?')}
+        description={t('Clears the watchlist, history and preferences stored on this device.')}
         footer={
           <>
             <Button variant="ghost" onClick={() => setResetOpen(false)}>
-              Cancel
+              {t('Cancel')}
             </Button>
-            <Button onClick={resetLocal}>Reset</Button>
+            <Button onClick={resetLocal}>{t('Reset')}</Button>
           </>
         }
       />

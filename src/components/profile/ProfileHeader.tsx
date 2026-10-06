@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Camera, CalendarDays, ImageIcon, MapPin, Settings, Share2 } from 'lucide-react'
 import { Avatar, Badge, Button, ButtonLink } from '@/components/ui'
 import { formatDate } from '@/lib/format'
@@ -25,7 +26,7 @@ export function ProfileHeader({ user, banner, onShare, onChangeAvatar, onChangeB
             className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-lg bg-black/55 px-3 py-2 text-xs font-semibold text-white ring-1 ring-inset ring-white/15 backdrop-blur-md transition-colors hover:bg-black/75"
           >
             <ImageIcon className="h-4 w-4" />
-            Change banner
+            {t('Change banner')}
           </button>
         )}
       </div>
@@ -36,7 +37,7 @@ export function ProfileHeader({ user, banner, onShare, onChangeAvatar, onChangeB
             <button
               type="button"
               onClick={onChangeAvatar}
-              aria-label="Change profile picture"
+              aria-label={t('Change profile picture')}
               className="absolute bottom-1 right-1 flex h-9 w-9 items-center justify-center rounded-full bg-accent text-white shadow-pop ring-4 ring-surface transition-transform hover:scale-105"
             >
               <Camera className="h-4 w-4" />
@@ -57,7 +58,7 @@ export function ProfileHeader({ user, banner, onShare, onChangeAvatar, onChangeB
             {user.memberSince && (
               <span className="inline-flex items-center gap-1.5">
                 <CalendarDays className="h-3.5 w-3.5" />
-                Member since {formatDate(user.memberSince, { month: 'long', year: 'numeric' })}
+                {t('Member since {p0}', { p0: formatDate(user.memberSince, { month: 'long', year: 'numeric' }) })}
               </span>
             )}
             {user.location && (
@@ -70,9 +71,9 @@ export function ProfileHeader({ user, banner, onShare, onChangeAvatar, onChangeB
         </div>
         <div className="flex gap-2">
           <ButtonLink to="/settings?tab=account" variant="secondary" size="md" leftIcon={<Settings className="h-4 w-4" />}>
-            Edit profile
+            {t('Edit profile')}
           </ButtonLink>
-          <Button variant="secondary" size="icon" aria-label="Share profile" onClick={onShare} className="h-11 w-11">
+          <Button variant="secondary" size="icon" aria-label={t('Share profile')} onClick={onShare} className="h-11 w-11">
             <Share2 className="h-4 w-4" />
           </Button>
         </div>

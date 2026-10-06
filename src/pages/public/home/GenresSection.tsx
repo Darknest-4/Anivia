@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { LayoutGrid } from 'lucide-react'
 import { GenreTile } from '@/components/anime'
 import { SectionHeader } from '@/components/common/SectionHeader'
@@ -10,7 +11,7 @@ export function GenresSection() {
   const postersFor = (slug: string) => (all?.items ?? []).filter((a) => a.genres.some((g) => g.slug === slug)).map((a) => a.poster)
   return (
     <section aria-labelledby="genres-heading" className="container-app">
-      <SectionHeader id="genres-heading" title="Explore Genres" icon={<LayoutGrid />} href="/genres" />
+      <SectionHeader id="genres-heading" title={t('Explore Genres')} icon={<LayoutGrid />} href="/genres" />
       <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
         {genres
           ? genres.slice(0, 8).map((g) => <GenreTile key={g.id} genre={g} posters={postersFor(g.slug)} />)

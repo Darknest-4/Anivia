@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Check, ImageIcon, Search, UserRound } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Dialog, EmptyState, Input, Skeleton } from '@/components/ui'
@@ -53,20 +54,20 @@ export function ProfileImagePicker({ kind, open, current, onClose, onSave }: Pro
       onClose={onClose}
       size="lg"
       icon={avatar ? <UserRound className="h-5 w-5" /> : <ImageIcon className="h-5 w-5" />}
-      title={avatar ? 'Choose a profile picture' : 'Choose a profile banner'}
-      description={avatar ? 'Pick any anime character — search by name.' : 'Pick the banner of an anime — search by title.'}
+      title={avatar ? t('Choose a profile picture') : t('Choose a profile banner')}
+      description={avatar ? t('Pick any anime character — search by name.') : t('Pick the banner of an anime — search by title.')}
       footer={
         <>
           {current && (
             <Button variant="ghost" className="mr-auto" disabled={saving} onClick={() => void save(null)}>
-              Remove
+              {t('Remove')}
             </Button>
           )}
           <Button variant="ghost" onClick={onClose}>
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button loading={saving} disabled={!selected || selected === current} onClick={() => selected && void save(selected)}>
-            Save
+            {t('Save')}
           </Button>
         </>
       }
@@ -75,8 +76,8 @@ export function ProfileImagePicker({ kind, open, current, onClose, onSave }: Pro
         type="search"
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder={avatar ? 'Search characters, e.g. Frieren, Luffy…' : 'Search anime, e.g. One Piece…'}
-        aria-label={avatar ? 'Search characters' : 'Search anime'}
+        placeholder={avatar ? t('Search characters, e.g. Frieren, Luffy…') : t('Search anime, e.g. One Piece…')}
+        aria-label={avatar ? t('Search characters') : t('Search anime')}
         leftIcon={<Search />}
         autoFocus
       />
@@ -110,10 +111,10 @@ function CharacterGrid({ query, selected, onSelect }: GridProps) {
         ))}
       </div>
     )
-  if (!items.length) return <EmptyState compact icon={<Search />} title="No characters found" description="Try another name." />
+  if (!items.length) return <EmptyState compact icon={<Search />} title={t('No characters found')} description={t('Try another name.')} />
   return (
     <>
-      {!query && <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-fg-subtle">Popular characters</p>}
+      {!query && <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-fg-subtle">{t('Popular characters')}</p>}
       <ul className="grid grid-cols-3 gap-x-3 gap-y-4 xs:grid-cols-4 sm:grid-cols-5">
         {items.map((c) => {
           const active = selected === c.image
@@ -153,10 +154,10 @@ function BannerGrid({ query, selected, onSelect }: GridProps) {
         ))}
       </div>
     )
-  if (!items.length) return <EmptyState compact icon={<Search />} title="No banners found" description="Try another title — not every anime has a banner." />
+  if (!items.length) return <EmptyState compact icon={<Search />} title={t('No banners found')} description={t('Try another title — not every anime has a banner.')} />
   return (
     <>
-      {!query && <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-fg-subtle">Trending anime</p>}
+      {!query && <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-fg-subtle">{t('Trending anime')}</p>}
       <ul className="grid gap-3 sm:grid-cols-2">
         {items.map((a) => {
           const active = selected === a.backdrop
@@ -166,7 +167,7 @@ function BannerGrid({ query, selected, onSelect }: GridProps) {
                 type="button"
                 onClick={() => onSelect(a.backdrop!)}
                 aria-pressed={active}
-                aria-label={`Banner of ${a.title}`}
+                aria-label={t('Banner of {p0}', { p0: a.title })}
                 className={cn('relative block aspect-[19/5] w-full overflow-hidden rounded-xl ring-2 transition', active ? 'ring-accent' : 'ring-transparent hover:ring-line-strong')}
               >
                 <img src={a.backdrop} alt="" loading="lazy" className="h-full w-full object-cover" />

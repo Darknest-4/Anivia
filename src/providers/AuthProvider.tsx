@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import type { Session, SupabaseClient } from '@supabase/supabase-js'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { config } from '@/config'
@@ -159,7 +160,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           ? {
               id: session.user.id,
               username: email?.split('@')[0] ?? 'member',
-              displayName: (session.user.user_metadata?.display_name as string) ?? email?.split('@')[0] ?? 'Member',
+              displayName: (session.user.user_metadata?.display_name as string) ?? email?.split('@')[0] ?? t('Member'),
               avatarHue: 348,
               bio: '',
               memberSince: session.user.created_at,

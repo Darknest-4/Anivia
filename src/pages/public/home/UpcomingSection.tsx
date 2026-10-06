@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { CalendarClock } from 'lucide-react'
 import { UpcomingCard } from '@/components/anime'
 import { SectionHeader } from '@/components/common/SectionHeader'
@@ -8,7 +9,7 @@ export function UpcomingSection() {
   const { data } = useUpcoming()
   return (
     <section aria-labelledby="upcoming-heading" className="container-app">
-      <SectionHeader id="upcoming-heading" title="Coming Soon" eyebrow="Upcoming" icon={<CalendarClock />} href="/season" linkLabel="Upcoming seasons" />
+      <SectionHeader id="upcoming-heading" title={t('Coming Soon')} eyebrow={t('Upcoming')} icon={<CalendarClock />} href="/season" linkLabel={t('Upcoming seasons')} />
       <div className="grid gap-4 lg:grid-cols-2">
         {data ? data.slice(0, 4).map((a) => <UpcomingCard key={a.id} anime={a} />) : Array.from({ length: 4 }, (_, i) => <Skeleton key={i} className="h-[164px] rounded-2xl" />)}
       </div>

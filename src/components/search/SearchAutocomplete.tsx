@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { ArrowUpRight, Building2, Clock, Hash, Loader2, Search, User, X } from 'lucide-react'
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -72,9 +73,9 @@ export function SearchAutocomplete({
     if (!data) return []
     return [
       ...data.anime.map((a) => ({ id: `a-${a.id}`, group: 'Anime', label: a.title, sublabel: `${a.type} · ${a.year ?? 'TBA'} · ${a.genres.slice(0, 2).map((g) => g.name).join(', ')}`, to: `/anime/${a.id}`, image: a.poster })),
-      ...data.genres.map((g) => ({ id: `g-${g.id}`, group: 'Genres', label: g.name, sublabel: g.animeCount !== undefined ? `${g.animeCount} titles` : 'Genre', to: `/genres/${g.slug}`, icon: <Hash className="h-4 w-4" /> })),
+      ...data.genres.map((g) => ({ id: `g-${g.id}`, group: 'Genres', label: g.name, sublabel: g.animeCount !== undefined ? t('{p0} titles', { p0: g.animeCount }) : t('Genre'), to: `/genres/${g.slug}`, icon: <Hash className="h-4 w-4" /> })),
       ...data.characters.map((c) => ({ id: `c-${c.id}`, group: 'Characters', label: c.name, sublabel: c.role, to: `/character/${c.id}`, image: c.image, icon: <User className="h-4 w-4" /> })),
-      ...data.studios.map((s) => ({ id: `s-${s.id}`, group: 'Studios', label: s.name, sublabel: [s.country, s.animeCount !== undefined ? `${s.animeCount} titles` : 'Studio'].filter(Boolean).join(' · '), to: `/studio/${s.id}`, icon: <Building2 className="h-4 w-4" /> })),
+      ...data.studios.map((s) => ({ id: `s-${s.id}`, group: 'Studios', label: s.name, sublabel: [s.country, s.animeCount !== undefined ? t('{p0} titles', { p0: s.animeCount }) : t('Studio')].filter(Boolean).join(' · '), to: `/studio/${s.id}`, icon: <Building2 className="h-4 w-4" /> })),
     ]
   }, [data, debounced, recent])
 
@@ -136,7 +137,7 @@ export function SearchAutocomplete({
           aria-controls={listId}
           aria-autocomplete="list"
           aria-activedescendant={active >= 0 ? `${listId}-${active}` : undefined}
-          aria-label="Search anime, genres, characters and studios"
+          aria-label={t('Search anime, genres, characters and studios')}
           autoFocus={autoFocus}
           autoComplete="off"
           spellCheck={false}
@@ -162,7 +163,7 @@ export function SearchAutocomplete({
                 setValue('')
                 inputRef.current?.focus()
               }}
-              aria-label="Clear search"
+              aria-label={t('Clear search')}
               className="rounded-md p-1 text-fg-subtle hover:bg-surface-3 hover:text-fg"
             >
               <X className="h-4 w-4" />
@@ -179,7 +180,7 @@ export function SearchAutocomplete({
 
       {showPanel && (
         <div className="absolute inset-x-0 top-full z-overlay mt-2 max-h-[min(70vh,520px)] min-w-[320px] animate-scale-in overflow-y-auto rounded-2xl border border-line-strong/70 bg-surface-2/95 p-2 shadow-pop backdrop-blur-xl scrollbar-thin">
-          <ul id={listId} role="listbox" aria-label="Search suggestions">
+          <ul id={listId} role="listbox" aria-label={t('Search suggestions')}>
             {options.map((opt, i) => {
               const header = opt.group !== lastGroup ? opt.group : null
               lastGroup = opt.group
@@ -187,10 +188,10 @@ export function SearchAutocomplete({
                 <li key={opt.id} role="presentation">
                   {header && (
                     <div className="flex items-center justify-between px-3 pb-1.5 pt-2.5">
-                      <span className="eyebrow">{header}</span>
+                      <span className="eyebrow">{t(header)}</span>
                       {header === 'Recent searches' && (
                         <button type="button" onClick={() => recentSearchesService.clear()} className="text-2xs font-semibold text-fg-subtle hover:text-fg">
-                          Clear
+                          {t('Clear')}
                         </button>
                       )}
                     </div>

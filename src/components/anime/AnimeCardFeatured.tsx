@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Info, Play } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { ButtonLink } from '@/components/ui'
@@ -42,11 +43,11 @@ export function AnimeCardFeatured({ anime, className, label = 'Featured' }: { an
         <div className="flex flex-wrap gap-2">
           {anime.status !== 'upcoming' && (
             <ButtonLink to={`/anime/${anime.id}/watch`} size="md" leftIcon={<Play className="h-4 w-4 fill-current" />}>
-              Watch now
+              {t('Watch now')}
             </ButtonLink>
           )}
           <ButtonLink to={`/anime/${anime.id}`} variant="glass" size="md" leftIcon={<Info className="h-4 w-4" />}>
-            Details
+            {t('Details')}
           </ButtonLink>
         </div>
       </div>

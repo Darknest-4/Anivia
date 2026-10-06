@@ -11,6 +11,7 @@ export const defaultPreferences: Preferences = {
   subtitleLanguage: 'en',
   audioLanguage: 'Japanese',
   interfaceLanguage: 'en',
+  language: 'auto',
   notifyReleases: true,
   notifyNewEpisodes: true,
   notifyAnnouncements: false,

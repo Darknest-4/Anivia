@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { NavLink } from 'react-router-dom'
 import { cn } from '@/lib/cn'
 import { mobileTabs } from './navItems'
@@ -6,7 +7,7 @@ import { mobileTabs } from './navItems'
 export function MobileNav() {
   return (
     <nav
-      aria-label="Primary"
+      aria-label={t('Primary')}
       className="surface-glass fixed inset-x-0 bottom-0 z-nav border-t border-line/80 pb-[env(safe-area-inset-bottom)] lg:hidden"
     >
       <ul className="mx-auto grid h-[var(--bottom-nav-h)] max-w-lg grid-cols-5">

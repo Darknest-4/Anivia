@@ -48,6 +48,8 @@ export interface Preferences {
   subtitleLanguage: string
   audioLanguage: string
   interfaceLanguage: string
+  /** UI language; "auto" follows the browser. Applied on reload. */
+  language: 'auto' | 'en' | 'hu'
   notifyReleases: boolean
   notifyNewEpisodes: boolean
   notifyAnnouncements: boolean

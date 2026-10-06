@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { CalendarClock, Cloud, Heart, MonitorSmartphone, Search, ShieldCheck, Tv } from 'lucide-react'
 import { PageHeader } from '@/components/common/PageHeader'
 import { ButtonLink } from '@/components/ui'
@@ -5,19 +6,19 @@ import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { providerName } from '@/services/anime'
 
 const features = [
-  { icon: Search, title: 'Discover', body: 'Trending, seasonal, genre and studio discovery with instant search and smart filters.' },
-  { icon: CalendarClock, title: 'Never miss an episode', body: 'A weekly airing schedule and notifications for the shows on your watchlist.' },
-  { icon: Cloud, title: 'Synced everywhere', body: 'Your watchlist, progress, scores and settings follow you — with two-way AniList sync.' },
-  { icon: MonitorSmartphone, title: 'Any screen', body: 'Made for phones, tablets and big screens, and installable as an app.' },
-  { icon: Tv, title: 'Watch legally', body: 'Official trailers and links to the licensed services where each series streams.' },
-  { icon: Heart, title: 'Made by fans', body: 'Free to use, no ads, and built for people who love anime.' },
+  { icon: Search, title: t('Discover'), body: t('Trending, seasonal, genre and studio discovery with instant search and smart filters.') },
+  { icon: CalendarClock, title: t('Never miss an episode'), body: t('A weekly airing schedule and notifications for the shows on your watchlist.') },
+  { icon: Cloud, title: t('Synced everywhere'), body: t('Your watchlist, progress, scores and settings follow you — with two-way AniList sync.') },
+  { icon: MonitorSmartphone, title: t('Any screen'), body: t('Made for phones, tablets and big screens, and installable as an app.') },
+  { icon: Tv, title: t('Watch legally'), body: t('Official trailers and links to the licensed services where each series streams.') },
+  { icon: Heart, title: t('Made by fans'), body: t('Free to use, no ads, and built for people who love anime.') },
 ]
 
 export default function AboutPage() {
-  useDocumentMeta({ title: 'About', description: 'ANIVIA is an anime discovery and tracking site with AniList sync.' })
+  useDocumentMeta({ title: t('About'), description: t('ANIVIA is an anime discovery and tracking site with AniList sync.') })
   return (
     <div className="container-app">
-      <PageHeader eyebrow="About ANIVIA" title={<>Your anime universe — <span className="text-gradient-accent">beautifully organized.</span></>} description="Discover, schedule, track and remember everything you watch." />
+      <PageHeader eyebrow={t('About ANIVIA')} title={<>{t('Your anime universe —')}{' '}<span className="text-gradient-accent">{t('beautifully organized.')}</span></>} description={t('Discover, schedule, track and remember everything you watch.')} />
 
       <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {features.map((f) => (
@@ -44,7 +45,7 @@ export default function AboutPage() {
           </p>
         </div>
         <ButtonLink to="/contact" variant="secondary">
-          Contact us
+          {t('Contact us')}
         </ButtonLink>
       </section>
     </div>

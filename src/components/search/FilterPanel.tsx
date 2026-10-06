@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Check, X } from 'lucide-react'
 import { Select } from '@/components/ui'
 import { useGenres } from '@/hooks/queries'
@@ -21,12 +22,12 @@ export function FilterPanel({ value, onChange, layout = 'bar', hide = [] }: Filt
     onChange({ genres: selected.includes(slug) ? selected.filter((g) => g !== slug) : [...selected, slug] })
 
   const selects = [
-    { key: 'year', label: 'Year', options: YEAR_OPTIONS, value: value.year ? String(value.year) : '', set: (v: string) => onChange({ year: v ? Number(v) : undefined }) },
-    { key: 'season', label: 'Season', options: SEASON_OPTIONS, value: value.season ?? '', set: (v: string) => onChange({ season: (v || undefined) as SeasonName | undefined }) },
-    { key: 'status', label: 'Status', options: STATUS_OPTIONS, value: value.status ?? '', set: (v: string) => onChange({ status: (v || undefined) as AnimeStatus | undefined }) },
-    { key: 'type', label: 'Type', options: TYPE_OPTIONS, value: value.type ?? '', set: (v: string) => onChange({ type: (v || undefined) as AnimeType | undefined }) },
-    { key: 'minRating', label: 'Rating', options: RATING_OPTIONS, value: value.minRating ? String(value.minRating) : '', set: (v: string) => onChange({ minRating: v ? Number(v) : undefined }) },
-    { key: 'language', label: 'Language', options: LANGUAGE_OPTIONS, value: value.language ?? '', set: (v: string) => onChange({ language: (v || undefined) as AudioLanguage | undefined }) },
+    { key: 'year', label: t('Year'), options: YEAR_OPTIONS, value: value.year ? String(value.year) : '', set: (v: string) => onChange({ year: v ? Number(v) : undefined }) },
+    { key: 'season', label: t('Season'), options: SEASON_OPTIONS, value: value.season ?? '', set: (v: string) => onChange({ season: (v || undefined) as SeasonName | undefined }) },
+    { key: 'status', label: t('Status'), options: STATUS_OPTIONS, value: value.status ?? '', set: (v: string) => onChange({ status: (v || undefined) as AnimeStatus | undefined }) },
+    { key: 'type', label: t('Type'), options: TYPE_OPTIONS, value: value.type ?? '', set: (v: string) => onChange({ type: (v || undefined) as AnimeType | undefined }) },
+    { key: 'minRating', label: t('Rating'), options: RATING_OPTIONS, value: value.minRating ? String(value.minRating) : '', set: (v: string) => onChange({ minRating: v ? Number(v) : undefined }) },
+    { key: 'language', label: t('Language'), options: LANGUAGE_OPTIONS, value: value.language ?? '', set: (v: string) => onChange({ language: (v || undefined) as AudioLanguage | undefined }) },
   ].filter((s) => !hide.includes(s.key as keyof AnimeFilters))
 
   return (
@@ -35,14 +36,14 @@ export function FilterPanel({ value, onChange, layout = 'bar', hide = [] }: Filt
         {selects.map((s) => (
           <div key={s.key}>
             {layout === 'stack' && <p className="mb-1.5 text-[13px] font-medium text-fg">{s.label}</p>}
-            <Select size="sm" aria-label={s.label} value={s.value} onChange={(e) => s.set(e.target.value)} options={s.options} placeholder={layout === 'bar' ? `${s.label}: Any` : 'Any'} />
+            <Select size="sm" aria-label={s.label} value={s.value} onChange={(e) => s.set(e.target.value)} options={s.options} placeholder={layout === 'bar' ? t('{p0}: Any', { p0: s.label }) : t('Any')} />
           </div>
         ))}
       </div>
       {!hide.includes('genres') && (
         <div>
-          {layout === 'stack' && <p className="mb-2 text-[13px] font-medium text-fg">Genres</p>}
-          <div role="group" aria-label="Genres" className={cn('flex gap-2', layout === 'bar' ? 'scrollbar-none -mx-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0' : 'flex-wrap')}>
+          {layout === 'stack' && <p className="mb-2 text-[13px] font-medium text-fg">{t('Genres')}</p>}
+          <div role="group" aria-label={t('Genres')} className={cn('flex gap-2', layout === 'bar' ? 'scrollbar-none -mx-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0' : 'flex-wrap')}>
             {(genres ?? []).map((g) => {
               const on = selected.includes(g.slug)
               return (
@@ -79,7 +80,7 @@ export function ActiveFilters({ value, onChange, onReset }: { value: AnimeFilter
   if (value.season) chips.push({ label: seasonLabel[value.season], clear: () => onChange({ season: undefined }) })
   if (value.status) chips.push({ label: statusLabel[value.status], clear: () => onChange({ status: undefined }) })
   if (value.type) chips.push({ label: value.type, clear: () => onChange({ type: undefined }) })
-  if (value.minRating) chips.push({ label: `${value.minRating}+ rating`, clear: () => onChange({ minRating: undefined }) })
+  if (value.minRating) chips.push({ label: t('{p0}+ rating', { p0: value.minRating }), clear: () => onChange({ minRating: undefined }) })
   if (value.language) chips.push({ label: value.language, clear: () => onChange({ language: undefined }) })
   if (!chips.length) return null
   return (
@@ -90,14 +91,14 @@ export function ActiveFilters({ value, onChange, onReset }: { value: AnimeFilter
           type="button"
           onClick={c.clear}
           className="inline-flex h-7 items-center gap-1 rounded-full bg-accent/12 pl-3 pr-2 text-xs font-semibold text-accent-soft ring-1 ring-inset ring-accent/25 hover:bg-accent/20"
-          aria-label={`Remove filter ${c.label}`}
+          aria-label={t('Remove filter {p0}', { p0: c.label })}
         >
           {c.label}
           <X className="h-3.5 w-3.5" />
         </button>
       ))}
       <button type="button" onClick={onReset} className="-my-2 rounded-md px-1.5 py-2 text-xs font-semibold text-fg-subtle hover:text-fg">
-        Clear all
+        {t('Clear all')}
       </button>
     </div>
   )

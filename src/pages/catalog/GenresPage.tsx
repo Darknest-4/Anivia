@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { GenreTile } from '@/components/anime'
 import { PageHeader } from '@/components/common/PageHeader'
 import { ErrorState, Skeleton } from '@/components/ui'
@@ -8,7 +9,7 @@ import { formatRating } from '@/lib/format'
 import { thumb } from '@/lib/images'
 
 export default function GenresPage() {
-  useDocumentMeta({ title: 'Genres', description: 'Explore anime by genre — action, fantasy, romance, sci-fi and more.' })
+  useDocumentMeta({ title: t('Genres'), description: t('Explore anime by genre — action, fantasy, romance, sci-fi and more.') })
   const genres = useGenres()
   const all = useBrowse({ perPage: 100, sort: 'popularity' })
   const used = new Set<string>()
@@ -16,7 +17,7 @@ export default function GenresPage() {
 
   return (
     <div className="container-app">
-      <PageHeader crumbs={[{ label: 'Home', to: '/' }, { label: 'Genres' }]} eyebrow="Discover" title="Genres" description="From quiet slice-of-life to galaxy-spanning mecha wars — find stories that match your mood." />
+      <PageHeader crumbs={[{ label: t('Home'), to: '/' }, { label: t('Genres') }]} eyebrow={t('Discover')} title={t('Genres')} description={t('From quiet slice-of-life to galaxy-spanning mecha wars — find stories that match your mood.')} />
       {genres.isError ? (
         <ErrorState onRetry={() => genres.refetch()} />
       ) : (
@@ -34,7 +35,7 @@ export default function GenresPage() {
                       <Link to={`/anime/${featured.id}`} className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-surface-2">
                         <img src={thumb(featured.poster)} alt="" loading="lazy" className="h-12 w-8 rounded object-cover" />
                         <span className="min-w-0">
-                          <span className="block text-2xs font-semibold uppercase tracking-wider text-fg-subtle">Featured</span>
+                          <span className="block text-2xs font-semibold uppercase tracking-wider text-fg-subtle">{t('Featured')}</span>
                           <span className="block truncate text-sm font-semibold text-fg group-hover:text-accent-soft">{featured.title}</span>
                         </span>
                         <span className="ml-auto text-xs text-fg-subtle">{featured.rating ? formatRating(featured.rating) : 'New'}</span>

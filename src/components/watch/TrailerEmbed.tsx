@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Play } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/cn'
@@ -20,7 +21,7 @@ export function TrailerEmbed({ youtubeId, title, thumbnail, autoplay, className 
       {active ? (
         <iframe
           src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1`}
-          title={`${title} — official trailer`}
+          title={t('{p0} — official trailer', { p0: title })}
           allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
           allowFullScreen
           referrerPolicy="strict-origin-when-cross-origin"
@@ -33,7 +34,7 @@ export function TrailerEmbed({ youtubeId, title, thumbnail, autoplay, className 
           <span className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-accent text-white shadow-glow transition-transform group-hover:scale-105">
             <Play className="ml-1 h-7 w-7 fill-current" />
           </span>
-          <span className="absolute bottom-3 left-4 text-sm font-semibold text-white">Official trailer</span>
+          <span className="absolute bottom-3 left-4 text-sm font-semibold text-white">{t('Official trailer')}</span>
         </button>
       )}
     </div>

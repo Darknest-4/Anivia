@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { CalendarRange, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -13,10 +14,10 @@ import type { SortOption } from '@/types'
 import NotFoundPage from '@/pages/info/NotFoundPage'
 
 const SORTS: { value: SortOption; label: string }[] = [
-  { value: 'popularity', label: 'Popular' },
-  { value: 'rating', label: 'Highest Rated' },
-  { value: 'newest', label: 'Newest' },
-  { value: 'title-asc', label: 'Alphabetical' },
+  { value: 'popularity', label: t('Popular') },
+  { value: 'rating', label: t('Highest Rated') },
+  { value: 'newest', label: t('Newest') },
+  { value: 'title-asc', label: t('Alphabetical') },
 ]
 
 export default function SeasonPage() {
@@ -29,7 +30,7 @@ export default function SeasonPage() {
   const [sort, setSort] = useState<SortOption>('popularity')
   const sorted = useMemo(() => (data ? sortAnime(data, sort) : undefined), [data, sort])
 
-  useDocumentMeta({ title: active ? `${active.label} Anime` : 'Seasonal Anime', description: 'Every anime premiering this season, plus upcoming and previous seasons.' })
+  useDocumentMeta({ title: active ? t('{p0} Anime', { p0: active.label }) : t('Seasonal Anime'), description: t('Every anime premiering this season, plus upcoming and previous seasons.') })
 
   if (slug && !parsed) return <NotFoundPage />
   if (!active || !current.data)
@@ -42,9 +43,9 @@ export default function SeasonPage() {
   const prev = shiftSeason(current.data, -1)
   const next = shiftSeason(current.data, 1)
   const quick = [
-    { value: prev.slug, label: `Previous · ${prev.label}` },
-    { value: current.data.slug, label: `Current · ${current.data.label}` },
-    { value: next.slug, label: `Upcoming · ${next.label}` },
+    { value: prev.slug, label: t('Previous · {p0}', { p0: prev.label }) },
+    { value: current.data.slug, label: t('Current · {p0}', { p0: current.data.label }) },
+    { value: next.slug, label: t('Upcoming · {p0}', { p0: next.label }) },
   ]
   const yearOptions = Array.from({ length: 16 }, (_, i) => current.data!.year + 1 - i)
   const selectOptions = yearOptions.flatMap((y) => [...SEASON_ORDER].reverse().map((s) => makeSeason(s, y))).map((s) => ({ value: s.slug, label: s.label }))
@@ -52,24 +53,24 @@ export default function SeasonPage() {
   return (
     <div className="container-app">
       <PageHeader
-        crumbs={[{ label: 'Home', to: '/' }, { label: 'Seasonal' }]}
-        eyebrow="Seasonal anime"
-        title={`${active.label} Season`}
-        description={active.slug === current.data.slug ? 'Everything airing right now, updated weekly.' : 'Explore the line-up for this anime season.'}
+        crumbs={[{ label: t('Home'), to: '/' }, { label: t('Seasonal') }]}
+        eyebrow={t('Seasonal anime')}
+        title={t('{p0} Season', { p0: active.label })}
+        description={active.slug === current.data.slug ? t('Everything airing right now, updated weekly.') : t('Explore the line-up for this anime season.')}
         actions={
           <div className="flex items-center gap-2">
-            <Link to={`/season/${shiftSeason(active, -1).slug}`} aria-label="Previous season" className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-line bg-surface-2 text-fg-muted hover:text-fg">
+            <Link to={`/season/${shiftSeason(active, -1).slug}`} aria-label={t('Previous season')} className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-line bg-surface-2 text-fg-muted hover:text-fg">
               <ChevronLeft className="h-4 w-4" />
             </Link>
-            <Select size="md" aria-label="Choose season" value={active.slug} onChange={(e) => navigate(`/season/${e.target.value}`)} options={selectOptions} className="w-44" />
-            <Link to={`/season/${shiftSeason(active, 1).slug}`} aria-label="Next season" className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-line bg-surface-2 text-fg-muted hover:text-fg">
+            <Select size="md" aria-label={t('Choose season')} value={active.slug} onChange={(e) => navigate(`/season/${e.target.value}`)} options={selectOptions} className="w-44" />
+            <Link to={`/season/${shiftSeason(active, 1).slug}`} aria-label={t('Next season')} className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-line bg-surface-2 text-fg-muted hover:text-fg">
               <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
         }
       />
 
-      <nav aria-label="Season shortcuts" className="scrollbar-none -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+      <nav aria-label={t('Season shortcuts')} className="scrollbar-none -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0">
         {quick.map((q) => (
           <Link
             key={q.value}
@@ -86,8 +87,8 @@ export default function SeasonPage() {
       </nav>
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-fg-muted">{data ? `${data.length} titles` : 'Loading…'}</p>
-        <Tabs items={SORTS} value={sort} onChange={setSort} label="Sort season" variant="segmented" size="sm" idPrefix="season-sort" />
+        <p className="text-sm text-fg-muted">{data ? t('{p0} titles', { p0: data.length }) : t('Loading…')}</p>
+        <Tabs items={SORTS} value={sort} onChange={setSort} label={t('Sort season')} variant="segmented" size="sm" idPrefix="season-sort" />
       </div>
 
       <div className="mt-6">
@@ -98,7 +99,7 @@ export default function SeasonPage() {
             items={sorted}
             loading={isLoading}
             showGenres
-            empty={<EmptyState icon={<CalendarRange />} title="No titles announced yet" description={`Nothing in the catalog for ${active.label} yet. Check back as new series are announced.`} />}
+            empty={<EmptyState icon={<CalendarRange />} title={t('No titles announced yet')} description={t('Nothing in the catalog for {p0} yet. Check back as new series are announced.', { p0: active.label })} />}
           />
         )}
       </div>

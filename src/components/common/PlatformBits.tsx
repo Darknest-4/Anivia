@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { useQuery } from '@tanstack/react-query'
 import { BarChart3, Eye, Megaphone, Wrench, X } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
@@ -40,23 +41,23 @@ export function ConsentBanner() {
   const { pathname } = useLocation()
   if (!enabled || consent !== null || pathname === '/privacy') return null
   return (
-    <div role="region" aria-label="Usage statistics" className="fixed inset-x-3 bottom-[calc(var(--bottom-nav-h,0px)+0.75rem)] z-toast mx-auto max-w-xl rounded-2xl border border-line bg-surface/95 p-4 shadow-xl backdrop-blur md:bottom-4">
+    <div role="region" aria-label={t('Usage statistics')} className="fixed inset-x-3 bottom-[calc(var(--bottom-nav-h,0px)+0.75rem)] z-toast mx-auto max-w-xl rounded-2xl border border-line bg-surface/95 p-4 shadow-xl backdrop-blur md:bottom-4">
       <div className="flex gap-3">
         <BarChart3 className="mt-0.5 h-5 w-5 shrink-0 text-accent-soft" />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-fg">Help us improve ANIVIA?</p>
+          <p className="text-sm font-semibold text-fg">{t('Help us improve ANIVIA?')}</p>
           <p className="mt-1 text-xs text-fg-muted">
             We’d like to count page views and time spent on pages — anonymously, stored on our own server, no ads or third-party trackers.{' '}
             <Link to="/privacy" className="text-accent-soft hover:underline">
-              Privacy policy
+              {t('Privacy policy')}
             </Link>
           </p>
           <div className="mt-3 flex gap-2">
             <Button size="sm" onClick={() => consentStore.set('granted')}>
-              Allow
+              {t('Allow')}
             </Button>
             <Button size="sm" variant="secondary" onClick={() => consentStore.set('denied')}>
-              No thanks
+              {t('No thanks')}
             </Button>
           </div>
         </div>
@@ -92,7 +93,7 @@ export function AnnouncementBanner() {
     <div className="relative z-header flex items-center justify-center gap-2 bg-accent px-10 py-2 text-center text-[13px] font-medium text-accent-fg">
       <Megaphone className="h-4 w-4 shrink-0" />
       <span>{body}</span>
-      <button type="button" aria-label="Dismiss announcement" onClick={() => dismissedStore.set(version)} className="absolute right-2 rounded-md p-1.5 hover:bg-black/15">
+      <button type="button" aria-label={t('Dismiss announcement')} onClick={() => dismissedStore.set(version)} className="absolute right-2 rounded-md p-1.5 hover:bg-black/15">
         <X className="h-4 w-4" />
       </button>
     </div>
@@ -111,9 +112,9 @@ export function MaintenanceGate({ children }: { children: ReactNode }) {
       <div className="max-w-md">
         <Logo />
         <Wrench className="mx-auto mt-10 h-10 w-10 text-accent-soft" />
-        <h1 className="mt-4 text-2xl font-bold text-fg">Maintenance in progress</h1>
+        <h1 className="mt-4 text-2xl font-bold text-fg">{t('Maintenance in progress')}</h1>
         <p className="mt-2 text-sm text-fg-muted">{message || 'We’ll be right back.'}</p>
-        <p className="mt-6 text-xs text-fg-subtle">Checked {now.toLocaleTimeString()} · <Link to="/login" className="hover:underline">Staff sign-in</Link></p>
+        <p className="mt-6 text-xs text-fg-subtle">Checked {now.toLocaleTimeString()} · <Link to="/login" className="hover:underline">{t('Staff sign-in')}</Link></p>
       </div>
     </div>
   )
@@ -134,9 +135,9 @@ export function ViewCount({ animeId, className }: { animeId: string; className?:
   if (!on || !d || !d.views) return null
   const fmt = new Intl.NumberFormat(undefined, { notation: 'compact' })
   return (
-    <span className={className} title="Page views on ANIVIA in the last 7 days">
+    <span className={className} title={t('Page views on ANIVIA in the last 7 days')}>
       <Eye className="mr-1 inline h-3.5 w-3.5 align-[-2px]" />
-      {fmt.format(d.views)} views this week{d.watching_now > 1 ? ` · ${d.watching_now} here now` : ''}
+      {t('{p0} views this week', { p0: fmt.format(d.views) })}{d.watching_now > 1 ? t(' · {p0} here now', { p0: d.watching_now }) : ''}
     </span>
   )
 }

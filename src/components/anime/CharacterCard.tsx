@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Heart } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Badge } from '@/components/ui'
@@ -15,7 +16,7 @@ export function CharacterCard({ character, animeTitle, className }: { character:
         <img src={character.image} alt="" loading="lazy" decoding="async" className="aspect-[3/4] w-full object-cover transition-transform duration-slow ease-out group-hover:scale-105" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
         <Badge variant={roleVariant[character.role]} className="absolute left-2 top-2 backdrop-blur-md">
-          {character.role}
+          {t(character.role)}
         </Badge>
         <span className="absolute bottom-2 left-2 inline-flex items-center gap-1 text-xs font-semibold text-white/90">
           <Heart className="h-3.5 w-3.5 fill-accent text-accent" aria-hidden />

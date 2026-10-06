@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { ArrowLeft, Play } from 'lucide-react'
 import { useParams } from 'react-router-dom'
 import { EpisodeList, StatusBadge } from '@/components/anime'
@@ -13,7 +14,7 @@ export default function EpisodesPage() {
   const anime = useAnime(id)
   const episodes = useEpisodes(id)
   const history = useHistory()
-  useDocumentMeta({ title: anime.data ? `${anime.data.title} · Episodes` : 'Episodes' })
+  useDocumentMeta({ title: anime.data ? t('{p0} · Episodes', { p0: anime.data.title }) : t('Episodes') })
 
   if (anime.isLoading)
     return (
@@ -36,18 +37,18 @@ export default function EpisodesPage() {
   return (
     <div className="container-app">
       <PageHeader
-        crumbs={[{ label: 'Home', to: '/' }, { label: a.title, to: `/anime/${a.id}` }, { label: 'Episodes' }]}
-        eyebrow="Episode guide"
+        crumbs={[{ label: t('Home'), to: '/' }, { label: a.title, to: `/anime/${a.id}` }, { label: t('Episodes') }]}
+        eyebrow={t('Episode guide')}
         title={a.title}
-        description={`${available} of ${a.episodes ?? available} episodes available · ${a.duration ?? 24} min each`}
+        description={t('{p0} of {p1} episodes available · {p2} min each', { p0: available, p1: a.episodes ?? available, p2: a.duration ?? 24 })}
         actions={
           <>
             <ButtonLink to={`/anime/${a.id}`} variant="secondary" leftIcon={<ArrowLeft className="h-4 w-4" />}>
-              Details
+              {t('Details')}
             </ButtonLink>
             {a.status !== 'upcoming' && (
               <ButtonLink to={`/anime/${a.id}/watch`} leftIcon={<Play className="h-4 w-4 fill-current" />}>
-                Watch
+                {t('Watch')}
               </ButtonLink>
             )}
           </>
@@ -59,11 +60,11 @@ export default function EpisodesPage() {
             <img src={a.poster} alt={`${a.title} poster`} className="w-full rounded-2xl shadow-card ring-1 ring-line" />
             <div className="rounded-2xl border border-line bg-surface p-4">
               <StatusBadge status={a.status} />
-              <p className="mt-3 text-sm font-semibold text-fg">Your progress</p>
+              <p className="mt-3 text-sm font-semibold text-fg">{t('Your progress')}</p>
               <p className="text-xs text-fg-subtle">
-                {watched.size} of {available} watched
+                {t('{p0} of {p1} watched', { p0: watched.size, p1: available })}
               </p>
-              <Progress value={available ? watched.size / available : 0} className="mt-3 bg-surface-3" label="Series progress" />
+              <Progress value={available ? watched.size / available : 0} className="mt-3 bg-surface-3" label={t('Series progress')} />
             </div>
           </div>
         </aside>

@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { CheckCircle2, Copy, Loader2, RefreshCw, XCircle } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -36,7 +37,7 @@ const SIMPLE = JSON.stringify({ query: '{ Page(perPage: 1) { media(type: ANIME, 
 const CHECKS: Check[] = [
   {
     id: 'anilist',
-    label: 'AniList API (direct)',
+    label: t('AniList API (direct)'),
     run: async () => {
       const res = await timedFetch(config.anilistUrl, { method: 'POST', headers: { 'content-type': 'application/json', accept: 'application/json' }, body: SIMPLE })
       if (!res.ok) throw new Error(await describe(res))
@@ -46,7 +47,7 @@ const CHECKS: Check[] = [
   },
   {
     id: 'proxy-health',
-    label: 'Edge cache (Worker /api/anilist/health)',
+    label: t('Edge cache (Worker /api/anilist/health)'),
     run: async () => {
       if (!config.anilistProxy) return 'SKIP — disabled in this build'
       const res = await timedFetch(`${config.anilistProxy}/health`)
@@ -58,7 +59,7 @@ const CHECKS: Check[] = [
   },
   {
     id: 'proxy',
-    label: 'Edge cache → AniList',
+    label: t('Edge cache → AniList'),
     run: async () => {
       if (!config.anilistProxy) return 'SKIP — disabled in this build'
       const h = await timedFetch(`${config.anilistProxy}/health`).then((r) => r.json() as Promise<{ ok?: boolean }>).catch(() => ({ ok: false }))
@@ -70,7 +71,7 @@ const CHECKS: Check[] = [
   },
   {
     id: 'db-proxy',
-    label: 'Supabase anime store (anilist-proxy function)',
+    label: t('Supabase anime store (anilist-proxy function)'),
     run: async () => {
       if (!config.anilistDbProxy) return 'SKIP — disabled in this build'
       const hr = await timedFetch(`${config.anilistDbProxy}/health`).catch(() => null)
@@ -84,7 +85,7 @@ const CHECKS: Check[] = [
   },
   {
     id: 'endpoint',
-    label: 'AniList route in use',
+    label: t('AniList route in use'),
     run: async () => {
       let chosen = ''
       try {
@@ -108,7 +109,7 @@ const CHECKS: Check[] = [
   },
   {
     id: 'anizip',
-    label: 'ani.zip (episode details & artwork)',
+    label: t('ani.zip (episode details & artwork)'),
     run: async () => {
       const res = await timedFetch(`${config.aniZipUrl}/mappings?anilist_id=21`)
       if (!res.ok) throw new Error(await describe(res))
@@ -118,7 +119,7 @@ const CHECKS: Check[] = [
   },
   {
     id: 'jikan',
-    label: 'Jikan (MyAnimeList) API',
+    label: t('Jikan (MyAnimeList) API'),
     run: async () => {
       // Jikan is only a fallback unless it's the selected data source — don't flag its outages as failures.
       const optional = activeDataSource !== 'jikan'
@@ -136,7 +137,7 @@ const CHECKS: Check[] = [
   },
   {
     id: 'supabase',
-    label: 'Accounts (Supabase)',
+    label: t('Accounts (Supabase)'),
     run: async () => {
       if (!config.supabaseUrl) return 'SKIP — accounts disabled'
       const res = await timedFetch(`${config.supabaseUrl}/auth/v1/health`, { headers: { apikey: config.supabaseKey } })
@@ -146,7 +147,7 @@ const CHECKS: Check[] = [
   },
   {
     id: 'supabase-db',
-    label: 'Database (feature flags, analytics)',
+    label: t('Database (feature flags, analytics)'),
     run: async () => {
       if (!config.supabaseUrl) return 'SKIP — accounts disabled'
       const res = await timedFetch(`${config.supabaseUrl}/rest/v1/feature_flags?select=key&limit=50`, { headers: { apikey: config.supabaseKey } })
@@ -157,7 +158,7 @@ const CHECKS: Check[] = [
   },
   {
     id: 'anilist-auth',
-    label: 'AniList sign-in function',
+    label: t('AniList sign-in function'),
     run: async () => {
       if (!config.supabaseUrl) return 'SKIP — accounts disabled'
       const res = await timedFetch(`${config.supabaseUrl}/functions/v1/anilist-auth`, { method: 'OPTIONS' }).catch(() => null)
@@ -169,7 +170,7 @@ const CHECKS: Check[] = [
 
 /** Self-service connectivity check — shows exactly which data source fails and why. */
 export default function StatusPage() {
-  useDocumentMeta({ title: 'System status', noindex: true })
+  useDocumentMeta({ title: t('System status'), noindex: true })
   const toast = useToast()
   const [results, setResults] = useState<Record<string, Result>>({})
   const [running, setRunning] = useState(false)
@@ -202,7 +203,7 @@ export default function StatusPage() {
 
   return (
     <div className="container-app max-w-3xl">
-      <PageHeader eyebrow="Diagnostics" title="System status" description="Checks every service ANIVIA depends on, from your browser." />
+      <PageHeader eyebrow={t('Diagnostics')} title={t('System status')} description={t('Checks every service ANIVIA depends on, from your browser.')} />
       <ul className="space-y-2">
         {CHECKS.map((c) => {
           const r = results[c.id]
@@ -232,14 +233,14 @@ export default function StatusPage() {
       </ul>
       <div className="mt-6 flex flex-wrap gap-2">
         <Button onClick={() => void run()} loading={running} leftIcon={<RefreshCw className="h-4 w-4" />}>
-          Run again
+          {t('Run again')}
         </Button>
         <Button
           variant="secondary"
           leftIcon={<Copy className="h-4 w-4" />}
-          onClick={() => void navigator.clipboard?.writeText(report()).then(() => toast({ title: 'Report copied', description: 'Paste it to support.' }))}
+          onClick={() => void navigator.clipboard?.writeText(report()).then(() => toast({ title: t('Report copied'), description: t('Paste it to support.') }))}
         >
-          Copy report
+          {t('Copy report')}
         </Button>
       </div>
     </div>

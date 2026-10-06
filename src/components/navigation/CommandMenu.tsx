@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { ArrowRight, CornerDownLeft, Moon, Search, Shuffle, Sun } from 'lucide-react'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -42,9 +43,9 @@ export default function CommandMenu({ open, onClose }: { open: boolean; onClose:
   }
 
   const commands = useMemo<Command[]>(() => {
-    const nav: Command[] = [...primaryNav, { to: '/search', label: 'Search', icon: Search }, ...libraryNav, ...discoverNav.filter((n) => n.to !== '/search')].map((item) => ({
+    const nav: Command[] = [...primaryNav, { to: '/search', label: t('Search'), icon: Search }, ...libraryNav, ...discoverNav.filter((n) => n.to !== '/search')].map((item) => ({
       id: `nav-${item.to}`,
-      group: 'Navigation',
+      group: t('Navigation'),
       label: item.label,
       hint: item.to,
       icon: <item.icon className="h-4 w-4" />,
@@ -53,8 +54,8 @@ export default function CommandMenu({ open, onClose }: { open: boolean; onClose:
     const actions: Command[] = [
       {
         id: 'toggle-theme',
-        group: 'Actions',
-        label: `Toggle theme (${resolvedTheme === 'dark' ? 'Light' : 'Dark'})`,
+        group: t('Actions'),
+        label: t('Toggle theme ({p0})', { p0: resolvedTheme === 'dark' ? t('Light') : t('Dark') }),
         icon: resolvedTheme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />,
         keywords: 'dark light mode appearance',
         run: () => {
@@ -62,13 +63,13 @@ export default function CommandMenu({ open, onClose }: { open: boolean; onClose:
           onClose()
         },
       },
-      { id: 'surprise', group: 'Actions', label: 'Surprise me', hint: 'Random top-rated title', icon: <Shuffle className="h-4 w-4" />, keywords: 'random', run: go('/browse?sort=rating') },
+      { id: 'surprise', group: 'Actions', label: t('Surprise me'), hint: t('Random top-rated title'), icon: <Shuffle className="h-4 w-4" />, keywords: 'random', run: go('/browse?sort=rating') },
     ]
     const q = debounced.toLowerCase()
     const filtered = [...nav, ...actions].filter((c) => !q || c.label.toLowerCase().includes(q) || c.keywords?.includes(q))
     const anime: Command[] = (data?.anime ?? []).map((a) => ({
       id: `anime-${a.id}`,
-      group: 'Anime',
+      group: t('Anime'),
       label: a.title,
       hint: `${a.type} · ${a.year}`,
       icon: <ArrowRight className="h-4 w-4" />,
@@ -101,7 +102,7 @@ export default function CommandMenu({ open, onClose }: { open: boolean; onClose:
 
   let lastGroup = ''
   return (
-    <Overlay open={open} onClose={onClose} placement="top" label="Command menu" className="max-w-xl">
+    <Overlay open={open} onClose={onClose} placement="top" label={t('Command menu')} className="max-w-xl">
       <div className="flex items-center gap-3 border-b border-line px-4">
         <Search className="h-5 w-5 shrink-0 text-fg-subtle" aria-hidden />
         <input
@@ -109,18 +110,18 @@ export default function CommandMenu({ open, onClose }: { open: boolean; onClose:
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={onKeyDown}
-          placeholder="Type a command or search anime…"
-          aria-label="Command search"
+          placeholder={t('Type a command or search anime…')}
+          aria-label={t('Command search')}
           aria-controls="command-list"
           aria-activedescendant={`cmd-${active}`}
           role="combobox"
           aria-expanded="true"
           className="h-14 flex-1 bg-transparent text-[15px] text-fg placeholder:text-fg-subtle focus:outline-none"
         />
-        <Kbd>Esc</Kbd>
+        <Kbd>{t('Esc')}</Kbd>
       </div>
-      <ul id="command-list" role="listbox" aria-label="Commands" className="max-h-[min(60vh,420px)] overflow-y-auto p-2 scrollbar-thin">
-        {commands.length === 0 && <li className="px-3 py-8 text-center text-sm text-fg-muted">No commands found.</li>}
+      <ul id="command-list" role="listbox" aria-label={t('Commands')} className="max-h-[min(60vh,420px)] overflow-y-auto p-2 scrollbar-thin">
+        {commands.length === 0 && <li className="px-3 py-8 text-center text-sm text-fg-muted">{t('No commands found.')}</li>}
         {commands.map((cmd, i) => {
           const header = cmd.group !== lastGroup ? cmd.group : null
           lastGroup = cmd.group

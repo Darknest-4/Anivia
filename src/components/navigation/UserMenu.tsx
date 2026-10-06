@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Cloud, CloudOff, LogIn, LogOut, RefreshCw, ShieldCheck, Sparkles, UserPlus } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Avatar, ButtonLink, Popover, Skeleton } from '@/components/ui'
@@ -7,7 +8,7 @@ import { useToast } from '@/providers/ToastProvider'
 import { config } from '@/config'
 import { libraryNav } from './navItems'
 
-const syncLabel = { idle: 'Sync idle', syncing: 'Syncing…', synced: 'Library synced', error: 'Sync failed — retrying' } as const
+const syncLabel = { idle: t('Sync idle'), syncing: t('Syncing…'), synced: t('Library synced'), error: t('Sync failed — retrying') } as const
 
 /** Account dropdown: sign-in buttons when signed out, profile + sync status + sign-out when signed in. */
 export function UserMenu() {
@@ -20,11 +21,11 @@ export function UserMenu() {
   if (isGuest)
     return (
       <div className="flex items-center gap-2">
-        <ButtonLink to="/login" variant="ghost" size="sm" aria-label="Sign in" title="Sign in" className="px-2.5 2xl:px-3" leftIcon={<LogIn className="h-4 w-4" />}>
-          <span className="hidden 2xl:inline">Sign in</span>
+        <ButtonLink to="/login" variant="ghost" size="sm" aria-label={t('Sign in')} title={t('Sign in')} className="px-2.5 2xl:px-3" leftIcon={<LogIn className="h-4 w-4" />}>
+          <span className="hidden 2xl:inline">{t('Sign in')}</span>
         </ButtonLink>
         <ButtonLink to="/register" size="sm" className="hidden 3xl:inline-flex" leftIcon={<UserPlus className="h-4 w-4" />}>
-          Join free
+          {t('Join free')}
         </ButtonLink>
       </div>
     )
@@ -34,7 +35,7 @@ export function UserMenu() {
     <Popover
       className="w-64"
       trigger={(p) => (
-        <button type="button" onClick={p.toggle} aria-expanded={p['aria-expanded']} aria-haspopup="menu" aria-label="Account menu" className="rounded-full transition-transform hover:scale-105">
+        <button type="button" onClick={p.toggle} aria-expanded={p['aria-expanded']} aria-haspopup="menu" aria-label={t('Account menu')} className="rounded-full transition-transform hover:scale-105">
           <Avatar name={user.displayName} hue={user.avatarHue} src={user.avatarUrl} size="sm" className="ring-line-strong" />
         </button>
       )}
@@ -71,13 +72,13 @@ export function UserMenu() {
             {isStaff && (
               <Link to="/admin" onClick={close} className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-fg-muted hover:bg-surface-3 hover:text-fg">
                 <ShieldCheck className="h-4 w-4" />
-                Admin dashboard
+                {t('Admin dashboard')}
               </Link>
             )}
             {config.enablePricing && (
               <Link to="/pricing" onClick={close} className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-semibold text-accent-soft hover:bg-surface-3">
               <Sparkles className="h-4 w-4" />
-              Upgrade to Pro
+              {t('Upgrade to Pro')}
             </Link>
             )}
           </nav>
@@ -89,22 +90,22 @@ export function UserMenu() {
                 close()
                 try {
                   await auth.signOut()
-                  toast({ title: 'Signed out', description: 'Your data was removed from this device — it’s safe in your account.', variant: 'info' })
+                  toast({ title: t('Signed out'), description: t('Your data was removed from this device — it’s safe in your account.'), variant: 'info' })
                   navigate('/')
                 } catch (e) {
-                  toast({ title: 'Couldn’t sign out', description: (e as Error).message, variant: 'error' })
+                  toast({ title: t('Couldn’t sign out'), description: (e as Error).message, variant: 'error' })
                 }
               }}
               className="mt-1 flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-fg-muted hover:bg-surface-3 hover:text-fg"
             >
               <LogOut className="h-4 w-4" />
-              Sign out
+              {t('Sign out')}
             </button>
           ) : anilistOnly ? (
             <>
               <Link to="/register" onClick={close} className="mt-1 flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-fg-muted hover:bg-surface-3 hover:text-fg">
                 <UserPlus className="h-4 w-4" />
-                Create an ANIVIA account
+                {t('Create an ANIVIA account')}
               </Link>
               <button
                 type="button"
@@ -115,13 +116,13 @@ export function UserMenu() {
                 className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-fg-muted hover:bg-surface-3 hover:text-fg"
               >
                 <LogOut className="h-4 w-4" />
-                Disconnect AniList
+                {t('Disconnect AniList')}
               </button>
             </>
           ) : (
             <Link to="/login" onClick={close} className="mt-1 flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-fg-muted hover:bg-surface-3 hover:text-fg">
               <LogIn className="h-4 w-4" />
-              Sign in
+              {t('Sign in')}
             </Link>
           )}
         </div>

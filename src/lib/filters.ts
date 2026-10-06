@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import type { Anime, AnimeFilters, Paginated, SortOption } from '@/types'
 
 /**
@@ -65,12 +66,12 @@ export function paginate<T>(items: T[], page = 1, perPage = 24): Paginated<T> {
 }
 
 export const SORT_OPTIONS: { value: SortOption; label: string }[] = [
-  { value: 'popularity', label: 'Popularity' },
-  { value: 'rating', label: 'Rating' },
-  { value: 'newest', label: 'Newest' },
-  { value: 'oldest', label: 'Oldest' },
-  { value: 'title-asc', label: 'A–Z' },
-  { value: 'title-desc', label: 'Z–A' },
-  { value: 'updated', label: 'Recently Updated' },
-  { value: 'episodes', label: 'Episodes' },
+  { value: 'popularity', label: t('Popularity') },
+  { value: 'rating', label: t('Rating') },
+  { value: 'newest', label: t('Newest') },
+  { value: 'oldest', label: t('Oldest') },
+  { value: 'title-asc', label: t('A–Z') },
+  { value: 'title-desc', label: t('Z–A') },
+  { value: 'updated', label: t('Recently Updated') },
+  { value: 'episodes', label: t('Episodes') },
 ]

@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Search, SearchX, SlidersHorizontal } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { AnimeCardList, AnimeGrid, AnimeListHeader } from '@/components/anime'
@@ -48,14 +49,14 @@ export function CatalogBrowser({ fixed = {}, hide: hideProp = [] }: CatalogBrows
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="min-w-0 flex-1 basis-full sm:basis-64">
-          <Input type="search" value={text} onChange={(e) => setText(e.target.value)} placeholder="Filter by title, studio or genre…" aria-label="Filter results" leftIcon={<Search />} className="h-10" />
+          <Input type="search" value={text} onChange={(e) => setText(e.target.value)} placeholder={t('Filter by title, studio or genre…')} aria-label={t('Filter results')} leftIcon={<Search />} className="h-10" />
         </div>
         <Button variant="secondary" size="sm" className="h-10 lg:hidden" onClick={() => setDrawer(true)} leftIcon={<SlidersHorizontal className="h-4 w-4" />}>
-          Filters
+          {t('Filters')}
           {active > 0 && <Badge variant="solid">{active}</Badge>}
         </Button>
-        <Select size="sm" aria-label="Sort by" value={query.sort} onChange={(e) => update({ sort: e.target.value as BrowseQuery['sort'] })} options={SORT_OPTIONS.map((o) => ({ value: o.value, label: `Sort: ${o.label}` }))} className="min-w-0 flex-1 sm:w-[170px] sm:flex-none" />
-        <Select size="sm" aria-label="Results per page" value={String(query.perPage)} onChange={(e) => update({ perPage: Number(e.target.value) })} options={PER_PAGE_OPTIONS} className="hidden w-[124px] sm:block" />
+        <Select size="sm" aria-label={t('Sort by')} value={query.sort} onChange={(e) => update({ sort: e.target.value as BrowseQuery['sort'] })} options={SORT_OPTIONS.map((o) => ({ value: o.value, label: t('Sort: {p0}', { p0: o.label }) }))} className="min-w-0 flex-1 sm:w-[170px] sm:flex-none" />
+        <Select size="sm" aria-label={t('Results per page')} value={String(query.perPage)} onChange={(e) => update({ perPage: Number(e.target.value) })} options={PER_PAGE_OPTIONS} className="hidden w-[124px] sm:block" />
         <ViewToggle value={view} onChange={(v) => viewModeStore.set(v)} />
       </div>
 
@@ -68,7 +69,7 @@ export function CatalogBrowser({ fixed = {}, hide: hideProp = [] }: CatalogBrows
         <p className="text-sm text-fg-muted" aria-live="polite">
           {data ? (
             <>
-              <span className="font-semibold text-fg">{formatNumber(data.total)}</span> {data.total === 1 ? 'title' : 'titles'} found
+              {t('{p0} titles found', { p0: formatNumber(data.total) })}
             </>
           ) : (
             'Loading titles…'
@@ -112,13 +113,13 @@ export function CatalogBrowser({ fixed = {}, hide: hideProp = [] }: CatalogBrows
         open={drawer}
         onClose={() => setDrawer(false)}
         side="bottom"
-        title="Filters"
+        title={t('Filters')}
         footer={
           <div className="grid grid-cols-2 gap-2">
             <Button variant="secondary" onClick={() => { setText(''); reset() }}>
-              Reset
+              {t('Reset')}
             </Button>
-            <Button onClick={() => setDrawer(false)}>Show {data ? formatNumber(data.total) : ''} results</Button>
+            <Button onClick={() => setDrawer(false)}>{t('Show {p0} results', { p0: data ? formatNumber(data.total) : '' })}</Button>
           </div>
         }
       >
@@ -135,9 +136,9 @@ function NoResults({ onReset }: { onReset: () => void }) {
     <EmptyState
       className="mt-6"
       icon={<SearchX />}
-      title="No anime match these filters"
-      description="Try removing a filter or two, or search for something different."
-      action={<Button variant="secondary" onClick={onReset}>Reset filters</Button>}
+      title={t('No anime match these filters')}
+      description={t('Try removing a filter or two, or search for something different.')}
+      action={<Button variant="secondary" onClick={onReset}>{t('Reset filters')}</Button>}
     />
   )
 }

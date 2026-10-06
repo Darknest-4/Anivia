@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Check, CheckCircle2, Lock, Play } from 'lucide-react'
 import { memo } from 'react'
 import { Link } from 'react-router-dom'
@@ -32,7 +33,7 @@ export const EpisodeItem = memo(function EpisodeItem({ episode, progress, active
               <Lock className="h-4 w-4" />
             </span>
           ) : active ? (
-            <span className="flex items-end gap-0.5 rounded-md bg-black/60 px-2 py-1.5" aria-label="Now playing">
+            <span className="flex items-end gap-0.5 rounded-md bg-black/60 px-2 py-1.5" aria-label={t('Now playing')}>
               {[0, 1, 2].map((i) => (
                 <span key={i} className="w-0.5 animate-pulse rounded-full bg-accent-soft" style={{ height: `${8 + i * 3}px`, animationDelay: `${i * 150}ms` }} />
               ))}
@@ -49,8 +50,8 @@ export const EpisodeItem = memo(function EpisodeItem({ episode, progress, active
       <div className="min-w-0 flex-1 py-0.5">
         <div className="flex items-center gap-2">
           <span className={cn('text-xs font-bold tabular-nums', active ? 'text-accent-soft' : 'text-fg-subtle')}>EP {pad2(episode.number)}</span>
-          {watched && <CheckCircle2 className="h-3.5 w-3.5 text-success" aria-label="Watched" />}
-          {episode.filler && <Badge variant="warning">Filler</Badge>}
+          {watched && <CheckCircle2 className="h-3.5 w-3.5 text-success" aria-label={t('Watched')} />}
+          {episode.filler && <Badge variant="warning">{t('Filler')}</Badge>}
         </div>
         <p className={cn('mt-0.5 line-clamp-2 text-sm font-semibold leading-snug', active ? 'text-accent-soft' : 'text-fg')}>{episode.title}</p>
         {layout === 'row' && <p className="mt-1 line-clamp-2 hidden text-[13px] leading-relaxed text-fg-muted sm:block">{episode.synopsis}</p>}
@@ -84,8 +85,8 @@ export const EpisodeItem = memo(function EpisodeItem({ episode, progress, active
         type="button"
         onClick={() => onToggleWatched(episode, !watched)}
         aria-pressed={Boolean(watched)}
-        aria-label={watched ? `Mark episode ${episode.number} as not watched` : `Mark episode ${episode.number} as watched`}
-        title={watched ? 'Watched — click to undo' : 'Mark as watched'}
+        aria-label={watched ? t('Mark episode {p0} as not watched', { p0: episode.number }) : t('Mark episode {p0} as watched', { p0: episode.number })}
+        title={watched ? t('Watched — click to undo') : t('Mark as watched')}
         className={cn(
           'absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full ring-1 transition-colors',
           watched ? 'bg-success/15 text-success ring-success/40 hover:bg-success/25' : 'text-fg-subtle ring-line hover:text-fg hover:ring-line-strong',

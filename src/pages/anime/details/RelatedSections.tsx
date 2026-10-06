@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Link2, Sparkles } from 'lucide-react'
 import { AnimeCard, AnimeRowSkeleton, ScrollRow } from '@/components/anime'
 import { SectionHeader } from '@/components/common/SectionHeader'
@@ -11,9 +12,9 @@ export function RelatedSections({ anime }: { anime: Anime }) {
     <div className="mt-16 space-y-14">
       {(related.isLoading || (related.data?.length ?? 0) > 0) && (
         <section aria-labelledby="related-heading" className="container-app">
-          <SectionHeader id="related-heading" title="Related Anime" icon={<Link2 />} />
+          <SectionHeader id="related-heading" title={t('Related Anime')} icon={<Link2 />} />
           {related.data ? (
-            <ScrollRow label="Related anime">
+            <ScrollRow label={t('Related anime')}>
               {related.data.map((a) => (
                 <AnimeCard key={a.id} anime={a} />
               ))}
@@ -24,9 +25,9 @@ export function RelatedSections({ anime }: { anime: Anime }) {
         </section>
       )}
       <section aria-labelledby="recs-heading" className="container-app">
-        <SectionHeader id="recs-heading" title="You May Also Like" icon={<Sparkles />} description={`Because you viewed ${anime.title}`} />
+        <SectionHeader id="recs-heading" title={t('You May Also Like')} icon={<Sparkles />} description={t('Because you viewed {p0}', { p0: anime.title })} />
         {recs.data ? (
-          <ScrollRow label="Recommendations">
+          <ScrollRow label={t('Recommendations')}>
             {recs.data.map((a) => (
               <AnimeCard key={a.id} anime={a} />
             ))}

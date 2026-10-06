@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { BellRing, CalendarDays } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui'
@@ -46,11 +47,11 @@ export function UpcomingCard({ anime, className }: { anime: Anime; className?: s
             onClick={() => {
               if (entry) return
               watchlistService.add(anime.id, 'planning')
-              toast({ title: 'Reminder set', description: `We’ll let you know when ${anime.title} premieres.`, icon: BellRing })
+              toast({ title: t('Reminder set'), description: t('We’ll let you know when {p0} premieres.', { p0: anime.title }), icon: BellRing })
             }}
             aria-pressed={Boolean(entry)}
           >
-            {entry ? 'Reminder on' : 'Remind me'}
+            {entry ? t('Reminder on') : t('Remind me')}
           </Button>
         </div>
       </div>

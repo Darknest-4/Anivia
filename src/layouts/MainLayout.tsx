@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Suspense, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { PageSkeleton } from '@/components/anime/Skeletons'
@@ -17,7 +18,7 @@ export function MainLayout() {
   return (
     <div className="pb-bottom-nav flex min-h-dvh flex-col">
       <a href="#main" className="sr-only z-toast rounded-lg bg-accent px-4 py-2 font-semibold text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4">
-        Skip to content
+        {t('Skip to content')}
       </a>
       <AnnouncementBanner />
       <Navbar transparent={transparent} onOpenMenu={() => setMenuOpen(true)} />

@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import type { Anime } from '@/types'
@@ -14,13 +15,13 @@ export function DetailsHero({ anime, children }: { anime: Anime; children: React
           <div className="hero-fade-bottom absolute inset-0" />
         </div>
         <div className="container-app pb-10 pt-8 md:pb-14 md:pt-28 lg:pt-36">
-          <nav aria-label="Breadcrumb" className="mb-6 hidden text-xs font-medium text-white/60 md:block">
+          <nav aria-label={t('Breadcrumb')} className="mb-6 hidden text-xs font-medium text-white/60 md:block">
             <Link to="/" className="hover:text-white">
-              Home
+              {t('Home')}
             </Link>
             <span className="mx-2">/</span>
             <Link to="/browse" className="hover:text-white">
-              Browse
+              {t('Browse')}
             </Link>
             <span className="mx-2">/</span>
             <span className="text-white/85">{anime.title}</span>
@@ -28,7 +29,7 @@ export function DetailsHero({ anime, children }: { anime: Anime; children: React
           <div className="flex flex-col items-center gap-6 text-center md:flex-row md:items-end md:gap-8 md:text-left">
             <img
               src={anime.poster}
-              alt={`${anime.title} poster`}
+              alt={t('{p0} poster', { p0: anime.title })}
               className="w-40 shrink-0 rounded-2xl shadow-pop ring-1 ring-white/10 sm:w-48 md:w-56 lg:w-64"
             />
             <div className="min-w-0 max-w-3xl pb-1">{children}</div>

@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Bookmark, Heart, History as HistoryIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -58,14 +59,14 @@ export default function ProfilePage() {
       <Tabs
         className="mt-10"
         items={[
-          { value: 'overview', label: 'Overview' },
-          { value: 'watchlist', label: 'Watchlist', count: items.length },
-          { value: 'history', label: 'History', count: history.length },
-          { value: 'favorites', label: 'Favorites', count: favoriteIds.length },
+          { value: 'overview', label: t('Overview') },
+          { value: 'watchlist', label: t('Watchlist'), count: items.length },
+          { value: 'history', label: t('History'), count: history.length },
+          { value: 'favorites', label: t('Favorites'), count: favoriteIds.length },
         ]}
         value={tab}
         onChange={setTab}
-        label="Profile sections"
+        label={t('Profile sections')}
         idPrefix="profile"
       />
 
@@ -74,10 +75,10 @@ export default function ProfilePage() {
           <div className="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
             <section aria-labelledby="activity-heading" className="rounded-2xl border border-line bg-surface p-5">
               <h2 id="activity-heading" className="text-base font-semibold text-fg">
-                Recent activity
+                {t('Recent activity')}
               </h2>
               {history.length === 0 ? (
-                <p className="mt-3 text-sm text-fg-subtle">No activity yet.</p>
+                <p className="mt-3 text-sm text-fg-subtle">{t('No activity yet.')}</p>
               ) : (
                 <ul className="mt-3 divide-y divide-line/70">
                   {history.slice(0, 6).map((h) => {
@@ -86,7 +87,7 @@ export default function ProfilePage() {
                       <li key={h.episodeId} className="flex items-center gap-3 py-3">
                         {a && <img src={thumb(a.poster)} alt="" loading="lazy" className="h-12 w-8 rounded object-cover" />}
                         <p className="min-w-0 flex-1 text-sm text-fg-muted">
-                          {h.completed ? 'Finished' : 'Watched'} <span className="font-semibold text-fg">episode {h.episodeNumber}</span> of{' '}
+                          {h.completed ? t('Finished watching') : t('Watched')} <span className="font-semibold text-fg">{t('episode {p0}', { p0: h.episodeNumber })}</span> {t('of')}{' '}
                           <Link to={`/anime/${h.animeId}`} className="font-semibold text-fg hover:text-accent-soft">
                             {a?.title ?? '…'}
                           </Link>
@@ -101,18 +102,18 @@ export default function ProfilePage() {
             <div className="space-y-6">
               <section aria-labelledby="genre-heading" className="rounded-2xl border border-line bg-surface p-5">
                 <h2 id="genre-heading" className="mb-4 text-base font-semibold text-fg">
-                  Favorite genres
+                  {t('Favorite genres')}
                 </h2>
                 <GenreBreakdown anime={library} />
               </section>
               <section aria-labelledby="fav-heading" className="rounded-2xl border border-line bg-surface p-3">
                 <h2 id="fav-heading" className="px-2 pb-1 pt-2 text-base font-semibold text-fg">
-                  Top favorites
+                  {t('Top favorites')}
                 </h2>
                 {favorites.slice(0, 3).map((a) => (
                   <AnimeCardCompact key={a.id} anime={a} />
                 ))}
-                {favorites.length === 0 && <p className="px-2 pb-2 text-sm text-fg-subtle">No favorites yet.</p>}
+                {favorites.length === 0 && <p className="px-2 pb-2 text-sm text-fg-subtle">{t('No favorites yet.')}</p>}
               </section>
             </div>
           </div>
@@ -126,12 +127,12 @@ export default function ProfilePage() {
                   {stats.watching} watching · {stats.planning} planning · {stats.completed} completed
                 </span>
                 <ButtonLink to="/watchlist" variant="secondary" size="sm">
-                  Manage watchlist
+                  {t('Manage watchlist')}
                 </ButtonLink>
               </div>
             </>
           ) : (
-            <EmptyState icon={<Bookmark />} title="Your watchlist is empty." description="No anime saved yet. Start exploring." action={<ButtonLink to="/browse">Browse anime</ButtonLink>} />
+            <EmptyState icon={<Bookmark />} title={t('Your watchlist is empty.')} description={t('No anime saved yet. Start exploring.')} action={<ButtonLink to="/browse">{t('Browse anime')}</ButtonLink>} />
           ))}
         {tab === 'history' &&
           (history.length ? (
@@ -142,16 +143,16 @@ export default function ProfilePage() {
               })}
             </ul>
           ) : (
-            <EmptyState icon={<HistoryIcon />} title="You haven’t watched anything yet." action={<ButtonLink to="/">Start watching</ButtonLink>} />
+            <EmptyState icon={<HistoryIcon />} title={t('You haven’t watched anything yet.')} action={<ButtonLink to="/">{t('Start watching')}</ButtonLink>} />
           ))}
         {tab === 'favorites' &&
           (favorites.length ? (
             <AnimeGrid items={favorites} density="dense" />
           ) : (
-            <EmptyState icon={<Heart />} title="No favorites yet" description="Tap the heart on any title to add it to your favorites." action={<ButtonLink to="/browse">Discover anime</ButtonLink>} />
+            <EmptyState icon={<Heart />} title={t('No favorites yet')} description={t('Tap the heart on any title to add it to your favorites.')} action={<ButtonLink to="/browse">{t('Discover anime')}</ButtonLink>} />
           ))}
       </div>
-      <ShareDialog heading="Share profile" title={`${user.displayName} (@${user.username})`} path="/profile" open={share} onClose={() => setShare(false)} />
+      <ShareDialog heading={t('Share profile')} title={`${user.displayName} (@${user.username})`} path="/profile" open={share} onClose={() => setShare(false)} />
     </div>
   )
 }

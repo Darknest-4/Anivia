@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { History as HistoryIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { AnimeCardContinueWatching, AnimeCardWideSkeleton, ScrollRow } from '@/components/anime'
@@ -26,15 +27,15 @@ export function ContinueWatchingSection() {
 
   return (
     <section aria-labelledby="continue-heading" className="container-app">
-      <SectionHeader id="continue-heading" title="Continue Watching" icon={<HistoryIcon />} href="/history" linkLabel="History" />
+      <SectionHeader id="continue-heading" title={t('Continue Watching')} icon={<HistoryIcon />} href="/history" linkLabel={t('History')} />
       {isLoading && !data ? (
-        <ScrollRow label="Continue watching" itemClassName={wide}>
+        <ScrollRow label={t('Continue watching')} itemClassName={wide}>
           {[0, 1, 2, 3].map((i) => (
             <AnimeCardWideSkeleton key={i} />
           ))}
         </ScrollRow>
       ) : (
-        <ScrollRow label="Continue watching" itemClassName={wide}>
+        <ScrollRow label={t('Continue watching')} itemClassName={wide}>
           {entries
             .filter((e) => byId.has(e.animeId))
             .map((entry) => {
@@ -46,7 +47,7 @@ export function ContinueWatchingSection() {
                   entry={entry}
                   onRemove={() => {
                     historyService.removeAnime(anime.id)
-                    toast({ title: 'Removed from Continue Watching', description: anime.title, variant: 'info' })
+                    toast({ title: t('Removed from Continue Watching'), description: anime.title, variant: 'info' })
                   }}
                 />
               )

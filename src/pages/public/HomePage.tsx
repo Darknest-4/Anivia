@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Flame, Sparkles, TrendingUp, RefreshCw } from 'lucide-react'
 import { useMemo } from 'react'
 import { AnimeHero, HeroSkeleton } from '@/components/anime'
@@ -18,13 +19,13 @@ import { HOME_SECTIONS, type HomeSectionId } from './home/sections'
 import { UpcomingSection } from './home/UpcomingSection'
 
 function TrendingRow() {
-  return <AnimeRowSection id="trending" title="Trending Now" icon={<TrendingUp />} href="/browse?sort=popularity" query={useTrending()} ranked />
+  return <AnimeRowSection id="trending" title={t('Trending Now')} icon={<TrendingUp />} href="/browse?sort=popularity" query={useTrending()} ranked />
 }
 function PopularRow() {
-  return <AnimeRowSection id="popular" title="Popular This Week" icon={<Flame />} href="/browse?sort=popularity" query={usePopular()} />
+  return <AnimeRowSection id="popular" title={t('Popular This Week')} icon={<Flame />} href="/browse?sort=popularity" query={usePopular()} />
 }
 function RecentRow() {
-  return <AnimeRowSection id="recent" title="Recently Updated" icon={<RefreshCw />} href="/browse?sort=updated" query={useRecent()} />
+  return <AnimeRowSection id="recent" title={t('Recently Updated')} icon={<RefreshCw />} href="/browse?sort=updated" query={useRecent()} />
 }
 function RecommendedRow() {
   const history = useHistory()
@@ -37,8 +38,8 @@ function RecommendedRow() {
   return (
     <AnimeRowSection
       id="recommended"
-      title="Recommended for You"
-      eyebrow={seeds.length ? 'Based on your library' : 'Hand-picked'}
+      title={t('Recommended for You')}
+      eyebrow={seeds.length ? t('Based on your library') : t('Hand-picked')}
       icon={<Sparkles />}
       href="/for-you"
       query={recommended}

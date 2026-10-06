@@ -1,3 +1,4 @@
+import { locale, t } from '@/i18n'
 import { CalendarPlus, Clock3 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -10,10 +11,13 @@ import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { cn } from '@/lib/cn'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+// 2024-01-01 was a Monday — format real dates so weekday names follow the UI language.
+const dayLong = (i: number) => new Date(2024, 0, 1 + i).toLocaleDateString(locale, { weekday: 'long' })
+const dayShort = (i: number) => new Date(2024, 0, 1 + i).toLocaleDateString(locale, { weekday: 'short' }).replace('.', '')
 type Range = 'today' | 'tomorrow' | 'week'
 
 export default function SchedulePage() {
-  useDocumentMeta({ title: 'Release Schedule', description: 'Weekly anime broadcast schedule — never miss a new episode.' })
+  useDocumentMeta({ title: t('Release Schedule'), description: t('Weekly anime broadcast schedule — never miss a new episode.') })
   const { data, isLoading, isError, refetch } = useSchedule()
   const today = (new Date().getDay() + 6) % 7
   const [range, setRange] = useState<Range>('week')
@@ -40,10 +44,10 @@ export default function SchedulePage() {
   return (
     <div className="container-app">
       <PageHeader
-        crumbs={[{ label: 'Home', to: '/' }, { label: 'Schedule' }]}
-        eyebrow="Weekly simulcast"
-        title="Release Schedule"
-        description="New episodes as they air. Times are shown in your local time zone."
+        crumbs={[{ label: t('Home'), to: '/' }, { label: t('Schedule') }]}
+        eyebrow={t('Weekly simulcast')}
+        title={t('Release Schedule')}
+        description={t('New episodes as they air. Times are shown in your local time zone.')}
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface-2 px-3 py-2 text-xs font-medium text-fg-muted">
@@ -51,11 +55,11 @@ export default function SchedulePage() {
               {tz}
             </span>
             <Button size="sm" variant="secondary" leftIcon={<CalendarPlus className="h-4 w-4" />} disabled={!data?.length} onClick={() => exportIcs(false)}>
-              Add week to calendar
+              {t('Add week to calendar')}
             </Button>
             {watchlist.length > 0 && (
               <Button size="sm" variant="secondary" disabled={!data?.length} onClick={() => exportIcs(true)}>
-                Only my shows
+                {t('Only my shows')}
               </Button>
             )}
           </div>
@@ -64,19 +68,19 @@ export default function SchedulePage() {
 
       <Tabs
         items={[
-          { value: 'today', label: 'Today' },
-          { value: 'tomorrow', label: 'Tomorrow' },
-          { value: 'week', label: 'This Week' },
+          { value: 'today', label: t('Today') },
+          { value: 'tomorrow', label: t('Tomorrow') },
+          { value: 'week', label: t('This Week') },
         ]}
         value={range}
         onChange={setRange}
-        label="Schedule range"
+        label={t('Schedule range')}
         variant="pill"
         idPrefix="sched-range"
       />
 
       {range === 'week' && (
-        <div role="tablist" aria-label="Day of week" className="scrollbar-none -mx-4 mt-5 grid auto-cols-[minmax(84px,1fr)] grid-flow-col gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+        <div role="tablist" aria-label={t('Day of week')} className="scrollbar-none -mx-4 mt-5 grid auto-cols-[minmax(84px,1fr)] grid-flow-col gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0">
           {DAYS.map((name, i) => (
             <button
               key={name}
@@ -89,10 +93,10 @@ export default function SchedulePage() {
                 day === i ? 'border-accent/60 bg-accent/10 text-fg' : 'border-line bg-surface text-fg-muted hover:border-line-strong hover:text-fg',
               )}
             >
-              <span className="text-xs font-semibold uppercase tracking-wider">{name.slice(0, 3)}</span>
+              <span className="text-xs font-semibold uppercase tracking-wider">{dayShort(i)}</span>
               <span className="mt-1 font-display text-xl font-bold">{weekDates[i].getDate()}</span>
-              <span className="mt-1 text-2xs text-fg-subtle">{counts[i]} shows</span>
-              {i === today && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-accent" aria-label="Today" />}
+              <span className="mt-1 text-2xs text-fg-subtle">{t('{p0} shows', { p0: counts[i] })}</span>
+              {i === today && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-accent" aria-label={t('Today')} />}
             </button>
           ))}
         </div>
@@ -111,7 +115,7 @@ export default function SchedulePage() {
           visibleDays.map((d) => (
             <ScheduleList
               key={d}
-              title={`${DAYS[d]}${d === today ? ' · Today' : d === (today + 1) % 7 ? ' · Tomorrow' : ''}`}
+              title={`${dayLong(d)}${d === today ? ` · ${t('Today')}` : d === (today + 1) % 7 ? ` · ${t('Tomorrow')}` : ''}`}
               date={weekDates[d]}
               items={data.filter((s) => s.day === d)}
             />

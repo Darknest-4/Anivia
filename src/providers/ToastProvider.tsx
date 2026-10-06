@@ -1,3 +1,4 @@
+import { t as tr } from '@/i18n'
 import { CheckCircle2, Info, TriangleAlert, X, type LucideIcon } from 'lucide-react'
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
@@ -78,7 +79,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 <button
                   type="button"
                   onClick={() => dismiss(t.id)}
-                  aria-label="Dismiss notification"
+                  aria-label={tr('Dismiss notification')}
                   className="shrink-0 rounded-md p-1 text-fg-subtle hover:bg-surface-3 hover:text-fg"
                 >
                   <X className="h-4 w-4" />

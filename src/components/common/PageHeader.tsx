@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
@@ -39,7 +40,7 @@ export function PageHeader({ title, description, eyebrow, crumbs, actions, class
 
 export function Breadcrumbs({ items, className }: { items: Crumb[]; className?: string }) {
   return (
-    <nav aria-label="Breadcrumb" className={className}>
+    <nav aria-label={t('Breadcrumb')} className={className}>
       <ol className="flex flex-wrap items-center gap-1.5 text-xs font-medium text-fg-subtle">
         {items.map((c, i) => (
           <li key={c.label} className="flex items-center gap-1.5">

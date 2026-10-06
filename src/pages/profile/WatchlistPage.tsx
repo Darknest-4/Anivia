@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Bookmark, Compass, Search, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { AnimeCard, AnimeCardList, AnimeCardSkeleton, AnimeListHeader, EpisodeStepper, gridClasses } from '@/components/anime'
@@ -16,7 +17,7 @@ type Filter = 'all' | WatchlistStatus
 type Sort = 'added' | 'updated' | 'title' | 'rating'
 
 export default function WatchlistPage() {
-  useDocumentMeta({ title: 'Watchlist', noindex: true })
+  useDocumentMeta({ title: t('Watchlist'), noindex: true })
   const { items } = useWatchlist()
   const view = useStore(viewModeStore)
   const toast = useToast()
@@ -51,11 +52,11 @@ export default function WatchlistPage() {
   const statusSelect = (anime: Anime, status: WatchlistStatus) => (
     <Select
       size="xs"
-      aria-label={`Status for ${anime.title}`}
+      aria-label={t('Status for {p0}', { p0: anime.title })}
       value={status}
       onChange={(e) => {
         watchlistService.setStatus(anime.id, e.target.value as WatchlistStatus)
-        toast({ title: 'Watchlist updated', description: anime.title })
+        toast({ title: t('Watchlist updated'), description: anime.title })
       }}
       options={WATCHLIST_STATUSES}
       className="min-w-0 flex-1"
@@ -64,42 +65,42 @@ export default function WatchlistPage() {
 
   return (
     <div>
-      <PageHeader eyebrow="Library" title="Watchlist" description="Everything you’re watching, planning and have finished — synced to your account when you’re signed in." />
+      <PageHeader eyebrow={t('Library')} title={t('Watchlist')} description={t('Everything you’re watching, planning and have finished — synced to your account when you’re signed in.')} />
 
       {items.length === 0 ? (
         <EmptyState
           icon={<Bookmark />}
-          title="Your watchlist is empty."
-          description="No anime saved yet. Start exploring and tap the bookmark on any title to save it here."
+          title={t('Your watchlist is empty.')}
+          description={t('No anime saved yet. Start exploring and tap the bookmark on any title to save it here.')}
           action={
             <ButtonLink to="/browse" leftIcon={<Compass className="h-4 w-4" />}>
-              Start exploring
+              {t('Start exploring')}
             </ButtonLink>
           }
         />
       ) : (
         <>
           <Tabs
-            items={[{ value: 'all', label: 'All', count: counts.all }, ...WATCHLIST_STATUSES.map((s) => ({ value: s.value, label: s.label, count: counts[s.value] ?? 0 }))]}
+            items={[{ value: 'all', label: t('All'), count: counts.all }, ...WATCHLIST_STATUSES.map((s) => ({ value: s.value, label: s.label, count: counts[s.value] ?? 0 }))]}
             value={filter}
             onChange={(v) => setFilter(v as Filter)}
-            label="Watchlist status"
+            label={t('Watchlist status')}
             idPrefix="wl"
           />
           <div className="mt-5 flex flex-wrap items-center gap-2">
             <div className="min-w-0 flex-1 basis-full sm:basis-60">
-              <Input type="search" value={text} onChange={(e) => setText(e.target.value)} placeholder="Search your watchlist…" aria-label="Search watchlist" leftIcon={<Search />} className="h-10" />
+              <Input type="search" value={text} onChange={(e) => setText(e.target.value)} placeholder={t('Search your watchlist…')} aria-label={t('Search watchlist')} leftIcon={<Search />} className="h-10" />
             </div>
             <Select
               size="sm"
-              aria-label="Sort watchlist"
+              aria-label={t('Sort watchlist')}
               value={sort}
               onChange={(e) => setSort(e.target.value as Sort)}
               options={[
-                { value: 'added', label: 'Recently added' },
-                { value: 'updated', label: 'Recently updated' },
-                { value: 'title', label: 'Title A–Z' },
-                { value: 'rating', label: 'Highest rated' },
+                { value: 'added', label: t('Recently added') },
+                { value: 'updated', label: t('Recently updated') },
+                { value: 'title', label: t('Title A–Z') },
+                { value: 'rating', label: t('Highest rated') },
               ]}
               className="w-[170px]"
             />
@@ -114,7 +115,7 @@ export default function WatchlistPage() {
                 ))}
               </div>
             ) : visible.length === 0 ? (
-              <EmptyState compact icon={<Search />} title="Nothing here yet" description="No titles match this filter. Try another status or search term." />
+              <EmptyState compact icon={<Search />} title={t('Nothing here yet')} description={t('No titles match this filter. Try another status or search term.')} />
             ) : view === 'grid' ? (
               <ul className={gridClasses.dense}>
                 {visible.map(({ anime, entry }) => (
@@ -140,7 +141,7 @@ export default function WatchlistPage() {
                         anime={anime}
                         index={i + 1}
                         actions={
-                          <Button variant="ghost" size="icon-sm" aria-label={`Remove ${anime.title}`} onClick={() => setRemoving(anime)}>
+                          <Button variant="ghost" size="icon-sm" aria-label={t('Remove {p0}', { p0: anime.title })} onClick={() => setRemoving(anime)}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         }
@@ -163,12 +164,12 @@ export default function WatchlistPage() {
         onClose={() => setRemoving(null)}
         size="sm"
         icon={<Trash2 className="h-5 w-5" />}
-        title="Remove from watchlist?"
-        description={removing ? `“${removing.title}” will be removed from your watchlist.` : undefined}
+        title={t('Remove from watchlist?')}
+        description={removing ? t('“{p0}” will be removed from your watchlist.', { p0: removing.title }) : undefined}
         footer={
           <>
             <Button variant="ghost" onClick={() => setRemoving(null)}>
-              Cancel
+              {t('Cancel')}
             </Button>
             <Button
               variant="danger"
@@ -176,11 +177,11 @@ export default function WatchlistPage() {
                 if (!removing) return
                 const entry = items.find((i) => i.animeId === removing.id)
                 watchlistService.remove(removing.id)
-                toast({ title: 'Removed from watchlist', description: removing.title, variant: 'info', action: { label: 'Undo', onClick: () => watchlistService.add(removing.id, entry?.status) } })
+                toast({ title: t('Removed from watchlist'), description: removing.title, variant: 'info', action: { label: t('Undo'), onClick: () => watchlistService.add(removing.id, entry?.status) } })
                 setRemoving(null)
               }}
             >
-              Remove
+              {t('Remove')}
             </Button>
           </>
         }

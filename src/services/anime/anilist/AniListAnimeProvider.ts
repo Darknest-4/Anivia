@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { config } from '@/config'
 import { filterAnime, paginate } from '@/lib/filters'
 import { matchGenres } from '@/lib/search'
@@ -162,7 +163,7 @@ export class AniListAnimeProvider implements AnimeProvider {
             animeId: anime.id,
             number: s.episode,
             season: 1,
-            title: `Episode ${s.episode}`,
+            title: t('Episode {p0}', { p0: s.episode }),
             synopsis: '',
             airDate: new Date(s.airingAt * 1000).toISOString(),
             duration: (anime.duration ?? 24) * 60,

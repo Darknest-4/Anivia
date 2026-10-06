@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { config } from '@/config'
 import {
   BarChart3,
@@ -27,38 +28,38 @@ export interface NavItem {
 }
 
 export const primaryNav: NavItem[] = [
-  { to: '/', label: 'Home', icon: Home, end: true },
-  { to: '/browse', label: 'Browse', icon: Compass },
-  { to: '/schedule', label: 'Schedule', icon: CalendarDays },
-  { to: '/genres', label: 'Genres', icon: LayoutGrid },
-  { to: '/season', label: 'Seasonal', icon: Snowflake },
+  { to: '/', label: t('Home'), icon: Home, end: true },
+  { to: '/browse', label: t('Browse'), icon: Compass },
+  { to: '/schedule', label: t('Schedule'), icon: CalendarDays },
+  { to: '/genres', label: t('Genres'), icon: LayoutGrid },
+  { to: '/season', label: t('Seasonal'), icon: Snowflake },
 ]
 
 export const discoverNav: NavItem[] = [
-  { to: '/characters', label: 'Characters', icon: Users },
-  { to: '/studios', label: 'Studios', icon: Building2 },
-  { to: '/lists', label: 'Lists', icon: ListOrdered },
-  { to: '/feed', label: 'Feed', icon: Rss },
-  { to: '/search', label: 'Search', icon: Search },
+  { to: '/characters', label: t('Characters'), icon: Users },
+  { to: '/studios', label: t('Studios'), icon: Building2 },
+  { to: '/lists', label: t('Lists'), icon: ListOrdered },
+  { to: '/feed', label: t('Feed'), icon: Rss },
+  { to: '/search', label: t('Search'), icon: Search },
 ]
 
 export const libraryNav: NavItem[] = [
-  { to: '/watchlist', label: 'Watchlist', icon: Bookmark },
-  { to: '/history', label: 'History', icon: History },
-  { to: '/for-you', label: 'For you', icon: Sparkles },
-  { to: '/stats', label: 'My stats', icon: BarChart3 },
-  { to: '/profile', label: 'Profile', icon: User },
-  { to: '/settings', label: 'Settings', icon: Settings },
+  { to: '/watchlist', label: t('Watchlist'), icon: Bookmark },
+  { to: '/history', label: t('History'), icon: History },
+  { to: '/for-you', label: t('For you'), icon: Sparkles },
+  { to: '/stats', label: t('My stats'), icon: BarChart3 },
+  { to: '/profile', label: t('Profile'), icon: User },
+  { to: '/settings', label: t('Settings'), icon: Settings },
 ]
 
 export const mobileTabs: NavItem[] = [
-  { to: '/', label: 'Home', icon: Home, end: true },
-  { to: '/browse', label: 'Browse', icon: Compass },
-  { to: '/watchlist', label: 'Watchlist', icon: Bookmark },
-  { to: '/schedule', label: 'Schedule', icon: CalendarDays },
-  { to: '/profile', label: 'Profile', icon: User },
+  { to: '/', label: t('Home'), icon: Home, end: true },
+  { to: '/browse', label: t('Browse'), icon: Compass },
+  { to: '/watchlist', label: t('Watchlist'), icon: Bookmark },
+  { to: '/schedule', label: t('Schedule'), icon: CalendarDays },
+  { to: '/profile', label: t('Profile'), icon: User },
 ]
 
-export const upgradeNav: NavItem = { to: '/pricing', label: 'Upgrade', icon: Sparkles }
+export const upgradeNav: NavItem = { to: '/pricing', label: t('Upgrade'), icon: Sparkles }
 /** Library links plus “Upgrade” when pricing is enabled. */
 export const libraryNavWithUpgrade: NavItem[] = config.enablePricing ? [...libraryNav, upgradeNav] : libraryNav

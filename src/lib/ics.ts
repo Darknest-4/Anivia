@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import type { ScheduleItem } from '@/types'
 
 const pad = (n: number) => String(n).padStart(2, '0')
@@ -26,7 +27,7 @@ export function scheduleToIcs(items: ScheduleItem[], origin = window.location.or
       `DTSTAMP:${stamp(now)}`,
       `DTSTART:${stamp(start)}`,
       `DTEND:${stamp(end)}`,
-      `SUMMARY:${escape(`${s.anime.title} — Episode ${s.episode}`)}`,
+      `SUMMARY:${escape(t('{p0} — Episode {p1}', { p0: s.anime.title, p1: s.episode }))}`,
       `URL:${origin}/anime/${s.animeId}`,
       `DESCRIPTION:${escape(`${origin}/anime/${s.animeId}`)}`,
       'END:VEVENT',

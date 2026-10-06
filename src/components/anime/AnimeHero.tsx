@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Calendar, Clock, Info, Play, Tv } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -35,7 +36,7 @@ export function AnimeHero({ items }: { items: Anime[] }) {
   return (
     <section
       aria-roledescription="carousel"
-      aria-label="Featured anime"
+      aria-label={t('Featured anime')}
       className="cinematic relative isolate -mt-[var(--header-h)] overflow-hidden"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
@@ -67,7 +68,7 @@ export function AnimeHero({ items }: { items: Anime[] }) {
           <div key={anime.id} className="min-w-0 max-w-2xl flex-1 animate-fade-up text-center md:text-left">
             <div className="flex flex-wrap items-center justify-center gap-2 md:justify-start">
               <Badge variant="solid" size="md">
-                #{index + 1} Spotlight
+                {t('#{p0} Spotlight', { p0: index + 1 })}
               </Badge>
               <StatusBadge status={anime.status} />
               {anime.quality && (
@@ -113,10 +114,10 @@ export function AnimeHero({ items }: { items: Anime[] }) {
             {/* Desktop actions */}
             <div className="mt-8 hidden flex-wrap gap-3 md:flex">
               <ButtonLink to={watchHref} size="lg" leftIcon={<Play className="h-5 w-5 fill-current" />}>
-                Watch Now
+                {t('Watch Now')}
               </ButtonLink>
               <ButtonLink to={`/anime/${anime.id}`} size="lg" variant="glass" leftIcon={<Info className="h-5 w-5" />}>
-                View Details
+                {t('View Details')}
               </ButtonLink>
               <WatchlistButton anime={anime} variant="glass" />
             </div>
@@ -126,12 +127,12 @@ export function AnimeHero({ items }: { items: Anime[] }) {
               <Link
                 to={`/anime/${anime.id}`}
                 className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white ring-1 ring-inset ring-white/15 backdrop-blur-md"
-                aria-label={`View details for ${anime.title}`}
+                aria-label={t('View details for {p0}', { p0: anime.title })}
               >
                 <Info className="h-5 w-5" />
               </Link>
               <ButtonLink to={watchHref} size="lg" className="max-w-[240px] flex-1" leftIcon={<Play className="h-5 w-5 fill-current" />}>
-                Watch Now
+                {t('Watch Now')}
               </ButtonLink>
               <WatchlistIconButton anime={anime} className="h-12 w-12 rounded-xl" />
             </div>
@@ -153,7 +154,7 @@ export function AnimeHero({ items }: { items: Anime[] }) {
         {/* Slide selector */}
         {items.length > 1 && (
           <div className="mt-8 flex items-center justify-center gap-2 md:absolute md:bottom-10 md:left-auto md:right-8 md:mt-0 lg:right-12 2xl:right-16">
-            <div className="hidden gap-2 lg:flex" role="tablist" aria-label="Choose featured anime">
+            <div className="hidden gap-2 lg:flex" role="tablist" aria-label={t('Choose featured anime')}>
               {items.map((a, i) => (
                 <button
                   key={a.id}
@@ -177,7 +178,7 @@ export function AnimeHero({ items }: { items: Anime[] }) {
                   key={a.id}
                   type="button"
                   onClick={() => setIndex(i)}
-                  aria-label={`Show ${a.title}`}
+                  aria-label={t('Show {p0}', { p0: a.title })}
                   aria-current={i === index}
                   className="-mx-1 flex h-11 min-w-[24px] items-center justify-center px-1 sm:h-6 sm:min-w-0"
                 >

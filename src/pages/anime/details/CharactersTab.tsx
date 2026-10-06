@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Mic, Users } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Badge, EmptyState, Skeleton } from '@/components/ui'
@@ -15,7 +16,7 @@ export function CharactersTab({ anime }: { anime: Anime }) {
       </div>
     )
   if (!data?.length)
-    return <EmptyState compact icon={<Users />} title="No characters yet" description="Character profiles for this title aren’t available yet." />
+    return <EmptyState compact icon={<Users />} title={t('No characters yet')} description={t('Character profiles for this title aren’t available yet.')} />
   return (
     <ul className="grid gap-3 md:grid-cols-2">
       {data.map((c) => (
@@ -25,7 +26,7 @@ export function CharactersTab({ anime }: { anime: Anime }) {
             <div className="min-w-0 py-1">
               <div className="flex items-center gap-2">
                 <p className="truncate font-semibold text-fg group-hover:text-accent-soft">{c.name}</p>
-                <Badge variant={c.role === 'Main' ? 'accent' : c.role === 'Antagonist' ? 'danger' : 'default'}>{c.role}</Badge>
+                <Badge variant={c.role === 'Main' ? 'accent' : c.role === 'Antagonist' ? 'danger' : 'default'}>{t(c.role)}</Badge>
               </div>
               {c.nativeName && <p className="text-xs text-fg-subtle">{c.nativeName}</p>}
               <p className="mt-2 inline-flex items-center gap-1.5 text-xs text-fg-muted">

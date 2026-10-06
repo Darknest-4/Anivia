@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { BarChart3, Clock3, Heart, Star, Tv } from 'lucide-react'
 import { useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
@@ -76,7 +77,7 @@ function Meter({ label, value, max, href }: { label: string; value: number; max:
 
 /** Personal statistics and a year in review. */
 export default function StatsPage() {
-  useDocumentMeta({ title: 'My stats', noindex: true })
+  useDocumentMeta({ title: t('My stats'), noindex: true })
   const { items: watchlist } = useWatchlist()
   const history = useHistory()
   const ratings = useStore(ratingsStore)
@@ -124,30 +125,30 @@ export default function StatsPage() {
   if (!watchlist.length && !history.length && !scores.length)
     return (
       <div className="pt-8 sm:pt-10">
-        <PageHeader eyebrow="Library" title="My stats" />
-        <EmptyState icon={<BarChart3 />} title="No stats yet" description="Add titles to your watchlist, mark episodes as watched and rate what you’ve seen." action={<ButtonLink to="/browse">Start exploring</ButtonLink>} />
+        <PageHeader eyebrow={t('Library')} title={t('My stats')} />
+        <EmptyState icon={<BarChart3 />} title={t('No stats yet')} description={t('Add titles to your watchlist, mark episodes as watched and rate what you’ve seen.')} action={<ButtonLink to="/browse">{t('Start exploring')}</ButtonLink>} />
       </div>
     )
 
   return (
     <div className="space-y-6 pb-10">
-      <PageHeader eyebrow="Library" title="My stats" description="Your anime life in numbers — from your watchlist, history and scores." />
+      <PageHeader eyebrow={t('Library')} title={t('My stats')} description={t('Your anime life in numbers — from your watchlist, history and scores.')} />
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Tile icon={<Tv />} label="Episodes watched" value={watched.length} />
-        <Tile icon={<Clock3 />} label="Watch time" value={formatWatchTime(seconds)} />
-        <Tile icon={<Star />} label="Average score" value={avg ? avg.toFixed(1) : '—'} hint={`${scores.length} rated`} />
-        <Tile icon={<Heart />} label="Favorites" value={favorites.length} hint={`${watchlist.length} in watchlist`} />
+        <Tile icon={<Tv />} label={t('Episodes watched')} value={watched.length} />
+        <Tile icon={<Clock3 />} label={t('Watch time')} value={formatWatchTime(seconds)} />
+        <Tile icon={<Star />} label={t('Average score')} value={avg ? avg.toFixed(1) : '—'} hint={t('{p0} rated', { p0: scores.length })} />
+        <Tile icon={<Heart />} label={t('Favorites')} value={favorites.length} hint={t('{p0} in watchlist', { p0: watchlist.length })} />
       </div>
 
       <section className="rounded-2xl border border-line bg-surface p-5">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-sm font-semibold text-fg">Year in review</h2>
-          <Select size="sm" aria-label="Year" value={String(year)} onChange={(e) => setYear(Number(e.target.value))} options={years.map((y) => ({ value: String(y), label: String(y) }))} />
+          <h2 className="text-sm font-semibold text-fg">{t('Year in review')}</h2>
+          <Select size="sm" aria-label={t('Year')} value={String(year)} onChange={(e) => setYear(Number(e.target.value))} options={years.map((y) => ({ value: String(y), label: String(y) }))} />
         </div>
         <p className="mb-4 text-sm text-fg-muted">
-          In {year} you watched <strong className="text-fg">{yearEpisodes}</strong> episodes of <strong className="text-fg">{yearTitles.length}</strong> titles.
+          In {year} you watched <strong className="text-fg">{yearEpisodes}</strong>{' '}{t('episodes of')}{' '}<strong className="text-fg">{yearTitles.length}</strong> titles.
         </p>
-        <Bars data={monthly} label={`Episodes watched per month in ${year}`} />
+        <Bars data={monthly} label={t('Episodes watched per month in {p0}', { p0: year })} />
         {topOfYear.length > 0 && (
           <ol className="mt-5 space-y-2">
             {topOfYear.map((x, i) => (
@@ -164,8 +165,8 @@ export default function StatsPage() {
       </section>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Panel title="Your scores">{scores.length ? <Bars data={distribution} label="How many titles got each score" /> : <p className="text-sm text-fg-subtle">Rate titles to see your score distribution.</p>}</Panel>
-        <Panel title="Favorite genres">
+        <Panel title={t('Your scores')}>{scores.length ? <Bars data={distribution} label={t('How many titles got each score')} /> : <p className="text-sm text-fg-subtle">{t('Rate titles to see your score distribution.')}</p>}</Panel>
+        <Panel title={t('Favorite genres')}>
           {genres.length ? (
             <ul className="space-y-3">
               {genres.map((g) => (
@@ -173,10 +174,10 @@ export default function StatsPage() {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-fg-subtle">Loading…</p>
+            <p className="text-sm text-fg-subtle">{t('Loading…')}</p>
           )}
         </Panel>
-        <Panel title="Watchlist">
+        <Panel title={t('Watchlist')}>
           <ul className="space-y-3">
             {statusCounts.map((s) => (
               <Meter key={s.value} label={s.label} value={s.n} max={Math.max(...statusCounts.map((x) => x.n))} />

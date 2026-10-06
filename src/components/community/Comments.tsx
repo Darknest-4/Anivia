@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { MessageCircle, Reply, Trash2 } from 'lucide-react'
 import { useState } from 'react'
@@ -26,7 +27,7 @@ export function Comments({ animeId, episode, heading = 'Discussion' }: { animeId
       setReplyTo(null)
       void client.invalidateQueries({ queryKey: key })
     },
-    onError: (e: Error) => toast({ title: 'Couldn’t post', description: e.message, variant: 'error' }),
+    onError: (e: Error) => toast({ title: t('Couldn’t post'), description: e.message, variant: 'error' }),
   })
   const remove = useMutation({ mutationFn: (id: number) => community.deleteComment(id), onSuccess: () => client.invalidateQueries({ queryKey: key }) })
 
@@ -41,12 +42,12 @@ export function Comments({ animeId, episode, heading = 'Discussion' }: { animeId
         <AuthorLine author={c.author} at={c.created_at} />
         <div className="flex items-center">
           {!nested && status === 'signed-in' && (
-            <Button variant="ghost" size="icon-sm" aria-label="Reply" onClick={() => setReplyTo(c)}>
+            <Button variant="ghost" size="icon-sm" aria-label={t('Reply')} onClick={() => setReplyTo(c)}>
               <Reply className="h-4 w-4" />
             </Button>
           )}
           {(c.mine || can('reports.manage')) && (
-            <Button variant="ghost" size="icon-sm" aria-label="Delete comment" onClick={() => remove.mutate(c.id)}>
+            <Button variant="ghost" size="icon-sm" aria-label={t('Delete comment')} onClick={() => remove.mutate(c.id)}>
               <Trash2 className="h-4 w-4" />
             </Button>
           )}
@@ -69,12 +70,12 @@ export function Comments({ animeId, episode, heading = 'Discussion' }: { animeId
       ) : (
         <div className="rounded-2xl border border-line bg-surface p-4 text-sm text-fg-muted">
           <ButtonLink to={`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`} size="sm" className="mr-3">
-            Sign in
+            {t('Sign in')}
           </ButtonLink>
-          to join the discussion.
+          {t('to join the discussion.')}
         </div>
       )}
-      {q.isLoading ? <Skeleton className="h-24 rounded-2xl" /> : roots.length === 0 ? <EmptyState compact icon={<MessageCircle />} title="No comments yet" description="Start the conversation." /> : <ul className="space-y-3">{roots.map((c) => item(c))}</ul>}
+      {q.isLoading ? <Skeleton className="h-24 rounded-2xl" /> : roots.length === 0 ? <EmptyState compact icon={<MessageCircle />} title={t('No comments yet')} description={t('Start the conversation.')} /> : <ul className="space-y-3">{roots.map((c) => item(c))}</ul>}
     </section>
   )
 }
@@ -100,11 +101,11 @@ function CommentForm({ replyTo, onCancel, onSubmit, busy }: { replyTo: Comment |
           </button>
         </p>
       )}
-      <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={2} maxLength={2000} placeholder="Say something nice…" aria-label="Your comment" />
+      <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={2} maxLength={2000} placeholder={t('Say something nice…')} aria-label={t('Your comment')} />
       <div className="flex items-center justify-between gap-3">
-        <Switch label="Spoiler" checked={spoiler} onChange={setSpoiler} />
+        <Switch label={t('Spoiler')} checked={spoiler} onChange={setSpoiler} />
         <Button type="submit" size="sm" loading={busy} disabled={!body.trim()}>
-          Post
+          {t('Post')}
         </Button>
       </div>
     </form>

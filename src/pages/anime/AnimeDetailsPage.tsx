@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Flag, Play, RotateCcw, Share2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams, useSearchParams } from 'react-router-dom'
@@ -66,11 +67,11 @@ export default function AnimeDetailsPage() {
   if (!anime) return <NotFoundPage />
 
   const tabs: TabItem<Tab>[] = [
-    { value: 'overview', label: 'Overview' },
-    { value: 'episodes', label: 'Episodes', count: anime.type === 'Movie' ? undefined : anime.episodes },
-    { value: 'characters', label: 'Characters' },
-    { value: 'staff', label: 'Staff' },
-    ...(reviewsOn ? [{ value: 'reviews' as Tab, label: 'Reviews' }] : []),
+    { value: 'overview', label: t('Overview') },
+    { value: 'episodes', label: t('Episodes'), count: anime.type === 'Movie' ? undefined : anime.episodes },
+    { value: 'characters', label: t('Characters') },
+    { value: 'staff', label: t('Staff') },
+    ...(reviewsOn ? [{ value: 'reviews' as Tab, label: t('Reviews') }] : []),
   ]
   const setTab = (t: Tab) => {
     const next = new URLSearchParams(params)
@@ -106,10 +107,10 @@ export default function AnimeDetailsPage() {
           {scoresHidden() ? null : anime.rating ? (
             <span className="inline-flex items-center gap-1.5">
               <span className="rounded-md bg-warning px-1.5 py-0.5 font-display text-sm font-bold text-black">{formatRating(anime.rating)}</span>
-              <span>{anime.rank ? `Ranked #${anime.rank}` : 'Score'}</span>
+              <span>{anime.rank ? t('Ranked #{p0}', { p0: anime.rank }) : t('Score')}</span>
             </span>
           ) : (
-            <span>Not yet rated</span>
+            <span>{t('Not yet rated')}</span>
           )}
           <span>{anime.year}</span>
           <span>{episodeLabel(anime)}</span>
@@ -129,20 +130,20 @@ export default function AnimeDetailsPage() {
             </Button>
           ) : next ? (
             <ButtonLink to={`/anime/${anime.id}/watch?ep=${next.episodeNumber}`} size="lg" leftIcon={next.resume ? <RotateCcw className="h-5 w-5" /> : <Play className="h-5 w-5 fill-current" />}>
-              {next.resume ? 'Continue' : 'Next:'} EP {next.episodeNumber}
+              {next.resume ? t('Continue') : t('Next:')} EP {next.episodeNumber}
             </ButtonLink>
           ) : (
             <ButtonLink to={`/anime/${anime.id}/watch`} size="lg" leftIcon={<Play className="h-5 w-5 fill-current" />}>
-              {anime.type === 'Movie' ? 'Watch Movie' : 'Watch EP 1'}
+              {anime.type === 'Movie' ? t('Watch Movie') : t('Watch EP 1')}
             </ButtonLink>
           )}
           <WatchlistButton anime={anime} variant="glass" />
-          <Button variant="glass" size="icon-lg" aria-label="Share" onClick={() => setShare(true)}>
+          <Button variant="glass" size="icon-lg" aria-label={t('Share')} onClick={() => setShare(true)}>
             <Share2 className="h-5 w-5" />
           </Button>
           <FavoriteButton anime={anime} size="md" className="h-12 w-12 rounded-xl" />
           <AddToList animeId={anime.id} title={anime.title} />
-          <Button variant="glass" size="icon-lg" aria-label="Report an issue" onClick={() => setReport(true)} className="hidden sm:inline-flex">
+          <Button variant="glass" size="icon-lg" aria-label={t('Report an issue')} onClick={() => setReport(true)} className="hidden sm:inline-flex">
             <Flag className="h-5 w-5" />
           </Button>
         </div>
@@ -150,7 +151,7 @@ export default function AnimeDetailsPage() {
 
       <div className="container-app mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="min-w-0">
-          <Tabs items={tabs} value={tab} onChange={setTab} label="Anime sections" idPrefix="details" />
+          <Tabs items={tabs} value={tab} onChange={setTab} label={t('Anime sections')} idPrefix="details" />
           <div role="tabpanel" id={`details-panel-${tab}`} aria-labelledby={`details-${tab}`} className="pt-6">
             {tab === 'overview' && <OverviewTab anime={anime} episodes={episodes.data} onShowEpisodes={() => setTab('episodes')} onShowCharacters={() => setTab('characters')} />}
             {tab === 'episodes' && <EpisodeList animeId={anime.id} episodes={episodes.data} loading={episodes.isLoading} />}
@@ -159,7 +160,7 @@ export default function AnimeDetailsPage() {
             {tab === 'reviews' && (
               <div className="space-y-10">
                 <Reviews animeId={anime.id} title={anime.title} />
-                <Comments animeId={anime.id} episode={null} heading="General discussion" />
+                <Comments animeId={anime.id} episode={null} heading={t('General discussion')} />
               </div>
             )}
           </div>

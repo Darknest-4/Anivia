@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Bell, BellOff, CalendarClock, Link2, PlayCircle, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Popover } from '@/components/ui'
@@ -35,10 +36,10 @@ export function NotificationsMenu() {
       {(close) => (
         <div>
           <div className="flex items-center justify-between border-b border-line px-4 py-3">
-            <p className="text-sm font-semibold text-fg">Notifications</p>
+            <p className="text-sm font-semibold text-fg">{t('Notifications')}</p>
             {unreadCount > 0 && (
               <button type="button" onClick={markAllRead} className="text-xs font-semibold text-accent-soft hover:underline">
-                Mark all as read
+                {t('Mark all as read')}
               </button>
             )}
           </div>
@@ -82,7 +83,7 @@ export function NotificationsMenu() {
                         </span>
                         <span className="mt-0.5 line-clamp-2 block text-xs leading-snug text-fg-subtle">{n.body}</span>
                       </span>
-                      {!read && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-accent" aria-label="Unread" />}
+                      {!read && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-accent" aria-label={t('Unread')} />}
                     </Link>
                   </li>
                 )
@@ -90,7 +91,7 @@ export function NotificationsMenu() {
             </ul>
           )}
           <Link to="/settings?tab=notifications" onClick={close} className="block border-t border-line px-4 py-3 text-center text-xs font-semibold text-fg-muted hover:text-fg">
-            Notification settings
+            {t('Notification settings')}
           </Link>
         </div>
       )}

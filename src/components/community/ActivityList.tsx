@@ -1,3 +1,4 @@
+import { t } from '@/i18n'
 import { Bookmark, Heart, ListPlus, MessageSquareText, Star, Tv } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useAnimeByIds } from '@/hooks/queries'
@@ -14,17 +15,17 @@ function describe(a: Activity) {
   const d = a.data as Record<string, string | number | undefined>
   switch (a.kind) {
     case 'status':
-      return `set to ${watchlistStatusLabel[d.status as WatchlistStatus] ?? d.status}`
+      return t('set to {p0}', { p0: watchlistStatusLabel[d.status as WatchlistStatus] ?? d.status })
     case 'rating':
-      return `rated ${d.score}/10`
+      return t('rated {p0}/10', { p0: d.score })
     case 'episode':
-      return `watched episode ${d.episode}`
+      return t('watched episode {p0}', { p0: d.episode })
     case 'review':
       return 'wrote a review of'
     case 'favorite':
       return 'added to favorites'
     case 'list':
-      return `created the list “${d.title ?? ''}”`
+      return t('created the list “{p0}”', { p0: d.title ?? '' })
   }
 }
 
