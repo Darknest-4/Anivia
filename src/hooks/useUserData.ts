@@ -1,3 +1,4 @@
+import { emitActivity } from '@/services/user/activity'
 import { useCallback, useSyncExternalStore } from 'react'
 import type { PersistentStore } from '@/services/storage'
 import {
@@ -49,6 +50,7 @@ export function useMyRating(animeId: string | undefined) {
     if (score === null) delete next[animeId]
     else next[animeId] = score
     ratingsStore.set(next)
+    if (score !== null) emitActivity({ kind: 'rating', animeId, data: { score } })
   }
   return { value, set }
 }

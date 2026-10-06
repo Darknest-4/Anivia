@@ -40,7 +40,7 @@ function RecommendedRow() {
       title="Recommended for You"
       eyebrow={seeds.length ? 'Based on your library' : 'Hand-picked'}
       icon={<Sparkles />}
-      href="/browse?sort=rating"
+      href="/for-you"
       query={recommended}
     />
   )

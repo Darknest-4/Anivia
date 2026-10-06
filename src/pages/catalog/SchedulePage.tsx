@@ -1,8 +1,10 @@
-import { Clock3 } from 'lucide-react'
+import { CalendarPlus, Clock3 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { PageHeader } from '@/components/common/PageHeader'
 import { ScheduleList } from '@/components/schedule/ScheduleList'
-import { ErrorState, Skeleton, Tabs } from '@/components/ui'
+import { Button, ErrorState, Skeleton, Tabs } from '@/components/ui'
+import { useWatchlist } from '@/hooks/useUserData'
+import { downloadText, scheduleToIcs } from '@/lib/ics'
 import { useSchedule } from '@/hooks/queries'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { cn } from '@/lib/cn'
@@ -17,6 +19,12 @@ export default function SchedulePage() {
   const [range, setRange] = useState<Range>('week')
   const [day, setDay] = useState(today)
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const { items: watchlist } = useWatchlist()
+  const exportIcs = (mine: boolean) => {
+    const ids = new Set(watchlist.filter((w) => w.status === 'watching' || w.status === 'planning').map((w) => w.animeId))
+    const list = (data ?? []).filter((s) => !mine || ids.has(s.animeId))
+    downloadText(mine ? 'anivia-my-releases.ics' : 'anivia-releases.ics', scheduleToIcs(list))
+  }
 
   const visibleDays = range === 'today' ? [today] : range === 'tomorrow' ? [(today + 1) % 7] : [day]
   const counts = useMemo(() => DAYS.map((_, i) => (data ?? []).filter((s) => s.day === i).length), [data])
@@ -37,10 +45,20 @@ export default function SchedulePage() {
         title="Release Schedule"
         description="New episodes as they air. Times are shown in your local time zone."
         actions={
-          <span className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface-2 px-3 py-2 text-xs font-medium text-fg-muted">
-            <Clock3 className="h-3.5 w-3.5" />
-            {tz}
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface-2 px-3 py-2 text-xs font-medium text-fg-muted">
+              <Clock3 className="h-3.5 w-3.5" />
+              {tz}
+            </span>
+            <Button size="sm" variant="secondary" leftIcon={<CalendarPlus className="h-4 w-4" />} disabled={!data?.length} onClick={() => exportIcs(false)}>
+              Add week to calendar
+            </Button>
+            {watchlist.length > 0 && (
+              <Button size="sm" variant="secondary" disabled={!data?.length} onClick={() => exportIcs(true)}>
+                Only my shows
+              </Button>
+            )}
+          </div>
         }
       />
 

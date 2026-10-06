@@ -116,6 +116,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!cancelled && data) setProfile(data)
       const { startCloudSync } = await import('@/services/user/cloudSync')
       if (!cancelled) stopSync.current = startCloudSync(client, userId, setSyncStatus)
+      // Forward your own actions to the activity feed (people who follow you see them).
+      const [{ onActivity }, { community }] = await Promise.all([import('@/services/user/activity'), import('@/services/community')])
+      if (cancelled) return
+      const off = onActivity((e) => void community.logActivity(e.kind, e.animeId, e.data).catch(() => undefined))
+      const stop = stopSync.current
+      stopSync.current = () => {
+        off()
+        stop?.()
+      }
     })()
     return () => {
       cancelled = true

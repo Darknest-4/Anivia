@@ -7,11 +7,13 @@ import { Avatar, Button, EmptyState, ErrorState, Skeleton, Tabs } from '@/compon
 import { useAnimeByIds } from '@/hooks/queries'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useFlag } from '@/providers/PlatformProvider'
+import { ActivityList, FollowStats } from '@/components/community'
+import { community } from '@/services/community'
 import { formatDate } from '@/lib/format'
 import { backend } from '@/services/backend'
 import { WATCHLIST_STATUSES } from '@/services/user'
 
-type Tab = 'watchlist' | 'favorites' | 'rated' | 'history'
+type Tab = 'watchlist' | 'favorites' | 'rated' | 'history' | 'activity'
 
 /** Read-only, shareable profile (only exists when the owner made it public). */
 export default function PublicProfilePage() {
@@ -19,6 +21,7 @@ export default function PublicProfilePage() {
   const [tab, setTab] = useState<Tab>('watchlist')
   const [share, setShare] = useState(false)
   const profilesOn = useFlag('public_profiles')
+  const socialOn = useFlag('social')
   const query = useQuery({ queryKey: ['public-profile', username.toLowerCase()], queryFn: () => backend.publicProfile(username), retry: false, enabled: profilesOn })
   const data = query.data
   useDocumentMeta({ title: data ? `${data.profile.display_name} (@${data.profile.username})` : `@${username}`, type: 'profile' })
@@ -26,7 +29,8 @@ export default function PublicProfilePage() {
   const ratedIds = useMemo(() => Object.entries(data?.ratings ?? {}).sort((a, b) => b[1] - a[1]).map(([id]) => id), [data])
   const historyIds = useMemo(() => [...new Set((data?.history ?? []).map((h) => h.animeId))], [data])
   const ids = tab === 'watchlist' ? (data?.watchlist ?? []).map((w) => w.animeId) : tab === 'favorites' ? data?.favorites ?? [] : tab === 'rated' ? ratedIds : historyIds
-  const anime = useAnimeByIds(ids.slice(0, 24))
+  const anime = useAnimeByIds(tab === 'activity' ? [] : ids.slice(0, 24))
+  const activity = useQuery({ queryKey: ['profile-activity', data?.profile.id], queryFn: () => community.profileActivity(data!.profile.id), enabled: Boolean(data?.profile.id) && tab === 'activity', retry: false })
 
   if (!profilesOn)
     return (
@@ -64,6 +68,7 @@ export default function PublicProfilePage() {
     { value: 'favorites' as const, label: 'Favorites', count: data.favorites.length },
     { value: 'rated' as const, label: 'Rated', count: ratedIds.length },
     ...(p.show_history ? [{ value: 'history' as const, label: 'Recently watched', count: historyIds.length }] : []),
+    ...(socialOn ? [{ value: 'activity' as const, label: 'Activity' }] : []),
   ]
 
   return (
@@ -79,6 +84,7 @@ export default function PublicProfilePage() {
             <CalendarDays className="h-3.5 w-3.5" />
             Member since {formatDate(p.created_at, { month: 'long', year: 'numeric' })}
           </p>
+          {socialOn && <FollowStats userId={p.id} />}
         </div>
         <Button variant="secondary" onClick={() => setShare(true)}>
           Share profile
@@ -103,7 +109,11 @@ export default function PublicProfilePage() {
 
       <Tabs className="mt-10" items={tabs} value={tab} onChange={setTab} label="Profile lists" idPrefix="pub" />
       <div className="pt-6" role="tabpanel" id={`pub-panel-${tab}`}>
-        <AnimeGrid items={anime.data} loading={anime.isLoading && ids.length > 0} density="dense" empty={<EmptyState compact icon={<Star />} title="Nothing here yet" />} />
+        {tab === 'activity' ? (
+          activity.data?.length ? <ActivityList items={activity.data} showAuthor={false} /> : <EmptyState compact icon={<Star />} title={activity.isLoading ? 'Loading…' : 'No activity yet'} />
+        ) : (
+          <AnimeGrid items={anime.data} loading={anime.isLoading && ids.length > 0} density="dense" empty={<EmptyState compact icon={<Star />} title="Nothing here yet" />} />
+        )}
       </div>
       <ShareDialog heading="Share profile" title={`${p.display_name} (@${p.username})`} path={`/u/${p.username}`} open={share} onClose={() => setShare(false)} />
     </div>

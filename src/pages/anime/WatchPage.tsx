@@ -13,6 +13,7 @@ import { formatDate, pad2 } from '@/lib/format'
 import NotFoundPage from '@/pages/info/NotFoundPage'
 import { TrailerEmbed, WatchLinks } from '@/components/watch'
 import { historyService } from '@/services/user'
+import { Comments } from '@/components/community'
 import { setPageTitle } from '@/services/platform/analytics'
 
 
@@ -218,6 +219,12 @@ export default function WatchPage() {
                   )}
                   <WatchLinks links={a.watchLinks} className="mt-4" title="Watch full episodes" />
                 </>
+              )}
+
+              {episode && (
+                <div className="mt-10">
+                  <Comments animeId={a.id} episode={episode.number} heading={`Episode ${episode.number} discussion`} />
+                </div>
               )}
 
             </div>

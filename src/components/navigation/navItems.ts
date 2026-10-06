@@ -1,11 +1,14 @@
 import { config } from '@/config'
 import {
+  BarChart3,
   Bookmark,
   CalendarDays,
   Compass,
   History,
   Home,
   LayoutGrid,
+  ListOrdered,
+  Rss,
   Search,
   Settings,
   Sparkles,
@@ -34,12 +37,16 @@ export const primaryNav: NavItem[] = [
 export const discoverNav: NavItem[] = [
   { to: '/characters', label: 'Characters', icon: Users },
   { to: '/studios', label: 'Studios', icon: Building2 },
+  { to: '/lists', label: 'Lists', icon: ListOrdered },
+  { to: '/feed', label: 'Feed', icon: Rss },
   { to: '/search', label: 'Search', icon: Search },
 ]
 
 export const libraryNav: NavItem[] = [
   { to: '/watchlist', label: 'Watchlist', icon: Bookmark },
   { to: '/history', label: 'History', icon: History },
+  { to: '/for-you', label: 'For you', icon: Sparkles },
+  { to: '/stats', label: 'My stats', icon: BarChart3 },
   { to: '/profile', label: 'Profile', icon: User },
   { to: '/settings', label: 'Settings', icon: Settings },
 ]

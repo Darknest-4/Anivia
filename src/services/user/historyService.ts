@@ -1,4 +1,5 @@
 import type { Episode, WatchProgress } from '@/types'
+import { emitActivity } from './activity'
 import { historyStore, watchlistStore } from './stores'
 
 const MAX_ENTRIES = 200
@@ -25,10 +26,21 @@ export const historyService = {
     }
     const duration = Math.max(60, Math.round(episode.duration || 24 * 60))
     historyService.record({ animeId: episode.animeId, episodeId: episode.id, episodeNumber: episode.number, progress: duration, duration })
+    emitActivity({ kind: 'episode', animeId: episode.animeId, data: { episode: episode.number } })
     if (!watchlistStore.get().some((i) => i.animeId === episode.animeId)) {
       const now = new Date().toISOString()
       watchlistStore.set((items) => [{ animeId: episode.animeId, status: 'watching', addedAt: now, updatedAt: now }, ...items])
     }
+  },
+  /** Highest episode marked as finished for a title (0 when none). */
+  progressOf(animeId: string, items: WatchProgress[] = historyStore.get()) {
+    return items.reduce((max, h) => (h.animeId === animeId && h.completed ? Math.max(max, h.episodeNumber) : max), 0)
+  },
+  /** Marks the next episode after the current progress as watched ("+1"). Returns the new progress. */
+  increment(animeId: string, durationMinutes = 24) {
+    const next = historyService.progressOf(animeId) + 1
+    historyService.setWatched({ animeId, id: `${animeId}-e${next}`, number: next, duration: durationMinutes * 60 }, true)
+    return next
   },
   /** Where to continue: the next episode after a finished one, otherwise the unfinished episode itself. */
   nextUp(animeId: string, available?: number, items: WatchProgress[] = historyStore.get()): { episodeNumber: number; resume: boolean } | null {

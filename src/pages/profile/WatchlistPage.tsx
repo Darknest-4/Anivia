@@ -1,6 +1,6 @@
 import { Bookmark, Compass, Search, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { AnimeCard, AnimeCardList, AnimeCardSkeleton, AnimeListHeader, gridClasses } from '@/components/anime'
+import { AnimeCard, AnimeCardList, AnimeCardSkeleton, AnimeListHeader, EpisodeStepper, gridClasses } from '@/components/anime'
 import { PageHeader } from '@/components/common/PageHeader'
 import { ViewToggle } from '@/components/search'
 import { Button, ButtonLink, Dialog, EmptyState, Input, Select, Tabs } from '@/components/ui'
@@ -120,6 +120,7 @@ export default function WatchlistPage() {
                 {visible.map(({ anime, entry }) => (
                   <li key={anime.id} className="min-w-0">
                     <AnimeCard anime={anime} />
+                    {entry.status === 'watching' && anime.type !== 'Movie' && <EpisodeStepper anime={anime} className="mt-2" />}
                     <div className="mt-2 flex items-center gap-1.5">
                       {statusSelect(anime, entry.status)}
                       <Button variant="ghost" size="icon-sm" aria-label={`Remove ${anime.title}`} onClick={() => setRemoving(anime)} className="h-9 w-9">
@@ -144,7 +145,10 @@ export default function WatchlistPage() {
                           </Button>
                         }
                       />
-                      <div className={cn('-mt-1 mb-2 flex justify-end px-3 md:hidden')}>{statusSelect(anime, entry.status)}</div>
+                      <div className={cn('-mt-1 mb-2 flex items-center justify-end gap-2 px-3')}>
+                        {entry.status === 'watching' && anime.type !== 'Movie' && <EpisodeStepper anime={anime} className="w-40" />}
+                        <div className="md:hidden">{statusSelect(anime, entry.status)}</div>
+                      </div>
                     </li>
                   ))}
                 </ul>

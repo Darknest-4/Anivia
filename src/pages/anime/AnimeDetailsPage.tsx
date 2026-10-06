@@ -23,6 +23,8 @@ import { episodeLabel } from '@/components/anime/AnimeMeta'
 import NotFoundPage from '@/pages/info/NotFoundPage'
 import { WatchLinks } from '@/components/watch'
 import { ViewCount } from '@/components/common/PlatformBits'
+import { AddToList, Comments, CommunityScore, Reviews } from '@/components/community'
+import { useFlag } from '@/providers/PlatformProvider'
 import { DetailsHero } from './details/DetailsHero'
 import { OverviewTab } from './details/OverviewTab'
 import { CharactersTab } from './details/CharactersTab'
@@ -31,7 +33,7 @@ import { RelatedSections } from './details/RelatedSections'
 import { EpisodeList } from '@/components/anime'
 import { formatRating, scoresHidden } from '@/lib/format'
 
-type Tab = 'overview' | 'episodes' | 'characters' | 'staff'
+type Tab = 'overview' | 'episodes' | 'characters' | 'staff' | 'reviews'
 
 export default function AnimeDetailsPage() {
   const { id } = useParams()
@@ -40,6 +42,9 @@ export default function AnimeDetailsPage() {
   const { data: anime, isLoading, isError, refetch } = useAnime(id)
   const episodes = useEpisodes(id)
   const history = useHistory()
+  const reviewsFlag = useFlag('reviews')
+  const commentsFlag = useFlag('comments')
+  const reviewsOn = reviewsFlag || commentsFlag
   const [share, setShare] = useState(false)
   const [report, setReport] = useState(false)
 
@@ -65,6 +70,7 @@ export default function AnimeDetailsPage() {
     { value: 'episodes', label: 'Episodes', count: anime.type === 'Movie' ? undefined : anime.episodes },
     { value: 'characters', label: 'Characters' },
     { value: 'staff', label: 'Staff' },
+    ...(reviewsOn ? [{ value: 'reviews' as Tab, label: 'Reviews' }] : []),
   ]
   const setTab = (t: Tab) => {
     const next = new URLSearchParams(params)
@@ -109,6 +115,7 @@ export default function AnimeDetailsPage() {
           <span>{episodeLabel(anime)}</span>
           {anime.duration && <span>{anime.duration} min</span>}
           <ViewCount animeId={anime.id} />
+          <CommunityScore animeId={anime.id} />
         </div>
         <div className="mt-4 flex flex-wrap justify-center gap-2 md:justify-start">
           {anime.genres.map((g) => (
@@ -134,6 +141,7 @@ export default function AnimeDetailsPage() {
             <Share2 className="h-5 w-5" />
           </Button>
           <FavoriteButton anime={anime} size="md" className="h-12 w-12 rounded-xl" />
+          <AddToList animeId={anime.id} title={anime.title} />
           <Button variant="glass" size="icon-lg" aria-label="Report an issue" onClick={() => setReport(true)} className="hidden sm:inline-flex">
             <Flag className="h-5 w-5" />
           </Button>
@@ -148,6 +156,12 @@ export default function AnimeDetailsPage() {
             {tab === 'episodes' && <EpisodeList animeId={anime.id} episodes={episodes.data} loading={episodes.isLoading} />}
             {tab === 'characters' && <CharactersTab anime={anime} />}
             {tab === 'staff' && <StaffTab anime={anime} />}
+            {tab === 'reviews' && (
+              <div className="space-y-10">
+                <Reviews animeId={anime.id} title={anime.title} />
+                <Comments animeId={anime.id} episode={null} heading="General discussion" />
+              </div>
+            )}
           </div>
         </div>
         <aside className="space-y-6">

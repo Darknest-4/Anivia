@@ -25,6 +25,10 @@ export const DEFAULT_FLAGS: Record<string, boolean> = {
   notifications: true,
   analytics: true,
   view_counts: true,
+  reviews: true,
+  comments: true,
+  social: true,
+  push_notifications: true,
   // Social sign-in buttons — turn on only after enabling the provider in Supabase → Authentication → Providers.
   oauth_google: false,
   oauth_discord: false,

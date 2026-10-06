@@ -1,4 +1,5 @@
 import type { WatchlistStatus } from '@/types'
+import { emitActivity } from './activity'
 import { watchlistStore } from './stores'
 
 export const watchlistService = {
@@ -12,6 +13,7 @@ export const watchlistService = {
       if (existing) return items.map((i) => (i.animeId === animeId ? { ...i, status, updatedAt: now } : i))
       return [{ animeId, status, addedAt: now, updatedAt: now }, ...items]
     })
+    emitActivity({ kind: 'status', animeId, data: { status } })
   },
   remove(animeId: string) {
     watchlistStore.set((items) => items.filter((i) => i.animeId !== animeId))
@@ -20,6 +22,7 @@ export const watchlistService = {
     watchlistStore.set((items) =>
       items.map((i) => (i.animeId === animeId ? { ...i, status, updatedAt: new Date().toISOString() } : i)),
     )
+    emitActivity({ kind: 'status', animeId, data: { status } })
   },
   clear: () => watchlistStore.set([]),
 }

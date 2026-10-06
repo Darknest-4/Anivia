@@ -38,6 +38,11 @@ const TermsPage = lazy(() => import('@/pages/info/TermsPage'))
 const NotFoundPage = lazy(() => import('@/pages/info/NotFoundPage'))
 const StatusPage = lazy(() => import('@/pages/info/StatusPage'))
 const AdminPage = lazy(() => import('@/pages/admin/AdminPage'))
+const FeedPage = lazy(() => import('@/pages/community/FeedPage'))
+const ListsPage = lazy(() => import('@/pages/community/ListsPage'))
+const ListPage = lazy(() => import('@/pages/community/ListPage'))
+const StatsPage = lazy(() => import('@/pages/library/StatsPage'))
+const ForYouPage = lazy(() => import('@/pages/library/ForYouPage'))
 
 export const routes: RouteObject[] = [
   {
@@ -62,10 +67,15 @@ export const routes: RouteObject[] = [
           { path: 'studios', element: <StudiosPage /> },
           { path: 'studio/:id', element: <StudioPage /> },
           { path: 'u/:username', element: <PublicProfilePage /> },
+          { path: 'lists', element: <ListsPage /> },
+          { path: 'lists/:id', element: <ListPage /> },
+          { path: 'feed', element: <FeedPage /> },
           {
             element: <LibraryLayout />,
             children: [
               { path: 'watchlist', element: <WatchlistPage /> },
+              { path: 'stats', element: <StatsPage /> },
+              { path: 'for-you', element: <ForYouPage /> },
               { path: 'history', element: <HistoryPage /> },
               { path: 'profile', element: <ProfilePage /> },
               { path: 'settings', element: <SettingsPage /> },
