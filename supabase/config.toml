@@ -1,0 +1,9 @@
+# Minimal Supabase CLI config — only what the deploy workflow needs.
+project_id = "wnmvktajokjhufuzpamy"
+
+# Both functions are called by visitors who may not be signed in.
+[functions.anilist-auth]
+verify_jwt = false
+
+[functions.anilist-proxy]
+verify_jwt = false

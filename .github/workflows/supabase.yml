@@ -1,0 +1,45 @@
+name: Supabase deploy
+
+# Deploys the Edge Functions (and optionally runs the SQL migrations) whenever
+# something under supabase/ changes on the deploy branch, or when started by hand
+# (Actions → Supabase deploy → Run workflow).
+#
+# Required repository secret (Settings → Secrets and variables → Actions):
+#   SUPABASE_ACCESS_TOKEN — https://supabase.com/dashboard/account/tokens
+# Optional repository secret (to also run the migrations):
+#   SUPABASE_DB_URL       — the Postgres connection string (Project Settings → Database)
+on:
+  push:
+    branches: [claude/anivia-anime-template-ukcfro, main]
+    paths: ['supabase/**']
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      PROJECT_REF: wnmvktajokjhufuzpamy
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Check token
+        run: |
+          if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
+            echo "::error::Add the SUPABASE_ACCESS_TOKEN repository secret first (see the comment at the top of this file)."
+            exit 1
+          fi
+      - name: Run SQL migrations
+        if: env.SUPABASE_DB_URL != ''
+        run: |
+          for f in supabase/migrations/*.sql; do
+            echo "→ $f"
+            psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q -f "$f"
+          done
+      - name: Deploy Edge Functions
+        run: |
+          supabase functions deploy anilist-auth --project-ref "$PROJECT_REF" --no-verify-jwt
+          supabase functions deploy anilist-proxy --project-ref "$PROJECT_REF" --no-verify-jwt
