@@ -8,7 +8,8 @@ const guest: User = {
   displayName: 'Guest',
   avatarHue: 220,
   bio: 'Sign in to sync your watchlist, history and settings across devices.',
-  memberSince: new Date().toISOString(),
+  // Empty = not a member (hides "Member since" on the profile).
+  memberSince: '',
   plan: 'free',
 }
 
@@ -24,7 +25,7 @@ export function useCurrentUser() {
   const user: User & { avatarUrl?: string } = signedIn
     ? { ...auth.user!, avatarUrl: al?.avatar }
     : al
-      ? { id: `anilist-${al.userId}`, username: al.name, displayName: al.name, avatarHue: 200, bio: '', memberSince: new Date().toISOString(), plan: 'free', avatarUrl: al.avatar }
+      ? { id: `anilist-${al.userId}`, username: al.name, displayName: al.name, avatarHue: 200, bio: '', memberSince: '', plan: 'free', avatarUrl: al.avatar }
       : guest
   const isGuest = !signedIn && !al && user === guest
   return { user, signedIn, isGuest, anilistOnly: !signedIn && Boolean(al), auth, anilist }

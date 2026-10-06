@@ -1,9 +1,10 @@
-# ANIVIA — Premium Anime Streaming & Discovery UI Template
+# ANIVIA — anime discovery & tracking
 
-> **Discover. Watch. Remember.**
-> ANIVIA is a premium, responsive, frontend-only anime streaming and discovery UI template that developers can connect to their own API and backend.
+> **Discover. Watch. Remember.** — live at **https://anivia.animehub.hu**
 
-ANIVIA gives you a complete, production-quality anime frontend — not just a homepage. It ships with a cinematic design system, 30 routes, a full catalog with search and filtering, title and episode pages, a fully interactive player UI, watchlist, history, schedule, seasons, genres, characters, studios, profile, settings, auth screens and pricing. Out of the box the catalog is powered by **real anime data from two key-less public APIs — [AniList](https://anilist.co) (GraphQL) and [Jikan v4](https://jikan.moe) (MyAnimeList)** — behind a clean provider layer. A fully **fictional offline demo catalog** is included too, and you can swap in your own backend without touching the UI.
+ANIVIA is a fast, responsive anime discovery and tracking site: trending and seasonal catalogs, search and filters, title and episode pages, a weekly release schedule, characters and studios, a watchlist with scores, watch history and notifications. Anime data comes from **[AniList](https://anilist.co)** (or **[Jikan](https://jikan.moe)** / MyAnimeList) with episode details and artwork from **[ani.zip](https://api.ani.zip)**. Accounts, sync, AniList sign-in, feature flags, roles and first-party analytics run on **Supabase**; the site is served by a **Cloudflare Worker**.
+
+ANIVIA does not host or stream episodes: it shows official trailers and links to licensed services (“Where to watch”). Episodes can be marked as watched to keep progress — also on AniList.
 
 ---
 
@@ -42,9 +43,9 @@ ANIVIA is the frontend foundation for:
 - release-schedule websites
 - personal anime media dashboards
 
-**What it is:** a polished React + TypeScript interface with an API-ready architecture.
+**What it is:** a React + TypeScript site with a provider-based data layer, a Supabase backend (see migrations `0001`–`0004` and `supabase/functions`) and a Cloudflare Worker for edge caching and share previews.
 
-**What it is not:** a streaming service. ANIVIA contains **no backend, no database, no authentication server, no payment processing, no video hosting, no copyrighted anime artwork or video, no scrapers and no third-party streaming sources.** The repository itself contains only fictional demo data and generated artwork; when the AniList / Jikan providers are enabled, metadata and cover images are loaded at runtime from those public APIs.
+**What it is not:** a streaming service. The repository contains no video hosting, no copyrighted artwork or video, no scrapers and no third-party streaming sources; metadata and cover images are loaded at runtime from the public APIs above.
 
 ---
 
@@ -70,7 +71,7 @@ ANIVIA is the frontend foundation for:
 - Anime details: backdrop, poster, full metadata panel, stats, next-episode countdown, synopsis, tags, episodes, characters, staff, studios, related titles and recommendations
 - Episode system: search, season & range selectors, sort, watch progress, watched indicators, filler and locked (unaired) states
 - Watch page: cinematic player with play/pause, seek with buffered range and hover preview, volume, fullscreen (with iOS fallback), settings (quality, subtitles, speed, autoplay), subtitles UI, previous/next, skip intro, autoplay-next countdown, double-tap seek on touch and keyboard shortcuts
-- Player states: playing, paused, loading, buffering, finished, no source, error and fullscreen — plus an in-page **state preview** for demos
+- Player states (with your own video provider): playing, paused, loading, buffering, finished, no source, error and fullscreen; without one, official trailers and “Where to watch” links, plus **mark episodes as watched**
 
 **Library (frontend-only, persisted in `localStorage`)**
 
@@ -114,8 +115,8 @@ No UI kit dependencies (no MUI/Bootstrap/jQuery). Dialogs, drawers, tabs, toasts
 ## 5. Installation
 
 ```bash
-# 1. Unzip the package and enter the folder
-cd anivia
+# 1. Clone the repository and enter the folder
+git clone https://github.com/Darknest-4/Anivia.git && cd Anivia
 
 # 2. Install dependencies
 npm install
@@ -133,14 +134,12 @@ npm run dev        # start the dev server on http://localhost:5173
 npm run typecheck  # TypeScript project check
 ```
 
-The app works immediately without any configuration: it loads live data from AniList (with Jikan episode titles). For fully offline work, set `VITE_ANIME_PROVIDER=mock` in `.env.local`.
+The app works immediately without any configuration: it loads live data from AniList (episode details from ani.zip) and uses the project’s Supabase for accounts.
 
-Demo tips:
+Tips:
 
 - Press **Ctrl/⌘ K** anywhere to open the command palette.
-- With the demo catalog (`mock`), search for **`!error`** to preview the search error state.
-- On any watch page, use **Player state preview** to inspect every player state.
-- **Settings → Account → Reset demo data** restores the seeded library.
+- Open **/status** to check every data source and service from the browser.
 
 ---
 
@@ -161,12 +160,11 @@ All variables are optional. Copy `.env.example` to `.env.local` to override them
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `VITE_ANIME_PROVIDER` | `anilist` | `anilist` (AniList + Jikan episode titles), `jikan`, `api` (your REST backend) or `mock` (offline demo). |
+| `VITE_ANIME_PROVIDER` | `anilist` | `anilist` (AniList + ani.zip episode details), `jikan` or `api` (your REST backend). |
 | `VITE_ANILIST_URL` | `https://graphql.anilist.co` | AniList GraphQL endpoint (override for a caching proxy). |
 | `VITE_JIKAN_URL` | `https://api.jikan.moe/v4` | Jikan endpoint (override for a self-hosted Jikan instance). |
-| `VITE_API_BASE_URL` | *(empty)* | Base URL of **your** API, used by the `api` providers. With `api` selected but no URL, the demo catalog is used. |
-| `VITE_VIDEO_PROVIDER` | `mock` | `mock` or `api` (uses `ApiVideoProvider` when a base URL is set). |
-| `VITE_MOCK_LATENCY` | `350` | Artificial latency (ms) of mock providers so loading states are visible. Use `0` to disable. |
+| `VITE_API_BASE_URL` | *(empty)* | Base URL of **your** API, used by the `api` providers. With `api` selected but no URL, AniList is used. |
+| `VITE_VIDEO_PROVIDER` | `none` | `none` (trailers + “Where to watch”) or `api` (uses `ApiVideoProvider` when a base URL is set). |
 | `VITE_SITE_URL` | `https://anivia.animehub.hu` | Public URL used for canonical and Open Graph tags. |
 
 > Variables prefixed with `VITE_` are embedded in the client bundle. **Never put secrets in them.**
@@ -180,7 +178,7 @@ All configuration is read in one place: `src/config/index.ts`.
 ```
 src/
 ├─ App.tsx                     Root route element (router-aware providers)
-├─ main.tsx                    Entry: providers, router, demo seed
+├─ main.tsx                    Entry: providers, router
 ├─ config/                     Runtime configuration (env with safe defaults)
 ├─ routes/                     Route table with lazy-loaded pages
 ├─ layouts/                    MainLayout, LibraryLayout (sidebar), AuthLayout (split screen)
@@ -201,7 +199,7 @@ src/
 │  ├─ schedule/                ScheduleList
 │  ├─ profile/                 Profile header, stats, genre breakdown
 │  ├─ auth/                    Auth form helpers
-│  └─ common/                  PageHeader, SectionHeader, ErrorBoundary, DemoNotice…
+│  └─ common/                  PageHeader, SectionHeader, ErrorBoundary, PlatformBits (flags, consent, banners)…
 ├─ providers/                  Theme, Toast, Command menu, App providers
 ├─ hooks/                      queries.ts (data hooks), user-data hooks, utilities
 ├─ services/
@@ -209,12 +207,10 @@ src/
 │  │  ├─ anilist/              AniList GraphQL provider (queries, types, mappers)
 │  │  ├─ jikan/                Jikan v4 provider (types, mappers)
 │  │  ├─ shared/               Rate-limited request queue, genre registry, dates, episode builder
-│  │  ├─ mockAnimeProvider.ts  Offline demo catalog
 │  │  └─ apiAnimeProvider.ts   Reference REST provider (+ apiMappers.ts)
-│  ├─ video/                   VideoProvider interface, MockVideoProvider, ApiVideoProvider
+│  ├─ video/                   VideoProvider interface, ApiVideoProvider
 │  ├─ user/                    Watchlist, history, favorites, preferences, recent searches
 │  └─ storage/                 Safe localStorage wrapper + observable persistent stores
-├─ data/                       Fictional demo records (anime, characters, studios, genres…)
 ├─ lib/                        Filters, search, formatting, seasons, procedural artwork
 ├─ types/                      Domain models (Anime, Episode, Character, Studio…)
 └─ styles/                     Tailwind entry + design tokens
@@ -263,7 +259,7 @@ Theme behavior:
 
 ## 12. Data sources
 
-There is no bundled demo catalog any more: all anime data is live. **AniList** (default) or **Jikan** provides the catalog, **ani.zip** adds episode titles, synopses, air dates and artwork (fanart, clear logos), and the Supabase `anilist-proxy` Edge Function stores what it fetches in the database (`api_cache`, `anime_catalog`). `src/lib/artwork.ts` still generates SVG placeholders for missing images.
+All anime data is live. **AniList** (default) or **Jikan** provides the catalog, **ani.zip** adds episode titles, synopses, air dates and artwork (fanart, clear logos), and the Supabase `anilist-proxy` Edge Function stores what it fetches in the database (`api_cache`, `anime_catalog`). `src/lib/artwork.ts` still generates SVG placeholders for missing images.
 
 ---
 
@@ -273,9 +269,8 @@ There is no bundled demo catalog any more: all anime data is live. **AniList** (
 
 | Provider | Select with | What it uses |
 | --- | --- | --- |
-| **AniList** *(default)* | `VITE_ANIME_PROVIDER=anilist` | AniList GraphQL for everything; episode titles, air dates and filler flags are enriched from Jikan through each title’s MyAnimeList id. Episode thumbnails come from AniList’s streaming-episode metadata when available. |
+| **AniList** *(default)* | `VITE_ANIME_PROVIDER=anilist` | AniList GraphQL for everything; episode titles, synopses, air dates, thumbnails and artwork (fanart, logos) are enriched from ani.zip. |
 | **Jikan v4** | `VITE_ANIME_PROVIDER=jikan` | The unofficial MyAnimeList REST API for all data. |
-| **Demo catalog** | `VITE_ANIME_PROVIDER=mock` | Fully offline, fictional data — ideal for development and live previews. |
 
 How the integration behaves:
 
@@ -296,8 +291,8 @@ ANIVIA talks to data exclusively through two interfaces:
 ```
 UI (pages/components)
    └─ hooks/queries.ts  (TanStack Query: caching, loading & error states)
-        ├─ AnimeProvider  ← AniListAnimeProvider | JikanAnimeProvider | MockAnimeProvider | ApiAnimeProvider | YourProvider
-        └─ VideoProvider  ← MockVideoProvider | ApiVideoProvider | YourProvider
+        ├─ AnimeProvider  ← AniListAnimeProvider | JikanAnimeProvider | ApiAnimeProvider | YourProvider
+        └─ VideoProvider  ← (none: trailers) | ApiVideoProvider | YourProvider
 ```
 
 To connect **your own backend** instead, the quickest path:
@@ -306,7 +301,7 @@ To connect **your own backend** instead, the quickest path:
 2. Make your API follow the endpoint conventions documented in `src/services/anime/apiAnimeProvider.ts` **or** edit those paths.
 3. Adjust the response shapes and mapping functions in `src/services/anime/apiMappers.ts`.
 
-> Only connect content and media you are licensed to use. This template does not — and must not be used to — scrape protected services, bypass DRM or embed unauthorized streams.
+> Only connect content and media you are licensed to use. ANIVIA does not — and must not be used to — scrape protected services, bypass DRM or embed unauthorized streams.
 
 ---
 
@@ -442,7 +437,7 @@ Keep API-specific shapes out of the UI by mapping them in one place (`apiMappers
 
 | ANIVIA model | Required fields | Notes |
 | --- | --- | --- |
-| `Anime` | `id`, `slug`, `title`, `description`, `poster`, `status`, `type`, `genres`, `studios`, `languages`, `quality`, `popularity`, `updatedAt` | `backdrop`, `rating`, `episodes`, `nextEpisodeAt`, `staff`, `relatedIds` are optional but enrich the UI. `artwork` is only used by the demo generator. |
+| `Anime` | `id`, `slug`, `title`, `description`, `poster`, `status`, `type`, `genres`, `studios`, `languages`, `quality`, `popularity`, `updatedAt` | `backdrop`, `rating`, `episodes`, `nextEpisodeAt`, `staff`, `relatedIds` are optional but enrich the UI. `artwork` is only used by the placeholder generator. |
 | `Episode` | `id`, `animeId`, `number`, `season`, `title`, `synopsis`, `airDate`, `duration` (seconds), `thumbnail` | Set `locked: true` for unreleased episodes. |
 | `Character` | `id`, `name`, `role`, `animeId`, `description`, `voiceActor`, `favorites`, `image` | |
 | `Genre` | `id`, `slug`, `name`, `description`, `hue` | `hue` (0–360) colors chips and tiles. |
@@ -466,7 +461,7 @@ Throw (or reject) from any provider method and the UI shows a friendly error sta
 
 ## 14c. Settings
 
-Visitors can customise: theme, **accent color** (7 presets), **text size**, **grid density**, spotlight rotation, reduced motion, **data source** (AniList / MyAnimeList / offline demo), **title language** (English / Romaji / Japanese), **score format** (10 / 100 / 5 point), **hide scores**, **blur synopses** (spoiler shield), default sort and page size, **which home sections appear**, offline cache, hover prefetch, data saver, trailer autoplay, playback, notifications, privacy and language options. Signed-in users get all of these synced to their account.
+Visitors can customise: theme, **accent color** (7 presets), **text size**, **grid density**, spotlight rotation, reduced motion, **data source** (AniList / MyAnimeList), **title language** (English / Romaji / Japanese), **score format** (10 / 100 / 5 point), **hide scores**, **blur synopses** (spoiler shield), default sort and page size, **which home sections appear**, offline cache, hover prefetch, data saver, trailer autoplay, notifications, usage statistics and privacy options (player options appear when a video provider is configured). Signed-in users get all of these synced to their account.
 
 ## 15. VideoProvider integration
 
@@ -476,7 +471,7 @@ export interface VideoProvider {
 }
 
 interface VideoSource {
-  kind: 'mp4' | 'hls' | 'dash' | 'demo'
+  kind: 'mp4' | 'hls' | 'dash'
   url?: string
   duration: number
   qualities: string[]
@@ -485,7 +480,7 @@ interface VideoSource {
 }
 ```
 
-- **`MockVideoProvider`** (default) returns a `demo` source: playback is **simulated** over generated artwork so every control and state can be demonstrated. No media file is involved. Locked episodes return `null`.
+- **No provider** (default, `VITE_VIDEO_PROVIDER=none`): the watch page shows the official trailer, “Where to watch” links and a **Mark as watched** button.
 - **Returning `null`** shows: *“Connect your video provider to start playback.”*
 - **`ApiVideoProvider`** is a reference implementation that requests `GET {API}/anime/:animeId/episodes/:episodeId/source` from **your own licensed media backend** and plays `mp4` sources through a native `<video>` element.
 
@@ -521,11 +516,8 @@ ANIVIA persists only non-sensitive, per-device data. All keys are prefixed with 
 | `anivia:favorites` | Anime ids |
 | `anivia:recent-searches` | Recent search terms |
 | `anivia:view-mode` | Grid / list preference |
-| `anivia:demo-seeded` | Whether the demo library was seeded |
 
 No passwords, tokens, payment data or API secrets are ever stored. The stores (`src/services/user/stores.ts`) are observable, sync across browser tabs, and can be replaced with API-backed implementations that keep the same method signatures.
-
-A small demo library is seeded on first visit only when the demo catalog (`mock`) is active; with AniList or Jikan the library starts empty. To disable seeding entirely, remove the `seedDemoLibrary()` call in `src/main.tsx`.
 
 ---
 
@@ -549,23 +541,22 @@ Set `VITE_*` variables in your host’s build settings before building.
 | Problem | Solution |
 | --- | --- |
 | Blank page on refresh of a deep link | Configure the SPA fallback (see Deployment). |
-| Still seeing demo data after setting an API URL | Set **both** `VITE_API_BASE_URL` and `VITE_ANIME_PROVIDER=api`, then restart the dev server (env vars are read at build time). |
+| Your own API isn’t used | Set **both** `VITE_API_BASE_URL` and `VITE_ANIME_PROVIDER=api`, then restart the dev server (env vars are read at build time). |
 | CORS errors | Allow your site’s origin on your API, or proxy requests through Vite’s `server.proxy` during development. |
 | Pages load slowly with Jikan | Jikan allows ~1 request/second sustained and ANIVIA queues requests to stay within it. Prefer `anilist`, self-host Jikan (`VITE_JIKAN_URL`) or put a caching proxy in front. |
-| “Something went wrong” with AniList/Jikan | The public API may be down or rate-limiting your IP — use **Try again**, or switch to `VITE_ANIME_PROVIDER=mock` for offline work. |
+| “Something went wrong” with AniList/Jikan | The public API may be down or rate-limiting your IP — use **Try again** and check **/status**. |
 | Continue Watching entries vanish after switching provider | Each provider uses its own ids; clear the library in Settings → Account. |
 | Player shows “Connect your video provider…” | Your `VideoProvider` returned `null`. Check the episode id and your source endpoint. |
 | HLS doesn’t play in Chrome/Firefox | Add `hls.js` (see VideoProvider integration). |
-| Theme or library looks stale | Clear site data, or use **Settings → Account → Reset demo data**. |
-| Loading states flash too briefly / too long | Tune `VITE_MOCK_LATENCY`. |
+| Theme or library looks stale | Clear site data, or use **Settings → Account → Reset local data**. |
 | `npm install` fails | Use Node 18.18+ and delete `node_modules` + the lockfile before reinstalling. |
 
 ---
 
 ## 19. License
 
-This template is distributed under the license provided by the marketplace where you purchased it (e.g. Envato Regular or Extended License). In short: you may use it to build end products for yourself or a client; you may not redistribute or resell the template itself.
+Private project — all rights reserved by the owner unless stated otherwise.
 
-All demo titles, characters, studios, names and artwork in the offline catalog are fictional and generated for the template. Data loaded from AniList or Jikan/MyAnimeList belongs to those services and the respective rights holders. Any resemblance to real works, companies or persons is coincidental. You are responsible for ensuring that any content, media and data you connect to ANIVIA is properly licensed.
+Anime data, titles and images loaded from AniList, Jikan/MyAnimeList and ani.zip belong to those services and the respective rights holders. Trailers are embedded from YouTube; “Where to watch” links point to official, licensed services.
 
 Icons by [Lucide](https://lucide.dev) (ISC license). Fonts Inter and Sora via Google Fonts (SIL Open Font License).

@@ -1,6 +1,6 @@
 import { Check, CheckCircle2, ChevronLeft, ChevronRight, Flag, ListVideo, Share2 } from 'lucide-react'
-import { useCallback, useState } from 'react'
-import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { useCallback, useEffect, useState } from 'react'
+import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { AnimeCard, EpisodeList, ReportDialog, ScrollRow, ShareDialog, WatchlistButton, AnimeGenreBadge } from '@/components/anime'
 import { SectionHeader } from '@/components/common/SectionHeader'
 import { VideoPlayer } from '@/components/player'
@@ -13,6 +13,7 @@ import { formatDate, pad2 } from '@/lib/format'
 import NotFoundPage from '@/pages/info/NotFoundPage'
 import { TrailerEmbed, WatchLinks } from '@/components/watch'
 import { historyService } from '@/services/user'
+import { setPageTitle } from '@/services/platform/analytics'
 
 
 export default function WatchPage() {
@@ -45,6 +46,12 @@ export default function WatchPage() {
     description: episode?.synopsis,
     type: 'video.episode',
   })
+
+  const { pathname } = useLocation()
+  const animeTitle = anime.data?.title
+  useEffect(() => {
+    if (animeTitle) setPageTitle(pathname, animeTitle)
+  }, [pathname, animeTitle])
 
   const goTo = useCallback(
     (n: number) => {

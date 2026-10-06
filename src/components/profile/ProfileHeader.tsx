@@ -23,10 +23,12 @@ export function ProfileHeader({ user, banner, onShare }: { user: User; banner?: 
           </div>
           <p className="text-sm text-fg-subtle">@{user.username}</p>
           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-fg-muted">
-            <span className="inline-flex items-center gap-1.5">
-              <CalendarDays className="h-3.5 w-3.5" />
-              Member since {formatDate(user.memberSince, { month: 'long', year: 'numeric' })}
-            </span>
+            {user.memberSince && (
+              <span className="inline-flex items-center gap-1.5">
+                <CalendarDays className="h-3.5 w-3.5" />
+                Member since {formatDate(user.memberSince, { month: 'long', year: 'numeric' })}
+              </span>
+            )}
             {user.location && (
               <span className="inline-flex items-center gap-1.5">
                 <MapPin className="h-3.5 w-3.5" />

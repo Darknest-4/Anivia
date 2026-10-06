@@ -1,4 +1,5 @@
 import { lazy } from 'react'
+import { config } from '@/config'
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router-dom'
 import { App } from '@/App'
 import { AuthLayout } from '@/layouts/AuthLayout'
@@ -70,7 +71,8 @@ export const routes: RouteObject[] = [
               { path: 'settings', element: <SettingsPage /> },
             ],
           },
-          { path: 'pricing', element: <PricingPage /> },
+          // Pricing exists only once a payment provider is connected (VITE_ENABLE_PRICING=true).
+          { path: 'pricing', element: config.enablePricing ? <PricingPage /> : <NotFoundPage /> },
           { path: 'about', element: <AboutPage /> },
           { path: 'contact', element: <ContactPage /> },
           { path: 'privacy', element: <PrivacyPage /> },

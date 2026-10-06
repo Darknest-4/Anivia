@@ -65,6 +65,7 @@ const ANIME_PATH = /^\/anime\/([^/]+)/
 
 interface Current {
   view: Promise<number | null>
+  path: string
   session: string
   enteredAt: number
   visibleMs: number
@@ -73,6 +74,8 @@ interface Current {
 
 let current: Current | null = null
 let started: string | null = null
+/** Titles reported by pages (path → title), e.g. an anime title once it has loaded. */
+const titles = new Map<string, string>()
 let heartbeat: number | undefined
 
 function elapsed(c: Current) {
@@ -115,8 +118,9 @@ export function trackPageview(path: string, title?: string) {
       : Promise.resolve(null)
   started = session
   const anime = ANIME_PATH.exec(path)?.[1] ?? null
-  const view = ready.then(() => rpc<number>('track_pageview', { p_session: session, p_path: path, p_anime: anime, p_title: anime ? (title ?? null) : null }))
-  current = { view, session, enteredAt: Date.now(), visibleMs: 0, visibleSince: document.visibilityState === 'visible' ? performance.now() : null }
+  const known = titles.get(path) ?? title ?? null
+  const view = ready.then(() => rpc<number>('track_pageview', { p_session: session, p_path: path, p_anime: anime, p_title: anime ? known : null }))
+  current = { view, path, session, enteredAt: Date.now(), visibleMs: 0, visibleSince: document.visibilityState === 'visible' ? performance.now() : null }
 
   if (heartbeat === undefined) {
     document.addEventListener('visibilitychange', onVisibility)
@@ -130,10 +134,15 @@ export function trackPageview(path: string, title?: string) {
   }
 }
 
-/** Updates the title of the current view once the page knows it (e.g. anime title after loading). */
-export function setPageTitle(title: string) {
+/**
+ * Reports the real title of a page once it is known (e.g. an anime title after loading).
+ * Applied to the view of that exact path only — never to the previous page's view.
+ */
+export function setPageTitle(path: string, title: string) {
+  titles.set(path, title)
+  if (titles.size > 200) titles.delete(titles.keys().next().value as string)
   const c = current
-  if (!c) return
+  if (!c || c.path !== path || !analyticsAllowed()) return
   void c.view.then((id) => id && rpc('track_pageview_title', { p_view: id, p_session: c.session, p_title: title }))
 }
 

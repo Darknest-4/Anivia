@@ -134,10 +134,13 @@ Deno.serve(async (req) => {
   } catch {
     return reply(text, 502)
   }
-  if (body?.data && !body.errors?.length) {
+  // Only clean, reasonably sized answers are stored (keeps the cache table from being filled with junk).
+  if (body?.data && !body.errors?.length && text.length < 400_000) {
     const work = Promise.all([
       db.from('api_cache').upsert({ key, body, expires_at: new Date(Date.now() + ttlFor(query) * 1000).toISOString() }),
       storeCatalog(body),
+      // Now and then, drop expired entries so the table doesn't grow forever.
+      Math.random() < 0.02 ? db.from('api_cache').delete().lt('expires_at', new Date().toISOString()) : null,
     ]).catch(() => undefined)
     // Keep the function alive for the writes without delaying the response.
     // deno-lint-ignore no-explicit-any

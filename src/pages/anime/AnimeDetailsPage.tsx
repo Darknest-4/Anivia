@@ -1,6 +1,6 @@
 import { Flag, Play, RotateCcw, Share2 } from 'lucide-react'
-import { useMemo, useState } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { useLocation, useParams, useSearchParams } from 'react-router-dom'
 import {
   AnimeGenreBadge,
   AnimeInfoPanel,
@@ -18,6 +18,7 @@ import { useAnime, useEpisodes } from '@/hooks/queries'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useHistory } from '@/hooks/useUserData'
 import { historyService } from '@/services/user'
+import { setPageTitle } from '@/services/platform/analytics'
 import { episodeLabel } from '@/components/anime/AnimeMeta'
 import NotFoundPage from '@/pages/info/NotFoundPage'
 import { WatchLinks } from '@/components/watch'
@@ -43,6 +44,10 @@ export default function AnimeDetailsPage() {
   const [report, setReport] = useState(false)
 
   useDocumentMeta({ title: anime?.title, description: anime?.synopsisShort, image: anime?.poster, type: 'video.tv_show' })
+  const { pathname } = useLocation()
+  useEffect(() => {
+    if (anime?.title) setPageTitle(pathname, anime.title)
+  }, [pathname, anime?.title])
 
   const next = useMemo(() => (id ? historyService.nextUp(id, anime?.episodesAired ?? anime?.episodes, history) : null), [history, id, anime?.episodesAired, anime?.episodes])
 

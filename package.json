@@ -2,7 +2,7 @@
   "name": "anivia",
   "private": true,
   "version": "1.0.0",
-  "description": "ANIVIA \u2014 Premium Anime Streaming & Discovery UI Template (frontend-only, API-ready).",
+  "description": "ANIVIA \u2014 anime discovery & tracking (AniList / Jikan / ani.zip, Supabase, Cloudflare Workers).",
   "type": "module",
   "scripts": {
     "dev": "vite",

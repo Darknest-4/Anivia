@@ -39,7 +39,13 @@ export function PlatformProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     void refreshFlags()
-    const onFocus = () => document.visibilityState === 'visible' && void refreshFlags()
+    // Re-check when the tab comes back, at most every 5 minutes.
+    let last = Date.now()
+    const onFocus = () => {
+      if (document.visibilityState !== 'visible' || Date.now() - last < 5 * 60_000) return
+      last = Date.now()
+      void refreshFlags()
+    }
     document.addEventListener('visibilitychange', onFocus)
     return () => document.removeEventListener('visibilitychange', onFocus)
   }, [refreshFlags])

@@ -8,7 +8,14 @@
 
 interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> }
+  /** Public Supabase project URL + publishable key (same values the browser uses). */
+  SUPABASE_URL?: string
+  SUPABASE_KEY?: string
 }
+
+// Public values (also shipped to every browser) — used to read share-preview data from the database.
+const DEFAULT_SUPABASE_URL = 'https://wnmvktajokjhufuzpamy.supabase.co'
+const DEFAULT_SUPABASE_KEY = 'sb_publishable_fr81aMF8zLh8ambsYTcJwg_SjxpX1DT'
 
 interface Ctx {
   waitUntil(promise: Promise<unknown>): void
@@ -81,29 +88,65 @@ async function proxyAniList(request: Request, ctx: Ctx, origin: string) {
 
 const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!)
 
-async function animeMeta(id: string, ctx: Ctx, origin: string) {
-  const cacheKey = new Request(`${origin}/__anime-meta/${id}`)
-  const hit = await caches.default.match(cacheKey)
-  if (hit) return (await hit.json()) as { title: string; description: string; image: string } | null
+type AlMeta = { isAdult?: boolean; title: { english: string | null; romaji: string | null }; description: string | null; coverImage: { extraLarge: string | null }; bannerImage: string | null }
+type Meta = { title: string; description: string; image: string } | null
 
-  const query = 'query($id:Int){Media(id:$id,type:ANIME){isAdult title{english romaji} description(asHtml:false) coverImage{extraLarge} bannerImage}}'
-  const res = await fetch(ANILIST, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ query, variables: { id: Number(id) } }) })
-  const m = res.ok ? ((await res.json()) as { data?: { Media?: { isAdult: boolean; title: { english: string | null; romaji: string | null }; description: string | null; coverImage: { extraLarge: string | null }; bannerImage: string | null } } }).data?.Media : null
-  const meta =
+const META_QUERY = 'query($id:Int){Media(id:$id,type:ANIME){id isAdult title{english romaji} description(asHtml:false) coverImage{extraLarge} bannerImage genres}}'
+
+/**
+ * Share-preview data for /anime/:id. AniList blocks Cloudflare Worker IPs, so this reads
+ * (1) the title stored in Supabase (anime_catalog), then (2) asks the Supabase anilist-proxy
+ * function, and only then (3) tries AniList directly.
+ */
+async function fetchMedia(id: string, env: Env): Promise<AlMeta | null> {
+  const base = env.SUPABASE_URL ?? DEFAULT_SUPABASE_URL
+  const key = env.SUPABASE_KEY ?? DEFAULT_SUPABASE_KEY
+  const headers = { apikey: key, Authorization: `Bearer ${key}`, accept: 'application/json' }
+  try {
+    const res = await fetch(`${base}/rest/v1/anime_catalog?id=eq.${encodeURIComponent(id)}&select=data`, { headers })
+    if (res.ok) {
+      const rows = (await res.json()) as { data: AlMeta }[]
+      if (rows[0]?.data?.title) return rows[0].data
+    }
+  } catch {
+    /* fall through */
+  }
+  const body = JSON.stringify({ query: META_QUERY, variables: { id: Number(id) } })
+  for (const url of [`${base}/functions/v1/anilist-proxy`, ANILIST]) {
+    try {
+      const res = await fetch(url, { method: 'POST', headers: { ...(url === ANILIST ? {} : headers), 'content-type': 'application/json', accept: 'application/json' }, body })
+      if (!res.ok || !(res.headers.get('content-type') ?? '').includes('json')) continue
+      const media = ((await res.json()) as { data?: { Media?: AlMeta | null } }).data?.Media
+      if (media) return media
+    } catch {
+      /* try the next source */
+    }
+  }
+  return null
+}
+
+async function animeMeta(id: string, env: Env, ctx: Ctx, origin: string): Promise<Meta> {
+  const cacheKey = new Request(`${origin}/__anime-meta/v2/${id}`)
+  const hit = await caches.default.match(cacheKey)
+  if (hit) return (await hit.json()) as Meta
+
+  const m = await fetchMedia(id, env)
+  const meta: Meta =
     m && !m.isAdult
       ? {
           title: m.title.english ?? m.title.romaji ?? 'Anime',
           description: (m.description ?? '').replace(/<[^>]+>/g, '').replace(/~!.*?!~/gs, '').replace(/\s+/g, ' ').trim().slice(0, 200),
-          image: m.bannerImage ?? m.coverImage.extraLarge ?? '',
+          image: m.bannerImage ?? m.coverImage?.extraLarge ?? '',
         }
       : null
-  ctx.waitUntil(caches.default.put(cacheKey, new Response(JSON.stringify(meta), { headers: { 'cache-control': 'public, max-age=86400' } })))
+  // Misses are retried soon; hits are kept for a day.
+  ctx.waitUntil(caches.default.put(cacheKey, new Response(JSON.stringify(meta), { headers: { 'cache-control': `public, max-age=${meta ? 86400 : 600}` } })))
   return meta
 }
 
 async function withMeta(request: Request, env: Env, ctx: Ctx, id: string, origin: string) {
   const page = await env.ASSETS.fetch(request)
-  const meta = await animeMeta(id, ctx, origin).catch(() => null)
+  const meta = await animeMeta(id, env, ctx, origin).catch(() => null)
   if (!meta || !(page.headers.get('content-type') ?? '').includes('text/html')) return page
   const title = `${meta.title} — ANIVIA`
   const tags = [
