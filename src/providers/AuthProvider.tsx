@@ -15,6 +15,8 @@ export interface Profile {
   created_at: string
   is_public?: boolean
   show_history?: boolean
+  avatar_url?: string | null
+  banner_url?: string | null
 }
 
 type AuthStatus = 'disabled' | 'loading' | 'signed-out' | 'signed-in'
@@ -33,7 +35,7 @@ interface AuthContextValue {
   sendPasswordReset: (email: string) => Promise<void>
   updatePassword: (password: string) => Promise<void>
   updateEmail: (email: string) => Promise<void>
-  updateProfile: (patch: Partial<Pick<Profile, 'username' | 'display_name' | 'bio' | 'avatar_hue' | 'is_public' | 'show_history'>>) => Promise<void>
+  updateProfile: (patch: Partial<Pick<Profile, 'username' | 'display_name' | 'bio' | 'avatar_hue' | 'is_public' | 'show_history' | 'avatar_url' | 'banner_url'>>) => Promise<void>
   signOut: (everywhere?: boolean) => Promise<void>
 }
 
@@ -58,6 +60,8 @@ function friendly(err: unknown): Error {
   if (/rate limit|too many/i.test(msg)) return new Error('Too many attempts. Please wait a minute and try again.')
   if (/provider is not enabled|unsupported provider/i.test(msg)) return new Error('This sign-in method is not enabled yet.')
   if (/duplicate key.*username/i.test(msg)) return new Error('That username is already taken.')
+  if (/banner_url.*(column|schema cache)|column.*banner_url/i.test(msg)) return new Error('Profile banners need the latest database update (supabase/migrations/0005_anivia_profile_images.sql).')
+  if (/profiles_(avatar|banner)_url_allowed/i.test(msg)) return new Error('Only images from AniList or MyAnimeList can be used.')
   if (/failed to fetch|network/i.test(msg)) return new Error('Can’t reach the account server. Check your connection.')
   return new Error(msg)
 }
@@ -139,6 +143,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             bio: profile.bio,
             memberSince: profile.created_at,
             plan: 'free',
+            avatarUrl: profile.avatar_url ?? undefined,
+            bannerUrl: profile.banner_url ?? undefined,
           }
         : session
           ? {

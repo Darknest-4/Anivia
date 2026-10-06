@@ -1,6 +1,8 @@
-import { Cloud, KeyRound, LogIn, LogOut, Mail, Trash2 } from 'lucide-react'
+import { Camera, Cloud, ImageIcon, KeyRound, LogIn, LogOut, Mail, Trash2 } from 'lucide-react'
 import { useEffect, useState, type FormEvent } from 'react'
 import { PasswordInput } from '@/components/auth/AuthBits'
+import { ProfileImagePicker } from '@/components/profile/ProfileImagePicker'
+import { useProfileImages, type ProfileImageKind } from '@/hooks/useProfileImages'
 import { Avatar, Button, ButtonLink, Dialog, Field, Input, Textarea } from '@/components/ui'
 import { formatDate } from '@/lib/format'
 import { useAuth } from '@/providers/AuthProvider'
@@ -24,6 +26,8 @@ export function AccountSettings() {
   const [deleting, setDeleting] = useState(false)
   const [confirmText, setConfirmText] = useState('')
   const navigate = useNavigate()
+  const images = useProfileImages()
+  const [picker, setPicker] = useState<ProfileImageKind | null>(null)
 
   useEffect(() => {
     if (auth.profile)
@@ -82,8 +86,8 @@ export function AccountSettings() {
         <Row>
           <form onSubmit={saveProfile} className="grid gap-4 sm:grid-cols-2">
             <div className="flex items-center gap-4 sm:col-span-2">
-              <Avatar name={form.display_name || 'Member'} hue={form.avatar_hue} size="lg" />
-              <label className="flex-1">
+              <Avatar name={form.display_name || 'Member'} hue={form.avatar_hue} src={images.avatarUrl} size="lg" />
+              <label className={images.avatarUrl ? 'hidden' : 'flex-1'}>
                 <span className="mb-1.5 block text-[13px] font-medium text-fg">Avatar color</span>
                 <input
                   type="range"
@@ -97,6 +101,15 @@ export function AccountSettings() {
                 />
               </label>
             </div>
+            <div className="flex flex-wrap gap-2 sm:col-span-2">
+              <Button type="button" variant="secondary" size="sm" leftIcon={<Camera className="h-4 w-4" />} onClick={() => setPicker('avatar')}>
+                {images.avatarUrl ? 'Change picture' : 'Choose a character picture'}
+              </Button>
+              <Button type="button" variant="secondary" size="sm" leftIcon={<ImageIcon className="h-4 w-4" />} onClick={() => setPicker('banner')}>
+                {images.bannerUrl ? 'Change banner' : 'Choose a banner'}
+              </Button>
+            </div>
+            {images.bannerUrl && <img src={images.bannerUrl} alt="Your profile banner" className="h-20 w-full rounded-xl object-cover sm:col-span-2" />}
             <Field label="Display name">{(p) => <Input {...p} maxLength={48} value={form.display_name} onChange={(e) => setForm({ ...form, display_name: e.target.value })} autoComplete="name" />}</Field>
             <Field label="Username" hint="3–24 characters">{(p) => <Input {...p} maxLength={24} value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} autoComplete="username" />}</Field>
             <Field label="Bio" className="sm:col-span-2" hint={`${form.bio.length}/280`}>
@@ -110,6 +123,17 @@ export function AccountSettings() {
           </form>
         </Row>
       </Card>
+
+      <ProfileImagePicker
+        kind={picker ?? 'avatar'}
+        open={picker !== null}
+        current={picker === 'banner' ? images.bannerUrl : images.avatarUrl}
+        onClose={() => setPicker(null)}
+        onSave={async (url) => {
+          await images.save(picker ?? 'avatar', url)
+          toast({ title: url ? (picker === 'banner' ? 'Banner updated' : 'Profile picture updated') : 'Removed' })
+        }}
+      />
 
       <Card title="Sign-in details">
         <Row>

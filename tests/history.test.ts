@@ -50,3 +50,14 @@ describe('formatting helpers', () => {
     expect(thumb(undefined)).toBeUndefined()
   })
 })
+
+describe('profile images', async () => {
+  const { isAllowedProfileImage } = await import('@/lib/profileImages')
+  it('accepts only anime-database artwork', () => {
+    expect(isAllowedProfileImage('https://s4.anilist.co/file/anilistcdn/character/large/b1-x.png')).toBe(true)
+    expect(isAllowedProfileImage('https://cdn.myanimelist.net/images/characters/1/1.jpg')).toBe(true)
+    expect(isAllowedProfileImage('https://evil.example/x.png')).toBe(false)
+    expect(isAllowedProfileImage('http://s4.anilist.co/x.png')).toBe(false)
+    expect(isAllowedProfileImage(undefined)).toBe(false)
+  })
+})

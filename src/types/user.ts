@@ -12,6 +12,10 @@ export interface User {
   memberSince: string
   location?: string
   plan: 'free' | 'plus' | 'pro'
+  /** Profile picture (an anime character's image). */
+  avatarUrl?: string
+  /** Profile banner (an anime banner). */
+  bannerUrl?: string
 }
 
 export interface WatchlistItem {

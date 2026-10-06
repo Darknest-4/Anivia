@@ -32,7 +32,7 @@ export const backend = {
 }
 
 export interface PublicProfile {
-  profile: { id: string; username: string; display_name: string; bio: string; avatar_hue: number; created_at: string; show_history: boolean }
+  profile: { id: string; username: string; display_name: string; bio: string; avatar_hue: number; avatar_url?: string | null; banner_url?: string | null; created_at: string; show_history: boolean }
   watchlist: { animeId: string; status: string; updatedAt: string }[]
   favorites: string[]
   ratings: Record<string, number>

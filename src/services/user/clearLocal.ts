@@ -1,5 +1,6 @@
 import { readNotificationsStore, notifiedStore } from '@/hooks/useNotifications'
 import { anilistAuthStore, anilistOptionsStore, anilistSnapshotStore } from '@/services/anilistAccount/store'
+import { profileLookStore } from './profileLook'
 import { favoriteCharactersStore, favoritesStore, historyStore, preferencesStore, ratingsStore, recentSearchesStore, watchlistStore } from './stores'
 
 /** Stops AniList pushes first, so clearing the library can never delete anything on AniList. */
@@ -17,7 +18,7 @@ export function detachAniList() {
 export function clearAccountData() {
   detachAniList()
   anilistOptionsStore.reset()
-  ;[watchlistStore, historyStore, favoritesStore, ratingsStore, favoriteCharactersStore, recentSearchesStore, preferencesStore, readNotificationsStore, notifiedStore].forEach((s) =>
+  ;[watchlistStore, historyStore, favoritesStore, ratingsStore, favoriteCharactersStore, recentSearchesStore, preferencesStore, readNotificationsStore, notifiedStore, profileLookStore].forEach((s) =>
     s.reset(),
   )
   try {

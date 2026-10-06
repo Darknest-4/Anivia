@@ -68,8 +68,9 @@ export default function PublicProfilePage() {
 
   return (
     <div className="container-app pt-8 sm:pt-10">
-      <header className="flex flex-col gap-5 rounded-3xl border border-line bg-surface p-6 sm:flex-row sm:items-center sm:p-8">
-        <Avatar name={p.display_name} hue={p.avatar_hue} size="xl" />
+      {p.banner_url && <img src={p.banner_url} alt="" className="mb-[-3rem] h-36 w-full rounded-3xl object-cover sm:h-48" />}
+      <header className="relative flex flex-col gap-5 rounded-3xl border border-line bg-surface p-6 sm:flex-row sm:items-center sm:p-8">
+        <Avatar name={p.display_name} hue={p.avatar_hue} src={p.avatar_url ?? undefined} size="xl" />
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-bold text-fg sm:text-3xl">{p.display_name}</h1>
           <p className="text-sm text-fg-subtle">@{p.username}</p>

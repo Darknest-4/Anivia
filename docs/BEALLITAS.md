@@ -10,6 +10,7 @@ Ez a lista végigvezet mindenen, amit **a Supabase és a Cloudflare felületén 
    - `supabase/migrations/0002_anivia_features.sql` (kapcsolat/hibajelentés, saját pontszámok, kedvenc karakterek, nyilvános profil, fióktörlés)
    - `supabase/migrations/0003_anivia_platform.sql` (jogosultságok/szerepkörök, feature flagek, látogatottsági statisztika, anime-adatok tárolása, AniList-fiók összekötés, admin funkciók)
    - `supabase/migrations/0004_anivia_oauth_flags.sql` (kapcsolók a Google / Discord / GitHub belépőgombokhoz)
+   - `supabase/migrations/0005_anivia_profile_images.sql` (profilkép anime-karakterből és profilbanner — a nyilvános profilon is látszik)
 3. Alternatíva a saját gépedről: hozz létre egy `supabase/.env.local` fájlt (nem kerül a repóba):
    ```
    SUPABASE_DB_URL=postgresql://postgres:JELSZÓ@db.wnmvktajokjhufuzpamy.supabase.co:5432/postgres

@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom'
 import { AnimeCardCompact, AnimeGrid, ShareDialog } from '@/components/anime'
 import { GenreBreakdown } from '@/components/profile/GenreBreakdown'
 import { ProfileHeader } from '@/components/profile/ProfileHeader'
+import { ProfileImagePicker } from '@/components/profile/ProfileImagePicker'
+import { useProfileImages, type ProfileImageKind } from '@/hooks/useProfileImages'
 import { ProfileStats } from '@/components/profile/ProfileStats'
 import { ButtonLink, EmptyState, Tabs } from '@/components/ui'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
@@ -37,11 +39,20 @@ export default function ProfilePage() {
   }
   const library = items.map((i) => byId.get(i.animeId)).filter((a) => a !== undefined)
   const favorites = favoriteIds.map((id) => byId.get(id)).filter((a) => a !== undefined)
-  const banner = byId.get(favoriteIds[0] ?? '')?.backdrop
+  const images = useProfileImages()
+  const [picker, setPicker] = useState<ProfileImageKind | null>(null)
+  const banner = images.bannerUrl ?? byId.get(favoriteIds[0] ?? '')?.backdrop
 
   return (
     <div className="pt-8 sm:pt-10">
-      <ProfileHeader user={user} banner={banner} onShare={() => setShare(true)} />
+      <ProfileHeader user={user} banner={banner} onShare={() => setShare(true)} onChangeAvatar={() => setPicker('avatar')} onChangeBanner={() => setPicker('banner')} />
+      <ProfileImagePicker
+        kind={picker ?? 'avatar'}
+        open={picker !== null}
+        current={picker === 'banner' ? images.bannerUrl : images.avatarUrl}
+        onClose={() => setPicker(null)}
+        onSave={(url) => images.save(picker ?? 'avatar', url)}
+      />
       <ProfileStats values={stats} className="mt-6" />
 
       <Tabs

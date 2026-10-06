@@ -23,7 +23,7 @@ export function Avatar({ name, hue = 348, src, size = 'md', className }: AvatarP
       style={{ background: `linear-gradient(135deg, hsl(${hue} 85% 60%), hsl(${(hue + 60) % 360} 70% 38%))` }}
       aria-hidden={!src}
     >
-      {src ? <img src={src} alt={name} className="h-full w-full object-cover" /> : initials}
+      {src ? <img src={src} alt={name} className="h-full w-full object-cover object-top" /> : initials}
     </span>
   )
 }
