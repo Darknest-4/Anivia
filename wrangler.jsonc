@@ -11,6 +11,6 @@
     // Serve index.html for client-side routes such as /anime/123 or /browse.
     "not_found_handling": "single-page-application",
     // The Worker handles the AniList cache proxy and share previews; everything else is static.
-    "run_worker_first": ["/api/*", "/anime/*"]
+    "run_worker_first": ["/api/*", "/anime/*", "/robots.txt", "/sitemap.xml"]
   }
 }
