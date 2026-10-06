@@ -19,6 +19,7 @@ const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, accept',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Expose-Headers': 'X-Cache, Retry-After',
 }
 const reply = (body: string, status = 200, extra: Record<string, string> = {}) =>
   new Response(body, { status, headers: { ...CORS, 'Content-Type': 'application/json', ...extra } })

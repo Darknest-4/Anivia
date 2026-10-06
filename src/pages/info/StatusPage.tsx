@@ -120,8 +120,17 @@ const CHECKS: Check[] = [
     id: 'jikan',
     label: 'Jikan (MyAnimeList) API',
     run: async () => {
-      const res = await timedFetch(`${config.jikanUrl}/anime/1`)
-      if (!res.ok) throw new Error(await describe(res))
+      // Jikan is only a fallback unless it's the selected data source — don't flag its outages as failures.
+      const optional = activeDataSource !== 'jikan'
+      const res = await timedFetch(`${config.jikanUrl}/anime/1`).catch((e: Error) => {
+        if (optional) return null
+        throw e
+      })
+      if (!res) return 'SKIP — unreachable right now (optional; only used when Jikan is the data source)'
+      if (!res.ok) {
+        if (optional) return `SKIP — ${await describe(res)} (optional)`
+        throw new Error(await describe(res))
+      }
       return 'OK'
     },
   },
