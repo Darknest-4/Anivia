@@ -47,6 +47,15 @@ export default function WatchPage() {
     type: 'video.episode',
   })
 
+  // Pin the episode in the URL once it is known, so marking it watched doesn't jump to the next one.
+  const resolvedEp = episode?.number
+  useEffect(() => {
+    if (params.get('ep') || resolvedEp === undefined) return
+    const next = new URLSearchParams(params)
+    next.set('ep', String(resolvedEp))
+    setParams(next, { replace: true })
+  }, [params, resolvedEp, setParams])
+
   const { pathname } = useLocation()
   const animeTitle = anime.data?.title
   useEffect(() => {
