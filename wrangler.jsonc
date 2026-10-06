@@ -14,5 +14,6 @@
     "run_worker_first": ["/api/*", "/anime/*", "/media/*"]
   },
   // Covers and banners uploaded to R2 (<anilistId>/<file>.jpg), served by worker/media.ts at /media/:id/cover|banner.
-  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "yume-media" }]
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "yume-media" }],
+  "vars": { "MEDIA_PUBLIC_URL": "https://media.animehub.hu" }
 }

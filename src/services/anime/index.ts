@@ -33,5 +33,6 @@ function createAnimeProvider(): AnimeProvider {
 }
 
 const baseProvider = createAnimeProvider()
-export const animeProvider: AnimeProvider = withDisplayPreferences(baseProvider)
+// R2 covers/banners are stored by AniList id.
+export const animeProvider: AnimeProvider = withDisplayPreferences(baseProvider, baseProvider instanceof AniListAnimeProvider)
 export const providerName = baseProvider.name ?? 'Custom API'

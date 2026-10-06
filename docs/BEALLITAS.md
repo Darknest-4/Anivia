@@ -99,12 +99,13 @@ Amelyiket nem kapcsolod be, arra kattintva barátságos hibaüzenet jelenik meg.
 
 ## 6b. Képek az R2-ből (borítók és bannerek)
 
-A `yume-media` R2 bucket a `wrangler.jsonc`-ben `MEDIA` néven a Workerhez van kötve — kulcs nem kell. A Worker a `/media/<anilistId>/cover` és `/media/<anilistId>/banner` címen szolgálja ki a képeket:
+A képek nyilvánosan a `https://media.animehub.hu` címen érhetők el (`yume-media` bucket). A böngésző **közvetlenül onnan** tölti őket.
+Mivel a fájlnevek véletlenszerűek (uuid), a Worker mondja meg, melyik fájl melyik animéhez tartozik: `/api/media?ids=21,20,…` — egy kérés egy egész listára. Ehhez a bucket `MEDIA` néven a Workerhez van kötve (`wrangler.jsonc`), kulcs nem kell; a nyilvános cím a `MEDIA_PUBLIC_URL` változó.
 - mappa: `<anilistId>/…/<bármi>.jpg|png|webp`;
-- ha a fájl neve/útvonala tartalmazza a „cover”/„poster” vagy „banner” szót, az dönt; különben a kép alakja: álló → borító, nagyon széles (≥ 2,6:1) → banner. A 16:9-es háttérképeket és a logókat figyelmen kívül hagyja;
-- ha egy animéhez nincs kép az R2-ben, automatikusan az AniList képe jelenik meg.
+- ha a fájl neve tartalmazza a „cover”/„poster” vagy „banner” szót, az dönt; különben a kép alakja: álló → borító, nagyon széles (≥ 2,6:1) → banner. A 16:9-es háttérképeket és a logókat kihagyja;
+- ha egy animéhez nincs kép az R2-ben, az AniList képe jelenik meg. Adattakarékos módban az AniList kisebb képei maradnak.
 
-Ellenőrzés: `https://anivia.animehub.hu/media/21/cover` → a válasz `x-anivia-media` fejléce mutatja, melyik fájlt választotta. Kikapcsolás: `VITE_MEDIA_BASE=` (üres) build változó.
+Ellenőrzés: `https://anivia.animehub.hu/api/media?ids=21` → a One Piece borító- és banner-címét kell mutatnia.
 
 ## 7. GitHub Actions (CI)
 

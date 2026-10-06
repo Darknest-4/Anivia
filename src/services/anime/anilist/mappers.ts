@@ -1,4 +1,3 @@
-import { config } from '@/config'
 import type { Anime, AnimeStatus, AnimeType, Character, SeasonName, Studio } from '@/types'
 import { genreFromName, isExcludedGenre } from '../shared/genres'
 import { cleanDescription, firstSentence, fuzzyDate, hueFromString } from '../shared/text'
@@ -26,18 +25,11 @@ export function mapStudio(s: { id: number; name: string } & Partial<AlStudio>): 
   }
 }
 
-/** R2 copy of an image (served by the Worker), with the AniList original as fallback. */
-export function mediaUrl(id: number, kind: 'cover' | 'banner', original: string) {
-  if (!config.mediaBase) return original
-  return `${config.mediaBase}/${id}/${kind}${original ? `?fb=${encodeURIComponent(original)}` : ''}`
-}
-
 export function mapMedia(m: AlMedia): Anime {
   const description = cleanDescription(m.description)
   const status = STATUS[m.status ?? ''] ?? 'finished'
   const aired = m.nextAiringEpisode ? m.nextAiringEpisode.episode - 1 : status === 'finished' ? m.episodes ?? undefined : status === 'upcoming' ? 0 : undefined
-  const originalPoster = m.coverImage.extraLarge ?? m.coverImage.large ?? ''
-  const poster = mediaUrl(m.id, 'cover', originalPoster)
+  const poster = m.coverImage.extraLarge ?? m.coverImage.large ?? ''
   return {
     id: String(m.id),
     slug: String(m.id),
@@ -47,7 +39,7 @@ export function mapMedia(m: AlMedia): Anime {
     description,
     synopsisShort: firstSentence(description),
     poster,
-    backdrop: mediaUrl(m.id, 'banner', m.bannerImage ?? originalPoster),
+    backdrop: m.bannerImage ?? poster,
     rating: m.averageScore ? m.averageScore / 10 : undefined,
     popularity: m.popularity ?? 0,
     rank: m.rankings?.find((r) => r.type === 'RATED' && r.allTime)?.rank,

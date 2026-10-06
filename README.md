@@ -365,9 +365,9 @@ Settings → **Connections** (or *Continue with AniList* on the sign-in page) co
 - `/api/anilist` — edge-cached AniList proxy (5 min, shared by all visitors). The app detects it automatically in production builds and falls back to AniList directly if it's missing or failing.
 - `/anime/:id` — injects Open Graph / Twitter tags (title, synopsis, image) so shared links render rich previews.
 
-### R2 images (`worker/media.ts`)
+### R2 images (`worker/media.ts`, `services/anime/media.ts`)
 
-`/media/:anilistId/cover|banner` serves covers and banners from the `yume-media` R2 bucket (binding `MEDIA` in `wrangler.jsonc`). Files live in `<anilistId>/` folders with arbitrary names; the Worker classifies them by name/metadata or by the image's aspect ratio (portrait → cover, ≥ 2.6:1 → banner, everything else ignored), caches the per-title index and the images at the edge, and redirects to the AniList CDN (`?fb=`) when a title has no R2 image. The AniList mapper uses these URLs when `VITE_MEDIA_BASE` (default `/media` in production) is set.
+Covers and banners live in the `yume-media` R2 bucket, public at `MEDIA_PUBLIC_URL` (https://media.animehub.hu), in `<anilistId>/` folders with arbitrary file names. `GET /api/media?ids=…` (binding `MEDIA`) classifies each folder's files by name/metadata or aspect ratio (portrait → cover, ≥ 2.6:1 → banner, the rest ignored) and returns public URLs; it is edge-cached. The display wrapper looks up every list's ids in one batched request (1.5 s cap) and swaps in the R2 images, so browsers load them straight from the bucket. Missing titles keep AniList's images; data-saver mode keeps AniList's smaller ones. `/media/:id/cover|banner` streams the same files through the Worker.
 
 ### Installable app (PWA)
 

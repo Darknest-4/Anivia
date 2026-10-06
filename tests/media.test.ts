@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { imageSize, serveMedia, type R2Bucket } from '../worker/media'
+import { imageSize, mediaLookup, serveMedia, type R2Bucket } from '../worker/media'
 
 function jpeg(width: number, height: number) {
   // SOI, APP0 (len 16), SOF0 (len 17)
@@ -73,5 +73,22 @@ describe('R2 media', () => {
     expect(ok.headers.get('location')).toBe('https://s4.anilistcdn.net/a.jpg')
     const evil = await serveMedia(new Request('https://x.test/media/9/cover?fb=' + encodeURIComponent('https://evil.example/a.jpg')), b, ctx, '9', 'cover')
     expect(evil.status).toBe(404)
+  })
+})
+
+describe('/api/media', () => {
+  beforeEach(() => {
+    vi.stubGlobal('caches', { default: { match: async () => undefined, put: async () => undefined } })
+  })
+  it('returns public URLs per AniList id', async () => {
+    const b = bucket({ '21/c c.jpg': jpeg(460, 650), '21/b.jpg': jpeg(1900, 400), '7/x.jpg': jpeg(1920, 1080) })
+    const res = await mediaLookup(new Request('https://x.test/api/media?ids=21,7,abc'), b, ctx, 'https://media.animehub.hu')
+    expect(await res.json()).toEqual({
+      '21': { cover: 'https://media.animehub.hu/21/c%20c.jpg', banner: 'https://media.animehub.hu/21/b.jpg' },
+      '7': null,
+    })
+  })
+  it('reports a missing bucket', async () => {
+    expect((await mediaLookup(new Request('https://x.test/api/media?ids=1'), undefined, ctx, 'https://m')).status).toBe(503)
   })
 })

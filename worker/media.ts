@@ -153,3 +153,36 @@ export async function serveMedia(request: Request, bucket: R2Bucket | undefined,
   ctx.waitUntil(caches.default.put(cacheKey, response.clone()))
   return response
 }
+
+const publicUrl = (base: string, key: string) => `${base.replace(/\/$/, '')}/${key.split('/').map(encodeURIComponent).join('/')}`
+
+/**
+ * GET /api/media?ids=1,2,3 → { "1": { cover, banner }, … } with public URLs (MEDIA_PUBLIC_URL),
+ * so browsers load the images straight from the public bucket. One request per list of titles.
+ */
+export async function mediaLookup(request: Request, bucket: R2Bucket | undefined, ctx: { waitUntil(p: Promise<unknown>): void }, publicBase: string): Promise<Response> {
+  const cors = { 'access-control-allow-origin': '*', 'content-type': 'application/json; charset=utf-8' }
+  if (!bucket || !publicBase) return new Response(JSON.stringify({ error: 'media bucket not configured' }), { status: 503, headers: cors })
+  const url = new URL(request.url)
+  const ids = [...new Set((url.searchParams.get('ids') ?? '').split(',').filter((id) => /^\d{1,9}$/.test(id)))].slice(0, 100)
+  if (!ids.length) return new Response('{}', { headers: cors })
+
+  const cacheKey = new Request(`${url.origin}/api/media?ids=${ids.slice().sort().join(',')}`)
+  const hit = await caches.default.match(cacheKey)
+  if (hit) return hit
+
+  const out: Record<string, { cover: string | null; banner: string | null } | null> = {}
+  await Promise.all(
+    ids.map(async (id) => {
+      try {
+        const index = await getIndex(bucket, id, ctx, url.origin)
+        out[id] = index.cover || index.banner ? { cover: index.cover && publicUrl(publicBase, index.cover), banner: index.banner && publicUrl(publicBase, index.banner) } : null
+      } catch {
+        out[id] = null
+      }
+    }),
+  )
+  const response = new Response(JSON.stringify(out), { headers: { ...cors, 'cache-control': `public, max-age=3600, s-maxage=${INDEX_TTL}` } })
+  ctx.waitUntil(caches.default.put(cacheKey, response.clone()))
+  return response
+}
