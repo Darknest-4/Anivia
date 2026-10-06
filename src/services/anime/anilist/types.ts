@@ -61,6 +61,7 @@ export interface AlStudio {
   name: string
   favourites: number | null
   isAnimationStudio: boolean
+  siteUrl?: string | null
   media?: { pageInfo?: { total: number }; nodes: { coverImage?: { large: string | null } }[] }
 }
 

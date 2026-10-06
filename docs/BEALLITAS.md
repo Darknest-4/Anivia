@@ -97,16 +97,6 @@ Amelyiket nem kapcsolod be, arra kattintva barátságos hibaüzenet jelenik meg.
   `VITE_SUPPORT_EMAIL`, `VITE_SOCIAL_DISCORD`, `VITE_SOCIAL_X`, `VITE_SOCIAL_INSTAGRAM`, `VITE_SOCIAL_WEBSITE`, `VITE_CF_ANALYTICS_TOKEN`, `VITE_ENABLE_PRICING`.
 - **Web Analytics** (ingyenes, süti nélküli): Cloudflare → Analytics & Logs → Web Analytics → add hozzá az oldalt, a kapott tokent tedd a `VITE_CF_ANALYTICS_TOKEN`-be.
 
-## 6b. Képek az R2-ből (borítók és bannerek)
-
-A képek nyilvánosan a `https://media.animehub.hu` címen érhetők el (`yume-media` bucket). A böngésző **közvetlenül onnan** tölti őket.
-Mivel a fájlnevek véletlenszerűek (uuid), a Worker mondja meg, melyik fájl melyik animéhez tartozik: `/api/media?ids=21,20,…` — egy kérés egy egész listára. Ehhez a bucket `MEDIA` néven a Workerhez van kötve (`wrangler.jsonc`), kulcs nem kell; a nyilvános cím a `MEDIA_PUBLIC_URL` változó.
-- mappa: `<anilistId>/…/<bármi>.jpg|png|webp`;
-- ha a fájl neve tartalmazza a „cover”/„poster” vagy „banner” szót, az dönt; különben a kép alakja: álló → borító, nagyon széles (≥ 2,6:1) → banner. A 16:9-es háttérképeket és a logókat kihagyja;
-- ha egy animéhez nincs kép az R2-ben, az AniList képe jelenik meg. Adattakarékos módban az AniList kisebb képei maradnak.
-
-Ellenőrzés: `https://anivia.animehub.hu/api/media?ids=21` → a One Piece borító- és banner-címét kell mutatnia.
-
 ## 7. GitHub Actions (CI)
 
 Minden feltöltésnél automatikusan lefut: típusellenőrzés, egységtesztek, build és a Worker ellenőrzése (`.github/workflows/ci.yml`). Ha piros, a GitHub „Actions” fülén látod, mi romlott el.

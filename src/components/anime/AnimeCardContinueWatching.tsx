@@ -12,17 +12,22 @@ interface Props {
   className?: string
 }
 
-/** Landscape resume card: episode artwork, progress bar, continue + remove actions. */
+/**
+ * Landscape resume card: episode artwork, progress bar, continue + remove actions.
+ * After a finished episode it points at the next one ("Up next").
+ */
 export function AnimeCardContinueWatching({ anime, entry, onRemove, className }: Props) {
   const pct = entry.duration ? entry.progress / entry.duration : 0
   const remaining = Math.max(0, entry.duration - entry.progress)
-  const href = `/anime/${anime.id}/watch?ep=${entry.episodeNumber}`
+  const upNext = entry.completed
+  const episode = upNext ? entry.episodeNumber + 1 : entry.episodeNumber
+  const href = `/anime/${anime.id}/watch?ep=${episode}`
   return (
     <article className={cn('group relative min-w-0', className)}>
       <div className="relative aspect-video overflow-hidden rounded-xl bg-surface-2 ring-1 ring-line/60">
         <img src={anime.backdrop ?? anime.poster} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover transition-transform duration-slow ease-out group-hover:scale-[1.04]" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-        <Link to={href} className="absolute inset-0 flex items-center justify-center" aria-label={`Continue ${anime.title} episode ${entry.episodeNumber}`}>
+        <Link to={href} className="absolute inset-0 flex items-center justify-center" aria-label={`${upNext ? 'Watch' : 'Continue'} ${anime.title} episode ${episode}`}>
           <span className="flex h-12 w-12 scale-90 items-center justify-center rounded-full bg-white/90 text-black opacity-90 shadow-pop transition-all duration-base group-hover:scale-100 group-hover:opacity-100">
             <Play className="ml-0.5 h-5 w-5 fill-current" />
           </span>
@@ -38,11 +43,20 @@ export function AnimeCardContinueWatching({ anime, entry, onRemove, className }:
           </button>
         )}
         <div className="pointer-events-none absolute inset-x-3 bottom-3">
-          <div className="mb-1.5 flex items-center justify-between text-2xs font-semibold text-white/85">
-            <span>EP {entry.episodeNumber}</span>
-            <span className="tabular-nums">{Math.round(pct * 100)}% · {formatClock(remaining)} left</span>
-          </div>
-          <Progress value={pct} size="xs" label={`${anime.title} progress`} />
+          {upNext ? (
+            <div className="flex items-center justify-between text-2xs font-semibold text-white/85">
+              <span className="rounded bg-accent px-1.5 py-0.5 text-accent-fg">Up next · EP {episode}</span>
+              <span>Watched EP {entry.episodeNumber}</span>
+            </div>
+          ) : (
+            <>
+              <div className="mb-1.5 flex items-center justify-between text-2xs font-semibold text-white/85">
+                <span>EP {entry.episodeNumber}</span>
+                <span className="tabular-nums">{Math.round(pct * 100)}% · {formatClock(remaining)} left</span>
+              </div>
+              <Progress value={pct} size="xs" label={`${anime.title} progress`} />
+            </>
+          )}
         </div>
       </div>
       <div className="mt-2.5 flex items-start justify-between gap-2">
@@ -55,7 +69,7 @@ export function AnimeCardContinueWatching({ anime, entry, onRemove, className }:
           <p className="text-xs text-fg-subtle">Watched {formatRelative(entry.lastWatched)}</p>
         </div>
         <Link to={href} className="shrink-0 rounded-md px-2 py-1 text-xs font-semibold text-accent-soft transition-colors hover:bg-accent/10">
-          Continue
+          {upNext ? 'Next episode' : 'Continue'}
         </Link>
       </div>
     </article>

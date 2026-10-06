@@ -49,7 +49,7 @@ export default function AdminPage() {
 
   return (
     <div className="container-app pb-16">
-      <PageHeader eyebrow={`Admin · ${role}`} title="Dashboard" description="Visitors, features, people and data — all stored in Supabase." />
+      <PageHeader eyebrow={`Staff area · signed in as ${role}`} title="Dashboard" description="Visitors, features, people and data — all stored in Supabase." />
       <Tabs items={visible} value={active} onChange={(t) => setParams(t === 'overview' ? {} : { tab: t }, { replace: true })} label="Admin sections" idPrefix="admin" />
       <div className="mt-6">
         {active === 'overview' && <Overview />}
@@ -149,16 +149,33 @@ function Overview() {
             {d.daily.length === 0 ? (
               <p className="text-sm text-fg-subtle">No data yet.</p>
             ) : (
-              <div className="flex h-40 items-end gap-1" role="img" aria-label="Page views per day">
-                {d.daily.map((x) => (
-                  <div key={x.day} className="group relative flex flex-1 flex-col items-center justify-end">
-                    <div className="w-full rounded-t bg-accent/70 transition-colors group-hover:bg-accent" style={{ height: `${Math.max(2, (x.pageviews / max) * 100)}%` }} />
-                    <span className="pointer-events-none absolute -top-8 z-10 hidden whitespace-nowrap rounded bg-surface-3 px-2 py-1 text-2xs text-fg group-hover:block">
-                      {x.day}: {x.visitors} visitors · {x.pageviews} views
+              <>
+                <div className="flex h-40 items-end gap-1" role="img" aria-label={`Page views per day, peak ${formatNumber(max)}`}>
+                  {d.daily.map((x) => (
+                    // h-full gives the bars a definite height to size their percentages against.
+                    <div key={x.day} className="group relative flex h-full flex-1 flex-col justify-end" title={`${x.day}: ${x.visitors} visitors · ${x.pageviews} views`}>
+                      <div className="relative w-full overflow-hidden rounded-t bg-accent/35 transition-colors group-hover:bg-accent/50" style={{ height: `${Math.max(2, (x.pageviews / max) * 100)}%` }}>
+                        <div className="absolute inset-x-0 bottom-0 bg-accent" style={{ height: `${x.pageviews ? Math.min(100, (x.visitors / x.pageviews) * 100) : 0}%` }} />
+                      </div>
+                      <span className="pointer-events-none absolute -top-8 left-1/2 z-10 hidden -translate-x-1/2 whitespace-nowrap rounded bg-surface-3 px-2 py-1 text-2xs text-fg shadow group-hover:block">
+                        {x.day}: {x.visitors} visitors · {x.pageviews} views
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-2 flex justify-between text-2xs text-fg-subtle">
+                  <span>{d.daily[0].day}</span>
+                  <span className="flex items-center gap-3">
+                    <span className="inline-flex items-center gap-1">
+                      <span className="h-2 w-2 rounded-sm bg-accent" /> visitors
                     </span>
-                  </div>
-                ))}
-              </div>
+                    <span className="inline-flex items-center gap-1">
+                      <span className="h-2 w-2 rounded-sm bg-accent/35" /> page views
+                    </span>
+                  </span>
+                  <span>{d.daily[d.daily.length - 1].day}</span>
+                </div>
+              </>
             )}
           </Panel>
           <div className="grid gap-6 lg:grid-cols-2">

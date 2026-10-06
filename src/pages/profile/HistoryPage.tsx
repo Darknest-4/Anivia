@@ -7,7 +7,7 @@ import { Button, ButtonLink, Dialog, EmptyState, Progress, Skeleton } from '@/co
 import { useAnimeByIds } from '@/hooks/queries'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useHistory } from '@/hooks/useUserData'
-import { formatClock, formatDate } from '@/lib/format'
+import { formatClock, formatDate, formatWatchTime } from '@/lib/format'
 import { useToast } from '@/providers/ToastProvider'
 import { historyService } from '@/services/user'
 import type { WatchProgress } from '@/types'
@@ -31,10 +31,7 @@ export default function HistoryPage() {
   const { data, isLoading } = useAnimeByIds(ids)
   const byId = useMemo(() => new Map((data ?? []).map((a) => [a.id, a])), [data])
 
-  const inProgress = useMemo(() => {
-    const seen = new Set<string>()
-    return history.filter((h) => !h.completed && !seen.has(h.animeId) && seen.add(h.animeId))
-  }, [history])
+  const inProgress = useMemo(() => historyService.upNext(history, (id) => byId.get(id)?.episodesAired ?? byId.get(id)?.episodes, 12), [history, byId])
 
   const groups = useMemo(() => {
     const map = new Map<string, WatchProgress[]>()
@@ -52,7 +49,7 @@ export default function HistoryPage() {
       <PageHeader
         eyebrow="Library"
         title="Watch History"
-        description="Pick up where you left off. History is stored only on this device."
+        description="Pick up where you left off. Saved in this browser and synced to your account when you’re signed in."
         actions={
           history.length > 0 && (
             <Button variant="secondary" leftIcon={<Trash2 className="h-4 w-4" />} onClick={() => setConfirm(true)}>
@@ -75,11 +72,11 @@ export default function HistoryPage() {
             {[
               { label: 'Episodes', value: history.length },
               { label: 'Completed', value: history.filter((h) => h.completed).length },
-              { label: 'Watch time', value: `${Math.round(totalSeconds / 3600)}h ${Math.round((totalSeconds % 3600) / 60)}m` },
+              { label: 'Watch time', value: formatWatchTime(totalSeconds) },
             ].map((s) => (
               <div key={s.label} className="rounded-2xl border border-line bg-surface p-4">
                 <p className="text-xs text-fg-subtle">{s.label}</p>
-                <p className="mt-1 font-display text-xl font-bold text-fg sm:text-2xl">{s.value}</p>
+                <p className="mt-1 whitespace-nowrap font-display text-lg font-bold text-fg sm:text-2xl">{s.value}</p>
               </div>
             ))}
           </div>
@@ -127,17 +124,17 @@ export default function HistoryPage() {
                               {anime.title}
                             </Link>
                             <p className="text-xs text-fg-subtle">Episode {h.episodeNumber}</p>
-                            <p className="mt-1 flex items-center gap-1.5 text-xs text-fg-muted">
+                            <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-fg-muted">
                               {h.completed ? (
-                                <>
+                                <span className="inline-flex items-center gap-1 whitespace-nowrap">
                                   <CheckCircle2 className="h-3.5 w-3.5 text-success" /> Watched
-                                </>
+                                </span>
                               ) : (
-                                <>
+                                <span className="inline-flex items-center gap-1 whitespace-nowrap tabular-nums">
                                   <Clock className="h-3.5 w-3.5" /> {formatClock(h.progress)} / {formatClock(h.duration)}
-                                </>
+                                </span>
                               )}
-                              <span className="text-fg-subtle">· {new Date(h.lastWatched).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
+                              <span className="whitespace-nowrap text-fg-subtle">· {new Date(h.lastWatched).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>
                             </p>
                           </div>
                           <Button variant="ghost" size="icon-sm" aria-label={`Remove episode ${h.episodeNumber} of ${anime.title} from history`} onClick={() => historyService.removeEntry(h.animeId, h.episodeId)}>

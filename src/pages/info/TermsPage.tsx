@@ -8,7 +8,7 @@ export default function TermsPage() {
     <LegalLayout
       title="Terms of Service"
       updated="October 5, 2026"
-      intro="These terms govern your use of ANIVIA. Please read them together with our Privacy Policy. Have them reviewed for your jurisdiction before going live."
+      intro="These terms govern your use of ANIVIA. Please read them together with our Privacy Policy."
       sections={[
         { id: 'service', title: 'The service', body: <p>ANIVIA helps you discover anime, follow release schedules and keep track of what you watch. Anime information, images and trailers are provided by third parties (AniList, MyAnimeList via Jikan, YouTube). ANIVIA does not host or stream episodes; “Where to watch” links lead to official, licensed services.</p> },
         { id: 'accounts', title: 'Your account', body: <p>You must provide accurate information and keep your password safe. You’re responsible for activity on your account. You can delete it at any time in Settings → Account.</p> },

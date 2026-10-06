@@ -8,6 +8,7 @@ import { useToast } from '@/providers/ToastProvider'
 import { watchlistService } from '@/services/user'
 import type { Anime } from '@/types'
 import { AnimeGenreBadge } from './AnimeGenreBadge'
+import { thumb } from '@/lib/images'
 
 /** Upcoming release card with premiere date and a "remind me" action (adds to watchlist). */
 export function UpcomingCard({ anime, className }: { anime: Anime; className?: string }) {
@@ -17,7 +18,7 @@ export function UpcomingCard({ anime, className }: { anime: Anime; className?: s
   return (
     <article className={cn('flex gap-4 rounded-2xl border border-line bg-surface p-3 transition-colors hover:border-line-strong', className)}>
       <Link to={`/anime/${anime.id}`} className="shrink-0" aria-label={anime.title}>
-        <img src={anime.poster} alt="" loading="lazy" className="h-36 w-24 rounded-xl object-cover ring-1 ring-line" />
+        <img src={thumb(anime.poster)} alt="" loading="lazy" className="h-36 w-24 rounded-xl object-cover ring-1 ring-line" />
       </Link>
       <div className="flex min-w-0 flex-1 flex-col py-1">
         <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-info">

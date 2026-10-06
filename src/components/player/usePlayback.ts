@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
+import { useCallback, useEffect, useState, type RefObject } from 'react'
 import type { VideoSource } from '@/types'
 
 export interface PlaybackState {
@@ -22,61 +22,19 @@ export interface PlaybackControls {
 
 const initial: PlaybackState = { currentTime: 0, duration: 0, buffered: 0, paused: true, waiting: false, ended: false, error: null }
 
-/**
- * Unified playback engine.
- * - `demo` sources are simulated with a clock (no media file involved).
- * - `mp4` / `hls` / `dash` sources drive a real <video> element supplied via `videoRef`.
- */
+/** Playback state and controls for a native <video> element supplied via `videoRef`. */
 export function usePlayback(source: VideoSource | null | undefined, videoRef: RefObject<HTMLVideoElement>, startAt = 0): [PlaybackState, PlaybackControls] {
   const [state, setState] = useState<PlaybackState>(initial)
-  const simulated = source?.kind === 'demo'
-  const sim = useRef({ time: 0, rate: 1, playing: false, bufferedTo: 0, waitingUntil: 0, last: 0 })
 
   // Reset on source change.
   useEffect(() => {
-    const duration = source?.duration ?? 0
-    const start = Math.min(startAt, Math.max(0, duration - 5))
-    sim.current = { time: start, rate: sim.current.rate, playing: false, bufferedTo: start + 20, waitingUntil: 0, last: 0 }
-    setState({ ...initial, duration, currentTime: start, buffered: Math.min(duration, start + 20) })
+    setState({ ...initial, duration: source?.duration ?? 0, currentTime: startAt })
     // startAt is only read when a new source arrives.
   }, [source])
 
-  /* ---------------- Simulated clock ---------------- */
-  useEffect(() => {
-    if (!simulated || !source) return
-    let raf = 0
-    let lastEmit = 0
-    const tick = (now: number) => {
-      const s = sim.current
-      const dt = s.last ? (now - s.last) / 1000 : 0
-      s.last = now
-      const waiting = s.waitingUntil > now
-      if (s.playing && !waiting) s.time = Math.min(source.duration, s.time + dt * s.rate)
-      // Buffer grows ahead of the playhead like a real stream.
-      s.bufferedTo = Math.min(source.duration, Math.max(s.bufferedTo, s.time) + dt * 12)
-      const ended = s.time >= source.duration
-      if (ended) s.playing = false
-      if (now - lastEmit > 100 || ended) {
-        lastEmit = now
-        setState((prev) => ({
-          ...prev,
-          currentTime: s.time,
-          buffered: Math.min(source.duration, Math.max(s.bufferedTo, s.time + 4)),
-          paused: !s.playing,
-          waiting: waiting && s.playing,
-          ended,
-        }))
-      }
-      raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [simulated, source])
-
-  /* ---------------- Native <video> ---------------- */
   useEffect(() => {
     const v = videoRef.current
-    if (simulated || !source || !v) return
+    if (!source || !v) return
     const sync = () =>
       setState((prev) => ({
         ...prev,
@@ -101,46 +59,26 @@ export function usePlayback(source: VideoSource | null | undefined, videoRef: Re
       v.removeEventListener('playing', onPlaying)
       v.removeEventListener('error', onError)
     }
-  }, [simulated, source, videoRef])
+  }, [source, videoRef])
 
   const play = useCallback(() => {
-    if (simulated) {
-      const s = sim.current
-      if (source && s.time >= source.duration) s.time = 0
-      s.playing = true
-      s.last = 0
-      setState((p) => ({ ...p, paused: false, ended: false }))
-    } else videoRef.current?.play().catch(() => setState((p) => ({ ...p, paused: true })))
-  }, [simulated, source, videoRef])
+    videoRef.current?.play().catch(() => setState((p) => ({ ...p, paused: true })))
+  }, [videoRef])
 
-  const pause = useCallback(() => {
-    if (simulated) {
-      sim.current.playing = false
-      setState((p) => ({ ...p, paused: true }))
-    } else videoRef.current?.pause()
-  }, [simulated, videoRef])
+  const pause = useCallback(() => videoRef.current?.pause(), [videoRef])
 
   const seek = useCallback(
     (time: number) => {
-      const duration = source?.duration ?? 0
-      const t = Math.max(0, Math.min(duration, time))
-      if (simulated) {
-        const s = sim.current
-        // Seeking past the buffered range triggers a short simulated buffering state.
-        if (t > s.bufferedTo || t < s.time - 120) {
-          s.waitingUntil = performance.now() + 900
-          s.bufferedTo = t + 2
-        }
-        s.time = t
-        setState((p) => ({ ...p, currentTime: t, ended: false }))
-      } else if (videoRef.current) videoRef.current.currentTime = t
+      const v = videoRef.current
+      if (!v) return
+      const duration = Number.isFinite(v.duration) ? v.duration : source?.duration ?? 0
+      v.currentTime = Math.max(0, Math.min(duration || time, time))
     },
-    [simulated, source, videoRef],
+    [source, videoRef],
   )
 
   const setRate = useCallback(
     (rate: number) => {
-      sim.current.rate = rate
       if (videoRef.current) videoRef.current.playbackRate = rate
     },
     [videoRef],

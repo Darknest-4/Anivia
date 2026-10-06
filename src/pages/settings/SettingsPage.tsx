@@ -1,4 +1,4 @@
-import { Bell, Gauge, Link2, Globe, LayoutGrid, MonitorPlay, Palette, RotateCcw, Shield, UserRound } from 'lucide-react'
+import { Bell, Gauge, Link2, LayoutGrid, MonitorPlay, Palette, RotateCcw, Shield, UserRound } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Card, Row } from './parts'
@@ -18,23 +18,25 @@ import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { usePreferences } from '@/hooks/useUserData'
 import { cn } from '@/lib/cn'
 import { useToast } from '@/providers/ToastProvider'
+import { hasVideoProvider } from '@/services/video'
 import { storage } from '@/services/storage'
 import { historyService, recentSearchesService } from '@/services/user'
 import type { Preferences, VideoQuality } from '@/types'
 
-type Section = 'appearance' | 'content' | 'playback' | 'performance' | 'notifications' | 'privacy' | 'language' | 'connections' | 'account'
+type Section = 'appearance' | 'content' | 'playback' | 'performance' | 'notifications' | 'privacy' | 'connections' | 'account'
 
-const sections: { value: Section; label: string; icon: typeof Palette; description: string }[] = [
+const allSections: { value: Section; label: string; icon: typeof Palette; description: string }[] = [
   { value: 'appearance', label: 'Appearance', icon: Palette, description: 'Theme and motion preferences.' },
   { value: 'content', label: 'Content', icon: LayoutGrid, description: 'Data source, titles, scores and home layout.' },
   { value: 'playback', label: 'Playback', icon: MonitorPlay, description: 'Autoplay, quality and subtitles.' },
   { value: 'performance', label: 'Speed & data', icon: Gauge, description: 'Caching, prefetching and data saver.' },
   { value: 'notifications', label: 'Notifications', icon: Bell, description: 'Choose what we notify you about.' },
   { value: 'privacy', label: 'Privacy', icon: Shield, description: 'Control your data and visibility.' },
-  { value: 'language', label: 'Language', icon: Globe, description: 'Interface and audio languages.' },
   { value: 'connections', label: 'Connections', icon: Link2, description: 'AniList sync.' },
-  { value: 'account', label: 'Account', icon: UserRound, description: 'Profile details and plan.' },
+  { value: 'account', label: 'Account', icon: UserRound, description: 'Profile, sign-in and sessions.' },
 ]
+// Player settings only matter when a video provider is configured (trailers have their own switch).
+const sections = allSections.filter((s) => s.value !== 'playback' || hasVideoProvider)
 
 const LANGS = [
   { value: 'en', label: 'English' },
@@ -48,7 +50,8 @@ const LANGS = [
 export default function SettingsPage() {
   useDocumentMeta({ title: 'Settings', noindex: true })
   const [params, setParams] = useSearchParams()
-  const section = (params.get('tab') as Section) || 'appearance'
+  const requested = params.get('tab') as Section | null
+  const section: Section = requested && sections.some((s) => s.value === requested) ? requested : 'appearance'
   const { prefs, update } = usePreferences()
   const auth = useAuth()
   const toast = useToast()
@@ -237,26 +240,6 @@ export default function SettingsPage() {
                 </Row>
               </Card>
             </>
-          )}
-
-          {section === 'language' && (
-            <Card title="Language" description="Localization strings are not included — this demonstrates the settings UI.">
-              <Row>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Field label="Interface language">{(p) => <Select {...p} value={prefs.interfaceLanguage} onChange={(e) => set('interfaceLanguage', e.target.value)} options={LANGS} />}</Field>
-                  <Field label="Preferred audio">
-                    {(p) => (
-                      <Select
-                        {...p}
-                        value={prefs.audioLanguage}
-                        onChange={(e) => set('audioLanguage', e.target.value)}
-                        options={['Japanese', 'English', 'Spanish', 'Portuguese', 'French', 'German'].map((l) => ({ value: l, label: l }))}
-                      />
-                    )}
-                  </Field>
-                </div>
-              </Row>
-            </Card>
           )}
 
           {section === 'account' && auth.status !== 'disabled' && (

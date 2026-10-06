@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Dialog, Input } from '@/components/ui'
 import { config } from '@/config'
 import { useToast } from '@/providers/ToastProvider'
+import { thumb } from '@/lib/images'
 interface ShareDialogProps {
   /** What is being shared. */
   title: string
@@ -49,7 +50,7 @@ export function ShareDialog({ title, path, image, open, onClose, heading = 'Shar
   return (
     <Dialog open={open} onClose={onClose} title={heading} description="Send this link to a friend." icon={<Share2 className="h-5 w-5" />}>
       <div className="flex items-center gap-3 rounded-xl border border-line bg-surface-2 p-3">
-        {image && <img src={image} alt="" className="h-16 w-11 rounded-md object-cover" />}
+        {image && <img src={thumb(image)} alt="" className="h-16 w-11 rounded-md object-cover" />}
         <div className="min-w-0">
           <p className="truncate font-semibold text-fg">{title}</p>
           <p className="truncate text-xs text-fg-subtle">{url}</p>

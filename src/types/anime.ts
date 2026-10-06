@@ -9,7 +9,7 @@ export type SeasonName = 'winter' | 'spring' | 'summer' | 'fall'
 export type AgeRating = 'G' | 'PG' | 'PG-13' | 'R' | 'R+'
 export type AudioLanguage = 'Japanese' | 'English' | 'Spanish' | 'Portuguese' | 'French' | 'German'
 
-/** Visual seed for locally generated demo artwork. Optional for real APIs. */
+/** Visual seed for locally generated placeholder artwork (see lib/artwork). */
 export interface ArtworkSeed {
   hue: number
   hue2: number
@@ -47,6 +47,12 @@ export interface Studio {
   logoHue: number
   animeCount?: number
   employees?: number
+  /** Users who favourited the studio on the source site. */
+  favorites?: number
+  /** A few cover images of the studio's best-known works. */
+  posters?: string[]
+  /** Studio page on the data source (e.g. AniList). */
+  siteUrl?: string
 }
 
 export interface StaffMember {
@@ -86,6 +92,8 @@ export interface Anime {
   rating?: number
   ratingCount?: number
   popularity: number
+  /** Users who favourited the title on the source site. */
+  favorites?: number
   rank?: number
   year?: number
   season?: SeasonName

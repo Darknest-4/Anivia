@@ -96,7 +96,7 @@ export function ActiveFilters({ value, onChange, onReset }: { value: AnimeFilter
           <X className="h-3.5 w-3.5" />
         </button>
       ))}
-      <button type="button" onClick={onReset} className="text-xs font-semibold text-fg-subtle hover:text-fg">
+      <button type="button" onClick={onReset} className="-my-2 rounded-md px-1.5 py-2 text-xs font-semibold text-fg-subtle hover:text-fg">
         Clear all
       </button>
     </div>

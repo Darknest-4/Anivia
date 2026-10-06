@@ -5,6 +5,7 @@ import { useBrowse, useGenres } from '@/hooks/queries'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { Link } from 'react-router-dom'
 import { formatRating } from '@/lib/format'
+import { thumb } from '@/lib/images'
 
 export default function GenresPage() {
   useDocumentMeta({ title: 'Genres', description: 'Explore anime by genre — action, fantasy, romance, sci-fi and more.' })
@@ -31,7 +32,7 @@ export default function GenresPage() {
                     <GenreTile genre={g} posters={titles.map((t) => t.poster)} size="lg" className="rounded-none border-0" />
                     {featured && (
                       <Link to={`/anime/${featured.id}`} className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-surface-2">
-                        <img src={featured.poster} alt="" className="h-12 w-8 rounded object-cover" />
+                        <img src={thumb(featured.poster)} alt="" loading="lazy" className="h-12 w-8 rounded object-cover" />
                         <span className="min-w-0">
                           <span className="block text-2xs font-semibold uppercase tracking-wider text-fg-subtle">Featured</span>
                           <span className="block truncate text-sm font-semibold text-fg group-hover:text-accent-soft">{featured.title}</span>

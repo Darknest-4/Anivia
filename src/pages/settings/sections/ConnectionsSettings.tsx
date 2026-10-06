@@ -4,6 +4,7 @@ import { Avatar, Button, Switch } from '@/components/ui'
 import { useStore } from '@/hooks/useUserData'
 import { formatRelative } from '@/lib/format'
 import { useAniList } from '@/providers/AniListProvider'
+import { useAuth } from '@/providers/AuthProvider'
 import { anilistOptionsStore, anilistSnapshotStore } from '@/services/anilistAccount/store'
 import { Card, Row } from '../parts'
 
@@ -11,12 +12,20 @@ const statusText = { idle: 'Waiting…', syncing: 'Syncing with AniList…', syn
 
 export function ConnectionsSettings() {
   const al = useAniList()
+  const { status } = useAuth()
   const opts = useStore(anilistOptionsStore)
   const snap = useStore(anilistSnapshotStore)
   const set = (k: keyof typeof opts, v: boolean) => anilistOptionsStore.set({ ...opts, [k]: v })
 
   return (
-    <Card title="AniList" description="Two-way sync: changes on ANIVIA appear on AniList and vice versa. Your AniList login stays in this browser only.">
+    <Card
+      title="AniList"
+      description={
+        status === 'signed-in'
+          ? 'Two-way sync: changes on ANIVIA appear on AniList and vice versa. The connection is saved to your account, so it works on every device until you disconnect it.'
+          : 'Two-way sync: changes on ANIVIA appear on AniList and vice versa. Sign in to keep the connection on all your devices.'
+      }
+    >
       {!al.account ? (
         <Row>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

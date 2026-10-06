@@ -6,7 +6,7 @@ import type { AniListIntent } from '@/services/anilistAccount/auth'
 /** AniList wordmark-style badge (simple “A” mark — not the official logo). */
 export function AniListMark({ className }: { className?: string }) {
   return (
-    <span className={cn('inline-flex items-center justify-center rounded-md bg-[#02a9ff] font-display font-extrabold text-white', className)} aria-hidden>
+    <span className={cn('inline-flex shrink-0 items-center justify-center rounded-md bg-[#02a9ff] font-display font-extrabold text-white', className)} aria-hidden>
       A
     </span>
   )

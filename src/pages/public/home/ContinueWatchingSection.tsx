@@ -12,14 +12,17 @@ const wide = 'w-[78%] xs:w-[60%] sm:w-[44%] lg:w-[31.5%] xl:w-[23.6%] 3xl:w-[18.
 export function ContinueWatchingSection() {
   const history = useHistory()
   const toast = useToast()
-  const entries = useMemo(() => {
+  // Latest entry per title (history is newest-first).
+  const latest = useMemo(() => {
     const seen = new Set<string>()
-    return history.filter((h) => !h.completed && !seen.has(h.animeId) && seen.add(h.animeId)).slice(0, 10)
+    return history.filter((h) => !seen.has(h.animeId) && seen.add(h.animeId)).slice(0, 16)
   }, [history])
-  const { data, isLoading } = useAnimeByIds(entries.map((e) => e.animeId))
+  const { data, isLoading } = useAnimeByIds(latest.map((e) => e.animeId))
+  const byId = useMemo(() => new Map((data ?? []).map((a) => [a.id, a])), [data])
+  // Drop titles whose last released episode is already watched.
+  const entries = useMemo(() => historyService.upNext(latest, (id) => byId.get(id)?.episodesAired ?? byId.get(id)?.episodes), [latest, byId])
 
   if (!entries.length) return null
-  const byId = new Map((data ?? []).map((a) => [a.id, a]))
 
   return (
     <section aria-labelledby="continue-heading" className="container-app">

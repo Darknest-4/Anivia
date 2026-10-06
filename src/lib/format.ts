@@ -38,6 +38,14 @@ export function formatMinutes(minutes?: number) {
   return m ? `${h}h ${m}m` : `${h}h`
 }
 
+/** Total watch time: 6120 → "1h 42m", 300 → "5m", 0 → "0m". */
+export function formatWatchTime(totalSeconds: number) {
+  const minutes = Math.floor(Math.max(0, totalSeconds) / 60)
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  return h ? `${h}h ${m}m` : `${m}m`
+}
+
 /** Media clock: 83 → "1:23", 3723 → "1:02:03" */
 export function formatClock(totalSeconds: number) {
   const s = Math.max(0, Math.floor(totalSeconds))

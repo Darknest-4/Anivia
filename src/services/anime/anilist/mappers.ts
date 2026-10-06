@@ -22,6 +22,9 @@ export function mapStudio(s: { id: number; name: string } & Partial<AlStudio>): 
     description: s.isAnimationStudio === false ? 'Production company' : '',
     logoHue: hueFromString(s.name),
     animeCount: s.media?.pageInfo?.total,
+    favorites: s.favourites ?? undefined,
+    posters: s.media?.nodes?.map((n) => n.coverImage?.large ?? '').filter(Boolean),
+    siteUrl: s.siteUrl ?? undefined,
   }
 }
 
@@ -42,6 +45,7 @@ export function mapMedia(m: AlMedia): Anime {
     backdrop: m.bannerImage ?? poster,
     rating: m.averageScore ? m.averageScore / 10 : undefined,
     popularity: m.popularity ?? 0,
+    favorites: m.favourites ?? undefined,
     rank: m.rankings?.find((r) => r.type === 'RATED' && r.allTime)?.rank,
     year: m.seasonYear ?? m.startDate?.year ?? undefined,
     season: (m.season?.toLowerCase() as SeasonName | undefined) ?? undefined,

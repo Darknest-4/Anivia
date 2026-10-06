@@ -34,6 +34,8 @@ export function mapProducer(p: JkProducer): Studio {
     description: cleanDescription(p.about),
     logoHue: hueFromString(name),
     animeCount: p.count ?? undefined,
+    favorites: p.favorites ?? undefined,
+    siteUrl: `https://myanimelist.net/anime/producer/${p.mal_id}`,
   }
 }
 
@@ -62,6 +64,7 @@ export function mapAnime(a: JkAnime): Anime {
     rating: a.score ?? undefined,
     ratingCount: a.scored_by ?? undefined,
     popularity: a.members ?? 0,
+    favorites: a.favorites ?? undefined,
     rank: a.rank ?? undefined,
     year: a.year ?? (a.aired?.from ? new Date(a.aired.from).getFullYear() : undefined),
     season: (a.season as SeasonName | null) ?? undefined,

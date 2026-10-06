@@ -27,12 +27,6 @@ export const config = {
   anilistDbProxy:
     (env.VITE_ANILIST_DB_PROXY as string | undefined) ??
     `${(env.VITE_SUPABASE_URL as string | undefined) ?? 'https://wnmvktajokjhufuzpamy.supabase.co'}/functions/v1/anilist-proxy`,
-  /**
-   * R2 covers & banners (public at media.animehub.hu). The Worker's `/api/media?ids=` tells which file
-   * belongs to which AniList id; images then load straight from the public bucket. Off by default
-   * (set VITE_MEDIA_API=/api/media to enable).
-   */
-  mediaApi: (env.VITE_MEDIA_API as string | undefined) ?? '',
   jikanUrl: (env.VITE_JIKAN_URL as string | undefined) || 'https://api.jikan.moe/v4',
   aniZipUrl: (env.VITE_ANIZIP_URL as string | undefined) || 'https://api.ani.zip',
   videoProvider: ((env.VITE_VIDEO_PROVIDER as string | undefined) ?? 'none') as 'none' | 'api',

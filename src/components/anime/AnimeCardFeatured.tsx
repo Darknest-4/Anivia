@@ -6,6 +6,7 @@ import { cn } from '@/lib/cn'
 import type { Anime } from '@/types'
 import { AnimeMeta, StatusBadge } from './AnimeMeta'
 import { AnimeRating } from './AnimeRating'
+import { thumb } from '@/lib/images'
 
 /** Cinematic landscape card with backdrop artwork — spotlight sections. */
 export function AnimeCardFeatured({ anime, className, label = 'Featured' }: { anime: Anime; className?: string; label?: string }) {
@@ -23,7 +24,7 @@ export function AnimeCardFeatured({ anime, className, label = 'Featured' }: { an
       <div className="mt-auto flex w-full flex-col gap-4 p-5 sm:my-auto sm:max-w-md sm:p-8">
         <span className="eyebrow text-accent-soft">{label}</span>
         <div className="flex gap-4">
-          <img src={anime.poster} alt="" loading="lazy" className="hidden aspect-[2/3] w-24 shrink-0 rounded-xl object-cover shadow-pop ring-1 ring-white/10 md:block" />
+          <img src={thumb(anime.poster)} alt="" loading="lazy" className="hidden aspect-[2/3] w-24 shrink-0 rounded-xl object-cover shadow-pop ring-1 ring-white/10 md:block" />
           <div className="min-w-0">
             <h3 className="font-display text-2xl font-bold leading-tight text-white sm:text-3xl">
               <Link to={`/anime/${anime.id}`} className="hover:underline">

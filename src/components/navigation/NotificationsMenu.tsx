@@ -4,6 +4,7 @@ import { Popover } from '@/components/ui'
 import { useNotifications, type AppNotification } from '@/hooks/useNotifications'
 import { cn } from '@/lib/cn'
 import { formatRelative } from '@/lib/format'
+import { thumb } from '@/lib/images'
 
 const ICONS: Record<AppNotification['kind'], typeof Bell> = { episode: PlayCircle, soon: CalendarClock, premiere: Sparkles, related: Link2 }
 
@@ -69,7 +70,7 @@ export function NotificationsMenu() {
                       className="flex gap-3 rounded-xl p-2.5 transition-colors hover:bg-surface-3"
                     >
                       <span className="relative shrink-0">
-                        <img src={n.anime.poster} alt="" className="h-12 w-9 rounded-md object-cover" />
+                        <img src={thumb(n.anime.poster)} alt="" loading="lazy" className="h-12 w-9 rounded-md object-cover" />
                         <span className={cn('absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full ring-2 ring-surface-2', read ? 'bg-surface-3 text-fg-subtle' : 'bg-accent text-white')}>
                           <Icon className="h-3 w-3" />
                         </span>

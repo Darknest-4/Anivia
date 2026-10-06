@@ -10,6 +10,7 @@ import { useDebounce } from '@/hooks/useDebounce'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useRecentSearches, useStore } from '@/hooks/useUserData'
 import { recentSearchesService, viewModeStore } from '@/services/user'
+import { thumb } from '@/lib/images'
 
 type Category = 'all' | 'anime' | 'characters' | 'studios'
 
@@ -43,8 +44,8 @@ export default function SearchPage() {
     <div className="container-app">
       <PageHeader eyebrow="Search" title="Find your next obsession" description="Search titles, alternative titles, genres, studios, characters and synopses." />
       <SearchAutocomplete size="lg" autoFocus openOnFocus={false} value={text} onValueChange={setText} onSubmit={(v) => setParams({ q: v })} placeholder="Search anime…" />
-      <p className="mt-2 text-xs text-fg-subtle">
-        Tip: press <span className="font-semibold">Ctrl/⌘ K</span> anywhere for quick navigation. Try “nar”, “moon” or “mecha”.
+      <p className="mt-2 hidden text-xs text-fg-subtle md:block">
+        Tip: press <span className="font-semibold">Ctrl/⌘ K</span> anywhere for quick navigation.
       </p>
 
       <div className="mt-8">
@@ -160,7 +161,7 @@ function InitialState({ onPick }: { onPick: (q: string) => void }) {
   const recent = useRecentSearches()
   const { data: trending } = useTrending()
   const { data: genres } = useGenres()
-  const suggestions = ['Celestial', 'nar', 'mecha', 'moon', 'samurai', 'idol']
+  const suggestions = ['Frieren', 'One Piece', 'Solo Leveling', 'Attack on Titan', 'Demon Slayer', 'Spy x Family']
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">
       <div className="space-y-8">
@@ -171,7 +172,7 @@ function InitialState({ onPick }: { onPick: (q: string) => void }) {
                 <Clock className="h-4 w-4 text-fg-subtle" />
                 Recent searches
               </h2>
-              <button type="button" onClick={() => recentSearchesService.clear()} className="text-xs font-semibold text-fg-subtle hover:text-fg">
+              <button type="button" onClick={() => recentSearchesService.clear()} className="-my-2 rounded-md px-1.5 py-2 text-xs font-semibold text-fg-subtle hover:text-fg">
                 Clear all
               </button>
             </div>
@@ -225,7 +226,7 @@ function InitialState({ onPick }: { onPick: (q: string) => void }) {
             <li key={a.id}>
               <Link to={`/anime/${a.id}`} className="flex items-center gap-3 rounded-xl border border-line bg-surface p-2 transition-colors hover:border-line-strong">
                 <span className="w-6 text-center font-display text-sm font-bold text-fg-subtle">{i + 1}</span>
-                <img src={a.poster} alt="" className="h-14 w-10 rounded-md object-cover" />
+                <img src={thumb(a.poster)} alt="" loading="lazy" className="h-14 w-10 rounded-md object-cover" />
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-semibold text-fg">{a.title}</span>
                   <span className="block truncate text-xs text-fg-subtle">{a.genres.map((g) => g.name).slice(0, 2).join(' · ')}</span>

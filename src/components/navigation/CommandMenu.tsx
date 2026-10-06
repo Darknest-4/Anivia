@@ -7,6 +7,7 @@ import { useDebounce } from '@/hooks/useDebounce'
 import { cn } from '@/lib/cn'
 import { useTheme } from '@/providers/ThemeProvider'
 import { discoverNav, libraryNav, primaryNav } from './navItems'
+import { thumb } from '@/lib/images'
 
 interface Command {
   id: string
@@ -135,7 +136,7 @@ export default function CommandMenu({ open, onClose }: { open: boolean; onClose:
                 className={cn('flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5', i === active ? 'bg-surface-3 text-fg' : 'text-fg-muted')}
               >
                 {cmd.image ? (
-                  <img src={cmd.image} alt="" className="h-10 w-7 rounded object-cover" />
+                  <img src={thumb(cmd.image)} alt="" loading="lazy" className="h-10 w-7 rounded object-cover" />
                 ) : (
                   <span className={cn('flex h-8 w-8 items-center justify-center rounded-lg', i === active ? 'bg-accent text-white' : 'bg-surface-2')}>{cmd.icon}</span>
                 )}

@@ -23,7 +23,7 @@ import { PlayerSettingsMenu } from './PlayerSettingsMenu'
 import { SeekBar } from './SeekBar'
 import { usePlayback } from './usePlayback'
 
-export type ForcedPlayerState = 'loading' | 'buffering' | 'error' | 'no-source' | 'finished' | null
+type PlayerOverlayState = 'loading' | 'buffering' | 'error' | 'no-source' | 'finished' | null
 
 export interface NextEpisodeInfo {
   title: string
@@ -56,8 +56,6 @@ interface VideoPlayerProps {
   defaultQuality?: string
   onProgress?: (time: number, duration: number) => void
   onOpenEpisodes?: () => void
-  /** Preview a specific UI state (template demo only). */
-  forcedState?: ForcedPlayerState
   className?: string
 }
 
@@ -75,12 +73,11 @@ const IconBtn = ({ label, onClick, children, className, pressed }: { label: stri
 )
 
 /**
- * ANIVIA cinematic player.
- * Renders demo (simulated) sources over generated artwork, or real mp4/hls sources
- * from your own VideoProvider through a native <video> element.
+ * ANIVIA cinematic player for sources from your own VideoProvider (VITE_VIDEO_PROVIDER=api),
+ * played through a native <video> element.
  */
 export function VideoPlayer(props: VideoPlayerProps) {
-  const { source, loading, error, locked, onRetry, poster, title, subtitle, startAt = 0, next, forcedState } = props
+  const { source, loading, error, locked, onRetry, poster, title, subtitle, startAt = 0, next } = props
   const containerRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const [state, controls] = usePlayback(source, videoRef, startAt)
@@ -99,9 +96,8 @@ export function VideoPlayer(props: VideoPlayerProps) {
   const lastTap = useRef(0)
 
   const isFs = fullscreen || pseudoFullscreen
-  const effective: ForcedPlayerState =
-    forcedState ?? (loading ? 'loading' : error || state.error ? 'error' : source === null ? 'no-source' : state.ended ? 'finished' : state.waiting ? 'buffering' : null)
-  const ready = Boolean(source) && !(forcedState && ['loading', 'error', 'no-source'].includes(forcedState))
+  const effective: PlayerOverlayState = loading ? 'loading' : error || state.error ? 'error' : source === null ? 'no-source' : state.ended ? 'finished' : state.waiting ? 'buffering' : null
+  const ready = Boolean(source)
 
   /* Autoplay when a new source arrives */
   useEffect(() => {
@@ -122,9 +118,9 @@ export function VideoPlayer(props: VideoPlayerProps) {
 
   /* Auto-next countdown */
   useEffect(() => {
-    if (state.ended && props.autoNext && next && !forcedState) setCountdown(8)
+    if (state.ended && props.autoNext && next) setCountdown(8)
     else setCountdown(null)
-  }, [state.ended, props.autoNext, next, forcedState])
+  }, [state.ended, props.autoNext, next])
   useEffect(() => {
     if (countdown === null) return
     if (countdown <= 0) {
@@ -250,7 +246,6 @@ export function VideoPlayer(props: VideoPlayerProps) {
     subtitleTrack && source?.cues?.find((c) => state.currentTime >= c.start && state.currentTime <= c.end)?.text
   const VolumeIcon = muted || volume === 0 ? VolumeX : volume < 0.5 ? Volume1 : Volume2
   const showChrome = controlsVisible || state.paused || settingsOpen
-  const isDemo = source?.kind === 'demo'
 
   return (
     <div
@@ -267,19 +262,11 @@ export function VideoPlayer(props: VideoPlayerProps) {
       role="region"
     >
       {/* Stage */}
-      {source && source.kind !== 'demo' ? (
+      {source ? (
         <video ref={videoRef} src={source.url} poster={source.poster ?? poster} playsInline className="absolute inset-0 h-full w-full bg-black object-contain" crossOrigin="anonymous" />
       ) : (
         <div className="absolute inset-0 overflow-hidden" aria-hidden>
-          {(source?.poster ?? poster) && (
-            <img
-              src={source?.poster ?? poster}
-              alt=""
-              className={cn('absolute inset-0 h-full w-full object-cover transition-[filter] duration-slow', isDemo && 'animate-ken-burns', (!source || effective) && 'blur-[2px] brightness-50')}
-              style={{ animationPlayState: state.paused ? 'paused' : 'running' }}
-            />
-          )}
-          {isDemo && !state.paused && <div className="absolute inset-0 animate-pulse bg-gradient-to-tr from-transparent via-white/[0.03] to-transparent" />}
+          {poster && <img src={poster} alt="" className="absolute inset-0 h-full w-full object-cover blur-[2px] brightness-50" />}
         </div>
       )}
 
@@ -339,7 +326,6 @@ export function VideoPlayer(props: VideoPlayerProps) {
             <p className="truncate text-sm font-semibold sm:text-base">{title}</p>
             {subtitle && <p className="truncate text-xs text-white/65 sm:text-sm">{subtitle}</p>}
           </div>
-          {isDemo && <span className="shrink-0 rounded-md bg-white/15 px-2 py-1 text-2xs font-semibold uppercase tracking-wider text-white/85 backdrop-blur">Demo source</span>}
         </div>
       </div>
 

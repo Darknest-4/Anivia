@@ -1,4 +1,5 @@
-import { usePreferences } from '@/hooks/useUserData'
+import { useHistory, usePreferences } from '@/hooks/useUserData'
+import { historyService } from '@/services/user'
 import { CalendarClock, ChevronRight, Tag } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -21,6 +22,7 @@ export function OverviewTab({ anime, episodes, onShowEpisodes, onShowCharacters 
   const [expanded, setExpanded] = useState(false)
   const { data: characters } = useCharacters({ animeId: anime.id })
   const latest = (episodes ?? []).filter((e) => !e.locked).slice(-4).reverse()
+  const history = useHistory()
 
   return (
     <div className="space-y-10">
@@ -87,7 +89,13 @@ export function OverviewTab({ anime, episodes, onShowEpisodes, onShowCharacters 
           <ul className="grid gap-1.5 xl:grid-cols-2">
             {latest.map((ep) => (
               <li key={ep.id}>
-                <EpisodeItem episode={ep} layout="compact" href={`/anime/${anime.id}/watch?ep=${ep.number}`} />
+                <EpisodeItem
+                  episode={ep}
+                  layout="compact"
+                  href={`/anime/${anime.id}/watch?ep=${ep.number}`}
+                  progress={history.find((h) => h.animeId === anime.id && h.episodeId === ep.id)}
+                  onToggleWatched={historyService.setWatched}
+                />
               </li>
             ))}
           </ul>

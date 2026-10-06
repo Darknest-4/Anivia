@@ -2,6 +2,7 @@ import { ArrowDownUp, Search } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { EmptyState, Input, Select } from '@/components/ui'
 import { useHistory } from '@/hooks/useUserData'
+import { historyService } from '@/services/user'
 import { cn } from '@/lib/cn'
 import type { Episode } from '@/types'
 import { EpisodeItem } from './EpisodeItem'
@@ -117,6 +118,7 @@ export function EpisodeList({ animeId, episodes, loading, activeEpisodeId, layou
                   active={ep.id === activeEpisodeId}
                   layout={layout}
                   href={`/anime/${animeId}/watch?ep=${ep.number}`}
+                  onToggleWatched={historyService.setWatched}
                 />
               </li>
             ))}

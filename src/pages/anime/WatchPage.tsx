@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Flag, ListVideo, Share2 } from 'lucide-react'
+import { Check, CheckCircle2, ChevronLeft, ChevronRight, Flag, ListVideo, Share2 } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { AnimeCard, EpisodeList, ReportDialog, ScrollRow, ShareDialog, WatchlistButton, AnimeGenreBadge } from '@/components/anime'
@@ -27,8 +27,8 @@ export default function WatchPage() {
   const [report, setReport] = useState(false)
 
   const list = episodes.data ?? []
-  const resume = history.find((h) => h.animeId === id)
-  const epNumber = Number(params.get('ep')) || resume?.episodeNumber || 1
+  const upNext = id ? historyService.nextUp(id, list.filter((e) => !e.locked).length || undefined, history) : null
+  const epNumber = Number(params.get('ep')) || upNext?.episodeNumber || 1
   const index = Math.max(0, list.findIndex((e) => e.number === epNumber))
   const episode = list[index]
   const prev = list[index - 1]
@@ -97,7 +97,7 @@ export default function WatchPage() {
           <div className="min-w-0">
             {showTrailer && a.trailer ? (
               <div className="relative overflow-hidden sm:rounded-2xl">
-                <TrailerEmbed youtubeId={a.trailer.youtubeId} thumbnail={a.trailer.thumbnail} title={a.title} autoplay={prefs.autoplay && !prefs.dataSaver} />
+                <TrailerEmbed youtubeId={a.trailer.youtubeId} thumbnail={a.trailer.thumbnail} title={a.title} autoplay={prefs.autoplayTrailers && !prefs.dataSaver} />
               </div>
             ) : (
             <VideoPlayer
@@ -135,9 +135,13 @@ export default function WatchPage() {
                   </Link>
                   <h1 className="mt-1 text-xl font-bold text-fg sm:text-2xl">
                     {episode ? (
-                      <>
-                        <span className="text-fg-subtle">EP {pad2(episode.number)}</span> {episode.title}
-                      </>
+                      /^episode\s*\d+$/i.test(episode.title.trim()) ? (
+                        `Episode ${episode.number}`
+                      ) : (
+                        <>
+                          <span className="text-fg-subtle">EP {pad2(episode.number)}</span> {episode.title}
+                        </>
+                      )
                     ) : (
                       'No episodes available'
                     )}
@@ -164,6 +168,16 @@ export default function WatchPage() {
               {episode && <p className="mt-4 max-w-3xl text-sm leading-relaxed text-fg-muted">{episode.synopsis}</p>}
 
               <div className="mt-5 flex flex-wrap items-center gap-2">
+                {episode && !episode.locked && (
+                  <Button
+                    variant={saved?.completed ? 'secondary' : 'primary'}
+                    aria-pressed={Boolean(saved?.completed)}
+                    leftIcon={saved?.completed ? <CheckCircle2 className="h-4 w-4 text-success" /> : <Check className="h-4 w-4" />}
+                    onClick={() => historyService.setWatched(episode, !saved?.completed)}
+                  >
+                    {saved?.completed ? `Watched EP ${episode.number}` : 'Mark as watched'}
+                  </Button>
+                )}
                 <WatchlistButton anime={a} size="md" />
                 <Button variant="secondary" leftIcon={<Share2 className="h-4 w-4" />} onClick={() => setShare(true)}>
                   Share

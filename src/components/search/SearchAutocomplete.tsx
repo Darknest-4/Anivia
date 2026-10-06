@@ -7,6 +7,7 @@ import { useDebounce } from '@/hooks/useDebounce'
 import { useRecentSearches } from '@/hooks/useUserData'
 import { cn } from '@/lib/cn'
 import { recentSearchesService } from '@/services/user'
+import { thumb } from '@/lib/images'
 
 interface Option {
   id: string
@@ -204,7 +205,7 @@ export function SearchAutocomplete({
                     className={cn('flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2', active === i ? 'bg-surface-3' : 'hover:bg-surface-3/60')}
                   >
                     {opt.image ? (
-                      <img src={opt.image} alt="" className={cn('shrink-0 object-cover', opt.group === 'Characters' ? 'h-9 w-9 rounded-full' : 'h-12 w-8 rounded-md')} />
+                      <img src={thumb(opt.image)} alt="" loading="lazy" className={cn('shrink-0 object-cover', opt.group === 'Characters' ? 'h-9 w-9 rounded-full' : 'h-12 w-8 rounded-md')} />
                     ) : (
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-3 text-fg-subtle">{opt.icon}</span>
                     )}

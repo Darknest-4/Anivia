@@ -4,6 +4,7 @@ import { cn } from '@/lib/cn'
 import type { Anime } from '@/types'
 import { AnimeMeta } from './AnimeMeta'
 import { AnimeRating } from './AnimeRating'
+import { thumb } from '@/lib/images'
 
 interface Props {
   anime: Anime
@@ -30,7 +31,7 @@ export function AnimeCardCompact({ anime, rank, className, aside }: Props) {
           {String(rank).padStart(2, '0')}
         </span>
       )}
-      <img src={anime.poster} alt="" loading="lazy" decoding="async" className="h-[72px] w-12 shrink-0 rounded-lg object-cover ring-1 ring-line" />
+      <img src={thumb(anime.poster)} alt="" loading="lazy" decoding="async" className="h-[72px] w-12 shrink-0 rounded-lg object-cover ring-1 ring-line" />
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-fg transition-colors group-hover:text-accent-soft">{anime.title}</p>
         <AnimeMeta anime={anime} className="mt-0.5" />

@@ -2,6 +2,7 @@ import { ArrowUpRight, Film, MapPin } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { cn } from '@/lib/cn'
 import type { Studio } from '@/types'
+import { thumb } from '@/lib/images'
 
 export function StudioMark({ studio, className }: { studio: Studio; className?: string }) {
   const initials = studio.name
@@ -50,7 +51,7 @@ export function StudioCard({ studio, posters = [], className }: { studio: Studio
       {posters.length > 0 && (
         <div className="mt-4 flex -space-x-3">
           {posters.slice(0, 4).map((src, i) => (
-            <img key={i} src={src} alt="" loading="lazy" className="h-16 w-11 rounded-md object-cover ring-2 ring-surface" />
+            <img key={i} src={thumb(src)} alt="" loading="lazy" className="h-16 w-11 rounded-md object-cover ring-2 ring-surface" />
           ))}
         </div>
       )}

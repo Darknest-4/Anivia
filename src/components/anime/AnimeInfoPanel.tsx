@@ -5,7 +5,7 @@ import type { Anime } from '@/types'
 
 /** Structured "Information" sidebar listing all key metadata fields. */
 export function AnimeInfoPanel({ anime, className }: { anime: Anime; className?: string }) {
-  const rows: [string, React.ReactNode][] = [
+  const rows: [string, React.ReactNode][] = ([
     ['Type', anime.type],
     ['Status', statusLabel[anime.status]],
     ['Release year', anime.year ?? 'TBA'],
@@ -15,12 +15,10 @@ export function AnimeInfoPanel({ anime, className }: { anime: Anime; className?:
         <Link to={`/season/${anime.season}-${anime.year}`} className="text-accent-soft hover:underline">
           {seasonLabel[anime.season]} {anime.year}
         </Link>
-      ) : (
-        '—'
-      ),
+      ) : null,
     ],
     ['Episodes', anime.episodes ? (anime.status === 'airing' && anime.episodesAired ? `${anime.episodesAired} of ${anime.episodes}` : anime.episodes) : 'TBA'],
-    ['Episode duration', anime.duration ? `${anime.duration} min` : '—'],
+    ['Episode duration', anime.duration ? `${anime.duration} min` : null],
     ['Aired', anime.airedFrom ? `${formatDate(anime.airedFrom)}${anime.airedTo && anime.airedTo !== anime.airedFrom ? ` – ${formatDate(anime.airedTo)}` : anime.status === 'airing' ? ' – present' : ''}` : 'TBA'],
     [
       'Studio',
@@ -33,27 +31,26 @@ export function AnimeInfoPanel({ anime, className }: { anime: Anime; className?:
             </Link>
           ))}
         </span>
-      ) : (
-        '—'
-      ),
+      ) : null,
     ],
     [
       'Genres',
-      <span key="g" className="flex flex-wrap justify-end gap-x-1">
+      anime.genres.length ? (<span key="g" className="flex flex-wrap justify-end gap-x-1">
         {anime.genres.map((g, i) => (
           <Link key={g.id} to={`/genres/${g.slug}`} className="hover:text-fg">
             {g.name}
             {i < anime.genres.length - 1 ? ',' : ''}
           </Link>
         ))}
-      </span>,
+      </span>) : null,
     ],
-    ['Age rating', anime.ageRating ?? '—'],
-    ...(scoresHidden() ? [] : [['Score', anime.rating ? `${formatRating(anime.rating)} (${formatCompact(anime.ratingCount ?? 0)} votes)` : 'Not yet rated'] as [string, React.ReactNode]]),
-    ['Popularity', `${formatCompact(anime.popularity)} members`],
+    ['Age rating', anime.ageRating ?? null],
+    ...(scoresHidden() ? [] : [['Score', anime.rating ? `${formatRating(anime.rating)}${anime.ratingCount ? ` (${formatCompact(anime.ratingCount)} votes)` : ''}` : 'Not yet rated'] as [string, React.ReactNode]]),
+    ['Popularity', anime.popularity ? `${formatCompact(anime.popularity)} members` : null],
+    ['Favorites', anime.favorites ? formatCompact(anime.favorites) : null],
     ...(anime.languages.length ? [['Audio', anime.languages.join(', ')] as [string, React.ReactNode]] : []),
     ...(anime.quality ? [['Quality', anime.quality] as [string, React.ReactNode]] : []),
-  ]
+  ] as [string, React.ReactNode][]).filter(([, value]) => value !== null && value !== undefined && value !== '')
   return (
     <section aria-labelledby="info-heading" className={cn('rounded-2xl border border-line bg-surface p-5', className)}>
       <h2 id="info-heading" className="text-base font-semibold text-fg">

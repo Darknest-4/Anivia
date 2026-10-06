@@ -6,6 +6,7 @@ import type { Anime } from '@/types'
 import { episodeLabel, StatusBadge } from './AnimeMeta'
 import { AnimeRating } from './AnimeRating'
 import { WatchlistIconButton } from './WatchlistButton'
+import { thumb } from '@/lib/images'
 
 interface Props {
   anime: Anime
@@ -30,7 +31,7 @@ export function AnimeCardList({ anime, index, className, actions }: Props) {
       {index !== undefined && <span className="hidden text-center font-display text-sm font-bold tabular-nums text-fg-subtle md:block">{index}</span>}
       <div className={cn('flex min-w-0 items-center gap-3', index === undefined ? 'col-span-2 md:col-span-2' : 'col-span-2 md:col-span-1')}>
         <Link to={`/anime/${anime.id}`} className="shrink-0" aria-label={anime.title}>
-          <img src={anime.poster} alt="" loading="lazy" decoding="async" className="h-16 w-11 rounded-lg object-cover ring-1 ring-line" />
+          <img src={thumb(anime.poster)} alt="" loading="lazy" decoding="async" className="h-16 w-11 rounded-lg object-cover ring-1 ring-line" />
         </Link>
         <div className="min-w-0">
           <h3 className="truncate text-sm font-semibold text-fg">

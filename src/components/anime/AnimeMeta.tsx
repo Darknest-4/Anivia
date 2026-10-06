@@ -1,4 +1,3 @@
-import { Fragment } from 'react'
 import { cn } from '@/lib/cn'
 import { statusLabel } from '@/lib/format'
 import type { Anime, AnimeStatus } from '@/types'
@@ -28,14 +27,20 @@ export function AnimeMeta({ anime, className, show = ['type', 'year', 'episodes'
     if (key === 'status') parts.push(statusLabel[anime.status])
     if (key === 'season' && anime.season) parts.push(`${anime.season[0].toUpperCase()}${anime.season.slice(1)} ${anime.year ?? ''}`.trim())
   }
+  // Every item carries a leading dot; the row is shifted left by one dot width and clipped,
+  // so a line never starts or ends with a stray separator when the meta wraps.
   return (
-    <p className={cn('flex min-w-0 flex-wrap items-center gap-x-1.5 text-xs text-fg-subtle', className)}>
-      {parts.map((p, i) => (
-        <Fragment key={`${p}-${i}`}>
-          {i > 0 && <span aria-hidden className="text-line-strong">•</span>}
-          <span className="whitespace-nowrap">{p}</span>
-        </Fragment>
-      ))}
+    <p className={cn('min-w-0 overflow-hidden text-xs text-fg-subtle', className)}>
+      <span className="-ml-3 flex flex-wrap items-center">
+        {parts.map((p, i) => (
+          <span key={`${p}-${i}`} className="whitespace-nowrap">
+            <span aria-hidden className="inline-block w-3 text-center text-line-strong">
+              •
+            </span>
+            {p}
+          </span>
+        ))}
+      </span>
     </p>
   )
 }

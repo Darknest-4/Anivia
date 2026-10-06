@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui'
 import { cn } from '@/lib/cn'
 import { formatRelative } from '@/lib/format'
 import type { EpisodeRelease } from '@/types'
+import { thumb } from '@/lib/images'
 
 /** Landscape card for a newly released episode. */
 export function EpisodeReleaseCard({ release, className }: { release: EpisodeRelease; className?: string }) {
@@ -23,7 +24,7 @@ export function EpisodeReleaseCard({ release, className }: { release: EpisodeRel
             <Play className="ml-0.5 h-5 w-5 fill-current" />
           </span>
           <div className="absolute bottom-2 left-2 right-2 flex items-center gap-2">
-            <img src={anime.poster} alt="" className="h-9 w-6 rounded object-cover ring-1 ring-white/20" />
+            <img src={thumb(anime.poster)} alt="" loading="lazy" className="h-9 w-6 rounded object-cover ring-1 ring-white/20" />
             <p className="truncate text-xs font-semibold text-white">{anime.title}</p>
           </div>
         </div>

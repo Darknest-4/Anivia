@@ -93,7 +93,7 @@ export const STUDIOS = `
   query ($search: String, $perPage: Int) {
     Page(perPage: $perPage) {
       studios(search: $search, sort: FAVOURITES_DESC) {
-        id name favourites isAnimationStudio
+        id name favourites isAnimationStudio siteUrl
         media(isMain: true, sort: POPULARITY_DESC, perPage: 4) { pageInfo { total } nodes { coverImage { large } } }
       }
     }
@@ -103,7 +103,7 @@ export const STUDIOS = `
 export const STUDIO = `
   query ($id: Int, $page: Int, $perPage: Int) {
     Studio(id: $id) {
-      id name favourites isAnimationStudio
+      id name favourites isAnimationStudio siteUrl
       media(isMain: true, sort: POPULARITY_DESC, page: $page, perPage: $perPage) {
         pageInfo { total currentPage lastPage perPage }
         nodes { type isAdult ${MEDIA_FIELDS} }

@@ -11,7 +11,7 @@ export default function PrivacyPage() {
     <LegalLayout
       title="Privacy Policy"
       updated="October 5, 2026"
-      intro="This policy explains what personal data ANIVIA processes, why, who helps us run the service, and the rights you have. Have it reviewed for your jurisdiction before going live."
+      intro="This policy explains what personal data ANIVIA processes, why, who helps us run the service, and the rights you have."
       sections={[
         {
           id: 'controller',

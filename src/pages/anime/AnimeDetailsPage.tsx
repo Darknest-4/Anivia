@@ -17,6 +17,7 @@ import { ErrorState } from '@/components/ui'
 import { useAnime, useEpisodes } from '@/hooks/queries'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useHistory } from '@/hooks/useUserData'
+import { historyService } from '@/services/user'
 import { episodeLabel } from '@/components/anime/AnimeMeta'
 import NotFoundPage from '@/pages/info/NotFoundPage'
 import { WatchLinks } from '@/components/watch'
@@ -43,7 +44,7 @@ export default function AnimeDetailsPage() {
 
   useDocumentMeta({ title: anime?.title, description: anime?.synopsisShort, image: anime?.poster, type: 'video.tv_show' })
 
-  const resume = useMemo(() => history.find((h) => h.animeId === id), [history, id])
+  const next = useMemo(() => (id ? historyService.nextUp(id, anime?.episodesAired ?? anime?.episodes, history) : null), [history, id, anime?.episodesAired, anime?.episodes])
 
   if (isLoading) return <DetailsSkeleton />
   if (isError)
@@ -114,9 +115,9 @@ export default function AnimeDetailsPage() {
             <Button size="lg" disabled leftIcon={<Play className="h-5 w-5" />}>
               Coming {anime.year}
             </Button>
-          ) : resume ? (
-            <ButtonLink to={`/anime/${anime.id}/watch?ep=${resume.episodeNumber}`} size="lg" leftIcon={<RotateCcw className="h-5 w-5" />}>
-              Continue EP {resume.episodeNumber}
+          ) : next ? (
+            <ButtonLink to={`/anime/${anime.id}/watch?ep=${next.episodeNumber}`} size="lg" leftIcon={next.resume ? <RotateCcw className="h-5 w-5" /> : <Play className="h-5 w-5 fill-current" />}>
+              {next.resume ? 'Continue' : 'Next:'} EP {next.episodeNumber}
             </ButtonLink>
           ) : (
             <ButtonLink to={`/anime/${anime.id}/watch`} size="lg" leftIcon={<Play className="h-5 w-5 fill-current" />}>

@@ -64,7 +64,7 @@ export default function WatchlistPage() {
 
   return (
     <div>
-      <PageHeader eyebrow="Library" title="Watchlist" description="Everything you’re watching, planning and have finished — saved on this device." />
+      <PageHeader eyebrow="Library" title="Watchlist" description="Everything you’re watching, planning and have finished — synced to your account when you’re signed in." />
 
       {items.length === 0 ? (
         <EmptyState

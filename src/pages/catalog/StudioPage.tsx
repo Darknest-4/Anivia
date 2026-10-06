@@ -1,4 +1,4 @@
-import { Building2, CalendarDays, Film, Globe2, MapPin, Users } from 'lucide-react'
+import { Building2, CalendarDays, ExternalLink, Film, Heart, MapPin, Users } from 'lucide-react'
 import { useParams } from 'react-router-dom'
 import { AnimeCardFeatured, AnimeGrid, StudioMark } from '@/components/anime'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -28,12 +28,16 @@ export default function StudioPage() {
     )
   if (!studio) return <NotFoundPage />
   const items = works.data?.items ?? []
+  // Only facts the data source actually provides — no placeholder dashes.
   const stats = [
-    { icon: MapPin, label: 'Country', value: studio.country ?? '—' },
-    { icon: CalendarDays, label: 'Founded', value: studio.founded ? String(studio.founded) : '—' },
-    { icon: Film, label: 'Anime', value: String(studio.animeCount ?? works.data?.total ?? items.length) },
-    { icon: Users, label: 'Staff', value: studio.employees ? formatNumber(studio.employees) : '—' },
-  ]
+    { icon: Film, label: 'Anime', value: formatNumber(studio.animeCount ?? works.data?.total ?? items.length) },
+    { icon: Heart, label: 'Favorites', value: studio.favorites ? formatNumber(studio.favorites) : null },
+    { icon: CalendarDays, label: 'Founded', value: studio.founded ? String(studio.founded) : null },
+    { icon: MapPin, label: 'Country', value: studio.country ?? null },
+    { icon: Users, label: 'Staff', value: studio.employees ? formatNumber(studio.employees) : null },
+  ].filter((s) => s.value !== null)
+  const link = studio.website ?? studio.siteUrl
+  const linkLabel = studio.website ? 'Official website' : link?.includes('anilist.co') ? 'View on AniList' : 'View on MyAnimeList'
 
   return (
     <div className="container-app">
@@ -47,13 +51,15 @@ export default function StudioPage() {
         }
         description={studio.description}
         actions={
-          <span className="inline-flex items-center gap-1.5 text-xs text-fg-subtle">
-            <Globe2 className="h-3.5 w-3.5" />
-            Official website placeholder
-          </span>
+          link ? (
+            <a href={link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs font-semibold text-fg-muted hover:text-fg">
+              <ExternalLink className="h-3.5 w-3.5" />
+              {linkLabel}
+            </a>
+          ) : undefined
         }
       />
-      <dl className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <dl className={`grid grid-cols-2 gap-3 ${stats.length >= 4 ? 'md:grid-cols-4' : stats.length === 3 ? 'md:grid-cols-3' : ''}`}>
         {stats.map((s) => (
           <div key={s.label} className="rounded-2xl border border-line bg-surface p-4">
             <dt className="flex items-center gap-1.5 text-xs text-fg-subtle">

@@ -3,6 +3,7 @@ import { forwardRef, useState, type InputHTMLAttributes } from 'react'
 import { Input } from '@/components/ui'
 import { cn } from '@/lib/cn'
 import { useAuth, type OAuthProvider } from '@/providers/AuthProvider'
+import { usePlatform } from '@/providers/PlatformProvider'
 import { useToast } from '@/providers/ToastProvider'
 
 export function AuthHeading({ title, description }: { title: string; description: string }) {
@@ -34,16 +35,20 @@ export const PasswordInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HT
 export function SocialButtons() {
   const toast = useToast()
   const { signInWithProvider, status } = useAuth()
+  const { flag } = usePlatform()
   const [busy, setBusy] = useState<OAuthProvider | null>(null)
-  const items: { id: OAuthProvider; label: string; icon: React.ReactNode }[] = [
-    { id: 'google', label: 'Google', icon: <span className="font-display text-base font-bold">G</span> },
-    { id: 'discord', label: 'Discord', icon: <MessageCircle className="h-4 w-4" /> },
-    { id: 'github', label: 'GitHub', icon: <GitBranch className="h-4 w-4" /> },
-  ]
-  if (status === 'disabled') return null
+  const items = (
+    [
+      { id: 'google', label: 'Google', icon: <span className="font-display text-base font-bold">G</span> },
+      { id: 'discord', label: 'Discord', icon: <MessageCircle className="h-4 w-4" /> },
+      { id: 'github', label: 'GitHub', icon: <GitBranch className="h-4 w-4" /> },
+    ] as { id: OAuthProvider; label: string; icon: React.ReactNode }[]
+  ).filter((i) => flag(`oauth_${i.id}`)) // enabled per provider in Admin → Feature flags
+  // Nothing above the email form → no "or continue with email" divider either.
+  if (status === 'disabled' || (!items.length && !flag('anilist_login'))) return null
   return (
     <div>
-      <div className="grid grid-cols-3 gap-2">
+      {items.length > 0 && <div className={cn('grid gap-2', items.length === 1 ? 'grid-cols-1' : items.length === 2 ? 'grid-cols-2' : 'grid-cols-3')}>
         {items.map((i) => (
           <button
             key={i.id}
@@ -58,14 +63,15 @@ export function SocialButtons() {
                 setBusy(null)
               }
             }}
+            aria-label={`Continue with ${i.label}`}
             className="flex h-11 items-center justify-center gap-2 rounded-lg border border-line bg-surface-2 text-[13px] font-semibold text-fg-muted transition-colors hover:border-line-strong hover:text-fg disabled:opacity-60"
           >
             {busy === i.id ? <Loader2 className="h-4 w-4 animate-spin" /> : i.icon}
-            <span className="hidden xs:inline">{i.label}</span>
+            <span className={items.length === 3 ? 'hidden xs:inline' : undefined}>{i.label}</span>
           </button>
         ))}
-      </div>
-      <div className="my-6 flex items-center gap-3 text-xs text-fg-subtle">
+      </div>}
+      <div className={cn('flex items-center gap-3 text-xs text-fg-subtle', items.length ? 'my-6' : 'mb-6 mt-3')}>
         <span className="h-px flex-1 bg-line" />
         or continue with email
         <span className="h-px flex-1 bg-line" />

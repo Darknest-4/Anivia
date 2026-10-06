@@ -1,4 +1,4 @@
-import { CheckCircle2, Lock, Play } from 'lucide-react'
+import { Check, CheckCircle2, Lock, Play } from 'lucide-react'
 import { memo } from 'react'
 import { Link } from 'react-router-dom'
 import { Badge, Progress } from '@/components/ui'
@@ -12,9 +12,11 @@ interface EpisodeItemProps {
   active?: boolean
   layout?: 'row' | 'compact'
   href: string
+  /** Shows a "watched" toggle next to the episode (pass a stable function — the item is memoized). */
+  onToggleWatched?: (episode: Episode, watched: boolean) => void
 }
 
-export const EpisodeItem = memo(function EpisodeItem({ episode, progress, active, layout = 'row', href }: EpisodeItemProps) {
+export const EpisodeItem = memo(function EpisodeItem({ episode, progress, active, layout = 'row', href, onToggleWatched }: EpisodeItemProps) {
   const pct = progress ? progress.progress / Math.max(1, progress.duration) : 0
   const watched = progress?.completed
   const locked = episode.locked
@@ -57,21 +59,40 @@ export const EpisodeItem = memo(function EpisodeItem({ episode, progress, active
     </>
   )
 
+  const toggle = onToggleWatched && !locked
   const classes = cn(
     'group flex gap-3 rounded-xl p-2 transition-colors sm:gap-4',
     active ? 'bg-accent/10 ring-1 ring-inset ring-accent/30' : 'hover:bg-surface-2',
     locked && 'cursor-not-allowed',
+    toggle && 'pr-12',
   )
 
-  if (locked)
-    return (
-      <div className={classes} aria-disabled="true">
-        {content}
-      </div>
-    )
-  return (
+  const item = locked ? (
+    <div className={classes} aria-disabled="true">
+      {content}
+    </div>
+  ) : (
     <Link to={href} className={classes} aria-current={active ? 'true' : undefined}>
       {content}
     </Link>
+  )
+  if (!toggle) return item
+  return (
+    <div className="relative">
+      {item}
+      <button
+        type="button"
+        onClick={() => onToggleWatched(episode, !watched)}
+        aria-pressed={Boolean(watched)}
+        aria-label={watched ? `Mark episode ${episode.number} as not watched` : `Mark episode ${episode.number} as watched`}
+        title={watched ? 'Watched — click to undo' : 'Mark as watched'}
+        className={cn(
+          'absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full ring-1 transition-colors',
+          watched ? 'bg-success/15 text-success ring-success/40 hover:bg-success/25' : 'text-fg-subtle ring-line hover:text-fg hover:ring-line-strong',
+        )}
+      >
+        <Check className="h-4 w-4" />
+      </button>
+    </div>
   )
 })

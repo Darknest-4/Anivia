@@ -5,7 +5,8 @@ import { cn } from '@/lib/cn'
 import { formatCompact } from '@/lib/format'
 import type { Character } from '@/types'
 
-const roleVariant = { Main: 'accent', Supporting: 'default', Antagonist: 'danger' } as const
+// Solid / glass badges stay readable on top of any artwork.
+const roleVariant = { Main: 'solid', Supporting: 'glass', Antagonist: 'glass' } as const
 
 export function CharacterCard({ character, animeTitle, className }: { character: Character; animeTitle?: string; className?: string }) {
   return (

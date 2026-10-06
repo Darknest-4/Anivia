@@ -1,4 +1,4 @@
-/** Deterministic pseudo random helpers so generated demo content is stable between reloads. */
+/** Deterministic pseudo random helpers so generated artwork is stable between reloads. */
 
 export function hashString(input: string): number {
   let h = 2166136261

@@ -1,10 +1,6 @@
 /**
- * Procedural, copyright-free demo artwork.
- *
- * ANIVIA ships without any third-party anime imagery. Posters, backdrops,
- * episode thumbnails and character portraits are generated as SVG data URIs
- * from a small seed (hue, secondary hue and motif). Replace them with your
- * own licensed images by returning real URLs from your AnimeProvider.
+ * Procedural, copyright-free SVG artwork (data URIs) generated from a small seed
+ * (hue, secondary hue and motif) — used for decorative backgrounds such as the 404 page.
  */
 import type { ArtworkMotif, ArtworkSeed } from '@/types'
 import { createRng, type Rng } from './random'

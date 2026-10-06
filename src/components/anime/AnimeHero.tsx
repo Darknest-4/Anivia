@@ -10,6 +10,7 @@ import { AnimeGenreBadge } from './AnimeGenreBadge'
 import { episodeLabel, StatusBadge } from './AnimeMeta'
 import { AnimeRating } from './AnimeRating'
 import { WatchlistButton, WatchlistIconButton } from './WatchlistButton'
+import { thumb } from '@/lib/images'
 
 const INTERVAL = 9000
 
@@ -166,7 +167,7 @@ export function AnimeHero({ items }: { items: Anime[] }) {
                     i === index ? 'w-[60px] ring-accent' : 'opacity-60 ring-transparent hover:opacity-100',
                   )}
                 >
-                  <img src={a.poster} alt="" className="h-full w-full object-cover" />
+                  <img src={thumb(a.poster)} alt="" className="h-full w-full object-cover" />
                 </button>
               ))}
             </div>
@@ -178,7 +179,7 @@ export function AnimeHero({ items }: { items: Anime[] }) {
                   onClick={() => setIndex(i)}
                   aria-label={`Show ${a.title}`}
                   aria-current={i === index}
-                  className="flex h-6 items-center"
+                  className="-mx-1 flex h-11 min-w-[24px] items-center justify-center px-1 sm:h-6 sm:min-w-0"
                 >
                   <span className={cn('block h-1.5 rounded-full transition-all duration-base', i === index ? 'w-6 bg-accent' : 'w-1.5 bg-white/40')} />
                 </button>

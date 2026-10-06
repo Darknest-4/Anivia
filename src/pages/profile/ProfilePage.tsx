@@ -11,12 +11,13 @@ import { useAnimeByIds } from '@/hooks/queries'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useFavorites, useHistory, useWatchlist } from '@/hooks/useUserData'
 import { formatRelative } from '@/lib/format'
+import { thumb } from '@/lib/images'
 
 type Tab = 'overview' | 'watchlist' | 'history' | 'favorites'
 
 export default function ProfilePage() {
-  const { user: demoUser } = useCurrentUser()
-  useDocumentMeta({ title: `${demoUser.displayName} (@${demoUser.username})`, type: 'profile', noindex: true })
+  const { user } = useCurrentUser()
+  useDocumentMeta({ title: `${user.displayName} (@${user.username})`, type: 'profile', noindex: true })
   const { items } = useWatchlist()
   const history = useHistory()
   const { ids: favoriteIds } = useFavorites()
@@ -31,7 +32,7 @@ export default function ProfilePage() {
     watching: items.filter((i) => i.status === 'watching').length,
     planning: items.filter((i) => i.status === 'planning').length,
     favorites: favoriteIds.length,
-    hours: Math.round(history.reduce((s, h) => s + h.progress, 0) / 3600 + items.filter((i) => i.status === 'completed').length * 8),
+    hours: Math.round((history.reduce((s, h) => s + h.progress, 0) / 3600) * 10) / 10,
     episodes: history.length,
   }
   const library = items.map((i) => byId.get(i.animeId)).filter((a) => a !== undefined)
@@ -40,7 +41,7 @@ export default function ProfilePage() {
 
   return (
     <div className="pt-8 sm:pt-10">
-      <ProfileHeader user={demoUser} banner={banner} onShare={() => setShare(true)} />
+      <ProfileHeader user={user} banner={banner} onShare={() => setShare(true)} />
       <ProfileStats values={stats} className="mt-6" />
 
       <Tabs
@@ -72,7 +73,7 @@ export default function ProfilePage() {
                     const a = byId.get(h.animeId)
                     return (
                       <li key={h.episodeId} className="flex items-center gap-3 py-3">
-                        {a && <img src={a.poster} alt="" className="h-12 w-8 rounded object-cover" />}
+                        {a && <img src={thumb(a.poster)} alt="" loading="lazy" className="h-12 w-8 rounded object-cover" />}
                         <p className="min-w-0 flex-1 text-sm text-fg-muted">
                           {h.completed ? 'Finished' : 'Watched'} <span className="font-semibold text-fg">episode {h.episodeNumber}</span> of{' '}
                           <Link to={`/anime/${h.animeId}`} className="font-semibold text-fg hover:text-accent-soft">
@@ -139,7 +140,7 @@ export default function ProfilePage() {
             <EmptyState icon={<Heart />} title="No favorites yet" description="Tap the heart on any title to add it to your favorites." action={<ButtonLink to="/browse">Discover anime</ButtonLink>} />
           ))}
       </div>
-      <ShareDialog heading="Share profile" title={`${demoUser.displayName} (@${demoUser.username})`} path="/profile" open={share} onClose={() => setShare(false)} />
+      <ShareDialog heading="Share profile" title={`${user.displayName} (@${user.username})`} path="/profile" open={share} onClose={() => setShare(false)} />
     </div>
   )
 }

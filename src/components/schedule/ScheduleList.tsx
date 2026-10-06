@@ -7,6 +7,7 @@ import { formatDate } from '@/lib/format'
 import { useToast } from '@/providers/ToastProvider'
 import { watchlistService } from '@/services/user'
 import type { ScheduleItem, ScheduleStatus } from '@/types'
+import { thumb } from '@/lib/images'
 
 const statusMeta: Record<ScheduleStatus, { label: string; variant: 'success' | 'accent' | 'info' | 'warning' }> = {
   aired: { label: 'Aired', variant: 'success' },
@@ -27,7 +28,7 @@ function ScheduleRow({ item }: { item: ScheduleItem }) {
       </div>
       <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-line bg-surface p-2.5 transition-colors group-hover:border-line-strong">
         <Link to={`/anime/${item.animeId}`} className="shrink-0" aria-label={item.anime.title}>
-          <img src={item.anime.poster} alt="" loading="lazy" className="h-16 w-11 rounded-lg object-cover" />
+          <img src={thumb(item.anime.poster)} alt="" loading="lazy" className="h-16 w-11 rounded-lg object-cover" />
         </Link>
         <div className="min-w-0 flex-1">
           <Link to={`/anime/${item.animeId}`} className="block truncate text-sm font-semibold text-fg hover:text-accent-soft">

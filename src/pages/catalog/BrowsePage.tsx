@@ -10,7 +10,7 @@ export default function BrowsePage() {
         crumbs={[{ label: 'Home', to: '/' }, { label: 'Browse' }]}
         eyebrow="Catalog"
         title="Browse Anime"
-        description="Filter the full catalog by genre, year, season, status, format, rating and audio language."
+        description="Filter the full catalog by genre, year, season, status, format and rating."
       />
       <CatalogBrowser />
     </div>
