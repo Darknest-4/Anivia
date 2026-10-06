@@ -20,7 +20,7 @@ export function AnimeCardHorizontal({ anime, className, actions }: Props) {
   return (
     <article onPointerEnter={() => prefetch(anime.id)} onFocusCapture={() => prefetch(anime.id)} className={cn('group relative flex gap-4 rounded-2xl border border-line bg-surface p-3 transition-colors hover:border-line-strong hover:bg-surface-2/60 sm:p-4', className)}>
       <Link to={`/anime/${anime.id}`} className="relative w-24 shrink-0 overflow-hidden rounded-xl sm:w-28" aria-label={anime.title}>
-        <AnimePoster src={anime.poster} alt="" />
+        <AnimePoster src={anime.poster} alt="" sizes="120px" />
       </Link>
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex items-start justify-between gap-3">
