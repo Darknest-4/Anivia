@@ -11,15 +11,10 @@ import { getSupabase, useAuth } from '@/providers/AuthProvider'
 import { usePlatform, type Permission, type Role } from '@/providers/PlatformProvider'
 import { useToast } from '@/providers/ToastProvider'
 import type { FeatureFlag } from '@/services/platform/flags'
+import { Panel, rpc, Stat } from './parts'
+import { SyncPanel } from './SyncPanel'
 
-type Tab = 'overview' | 'errors' | 'flags' | 'users' | 'inbox' | 'data'
-
-async function rpc<T>(fn: string, args: Record<string, unknown> = {}): Promise<T> {
-  const client = await getSupabase()
-  const { data, error } = await client.rpc(fn, args)
-  if (error) throw new Error(error.message)
-  return data as T
-}
+type Tab = 'overview' | 'errors' | 'flags' | 'users' | 'inbox' | 'data' | 'sync'
 
 /** Staff dashboard: analytics, feature flags, roles, inbox and the anime data store. */
 export default function AdminPage() {
@@ -45,6 +40,7 @@ export default function AdminPage() {
     { value: 'users', label: t('Users & roles'), perm: 'users.manage' },
     { value: 'inbox', label: t('Inbox'), perm: 'reports.manage' },
     { value: 'data', label: t('Anime data'), perm: 'cache.manage' },
+    { value: 'sync', label: t('AniZip sync'), perm: 'cache.manage' },
   ]
   const visible = items.filter((i) => can(i.perm))
   const active = visible.some((i) => i.value === tab) ? tab : visible[0]?.value
@@ -60,6 +56,7 @@ export default function AdminPage() {
         {active === 'users' && <UsersPanel />}
         {active === 'inbox' && <InboxPanel />}
         {active === 'data' && <DataPanel />}
+        {active === 'sync' && <SyncPanel />}
       </div>
     </div>
   )
@@ -89,28 +86,6 @@ const duration = (s: number | null | undefined) => {
   if (!s) return '—'
   const m = Math.floor(s / 60)
   return m ? `${m}m ${Math.round(s % 60)}s` : `${Math.round(s)}s`
-}
-
-function Stat({ icon, label, value, hint }: { icon: ReactNode; label: string; value: ReactNode; hint?: string }) {
-  return (
-    <div className="rounded-2xl border border-line bg-surface p-4">
-      <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-fg-subtle">
-        <span className="[&>svg]:h-4 [&>svg]:w-4">{icon}</span>
-        {label}
-      </p>
-      <p className="mt-2 font-display text-2xl font-bold text-fg">{value}</p>
-      {hint && <p className="mt-0.5 text-xs text-fg-subtle">{hint}</p>}
-    </div>
-  )
-}
-
-function Panel({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section className="rounded-2xl border border-line bg-surface p-5">
-      <h2 className="mb-4 text-sm font-semibold text-fg">{title}</h2>
-      {children}
-    </section>
-  )
 }
 
 function Overview() {

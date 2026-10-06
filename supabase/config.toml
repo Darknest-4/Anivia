@@ -10,3 +10,6 @@ verify_jwt = false
 
 [functions.send-push]
 verify_jwt = false
+
+[functions.anizip-sync]
+verify_jwt = false

@@ -1,4 +1,5 @@
 import { config } from '@/config'
+import { getSupabase } from '@/providers/AuthProvider'
 import type { EpisodeHint } from './shared/episodes'
 import { createRequestQueue } from './shared/requestQueue'
 
@@ -43,7 +44,54 @@ const queue = createRequestQueue({ minInterval: 120, perMinute: 120, retries: 1,
 
 const clean = (s?: string | null) => (s ?? '').replace(/\s*\(Source:[^)]*\)\s*$/i, '').trim()
 
+interface StoredAniZip {
+  mal_id: number | null
+  episode_count: number | null
+  images: { coverType: string; url: string }[]
+  episodes: { key: string; titles: Record<string, string>; overview: string | null; summary: string | null; air_date: string | null; air_date_utc: string | null; image: string | null; runtime: number | null; length: number | null }[]
+}
+
+/** Imported copy in the ANIVIA database (background AniZip sync, migration 0008). Null when not imported (yet). */
+async function fromDatabase(anilistId: string | number): Promise<AniZipInfo | null> {
+  if (!config.supabaseUrl || !config.supabaseKey || !/^\d+$/.test(String(anilistId))) return null
+  try {
+    const client = await getSupabase()
+    const { data, error } = await client.rpc('anizip_for_anilist', { p_anilist_id: Number(anilistId) })
+    if (error || !data) return null
+    const row = data as StoredAniZip
+    const episodes = new Map<number, EpisodeHint>()
+    for (const e of row.episodes ?? []) {
+      if (!/^\d+$/.test(e.key)) continue
+      const t = e.titles ?? {}
+      episodes.set(Number(e.key), {
+        title: t.en || t['x-jat'] || t.ja || undefined,
+        synopsis: clean(e.overview || e.summary) || undefined,
+        airDate: e.air_date_utc || e.air_date || undefined,
+        thumbnail: e.image || undefined,
+        duration: (e.runtime || e.length || 0) * 60 || undefined,
+      })
+    }
+    return toInfo(episodes, row.episode_count ?? undefined, row.images ?? [], row.mal_id ?? undefined)
+  } catch {
+    return null
+  }
+}
+
+function toInfo(episodes: Map<number, EpisodeHint>, episodeCount: number | undefined, images: { coverType: string; url: string }[], malId: unknown): AniZipInfo {
+  const img = (type: string) => images.find((i) => i.coverType.toLowerCase() === type)?.url
+  return { episodes, episodeCount, fanart: img('fanart'), banner: img('banner'), logo: img('clearlogo'), malId: typeof malId === 'number' ? malId : undefined }
+}
+
+/** Episode titles, synopses and artwork: from the ANIVIA database when imported, otherwise live from ani.zip. */
 export async function fetchAniZip(id: { anilist?: string | number; mal?: string | number }): Promise<AniZipInfo | null> {
+  if (id.anilist) {
+    const stored = await fromDatabase(id.anilist)
+    if (stored) return stored
+  }
+  return fetchAniZipLive(id)
+}
+
+async function fetchAniZipLive(id: { anilist?: string | number; mal?: string | number }): Promise<AniZipInfo | null> {
   const param = id.anilist ? `anilist_id=${encodeURIComponent(id.anilist)}` : id.mal ? `mal_id=${encodeURIComponent(id.mal)}` : ''
   if (!param) return null
   const data = await queue.request<AniZipResponse | null>(`${config.aniZipUrl}/mappings?${param}`, { headers: { accept: 'application/json' } })
@@ -62,9 +110,7 @@ export async function fetchAniZip(id: { anilist?: string | number; mal?: string 
       duration: (e.runtime || e.length || 0) * 60 || undefined,
     })
   }
-  const img = (type: string) => data.images?.find((i) => i.coverType.toLowerCase() === type)?.url
-  const mal = data.mappings?.mal_id
-  return { episodes, episodeCount: data.episodeCount, fanart: img('fanart'), banner: img('banner'), logo: img('clearlogo'), malId: typeof mal === 'number' ? mal : undefined }
+  return toInfo(episodes, data.episodeCount, data.images ?? [], data.mappings?.mal_id)
 }
 
 /** Resolves within `ms` or gives up quietly (ani.zip is enrichment, never a blocker). */

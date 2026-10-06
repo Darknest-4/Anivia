@@ -2,7 +2,7 @@
   "name": "anivia",
   "private": true,
   "version": "1.0.0",
-  "description": "ANIVIA \u2014 anime discovery & tracking (AniList / Jikan / ani.zip, Supabase, Cloudflare Workers).",
+  "description": "ANIVIA — anime discovery & tracking (AniList / Jikan / ani.zip, Supabase, Cloudflare Workers).",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -25,6 +25,7 @@
     "react-router-dom": "^6.30.6"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.2.17",
     "@types/node": "^26.6.4",
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",

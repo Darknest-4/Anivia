@@ -13,6 +13,7 @@ Ez a lista végigvezet mindenen, amit **a Supabase és a Cloudflare felületén 
    - `supabase/migrations/0005_anivia_profile_images.sql` (profilkép anime-karakterből és profilbanner — a nyilvános profilon is látszik)
    - `supabase/migrations/0006_anivia_community.sql` (követés + hírfolyam, értékelések, hozzászólások, saját listák, közösségi pontszám, hibanapló, push-feliratkozások)
    - `supabase/migrations/0007_anivia_push_auto.sql` (push-értesítés automatikus kulcsokkal és időzítéssel)
+   - `supabase/migrations/0008_anivia_anizip_sync.sql` (AniZip anime- és epizódadatok importja a saját adatbázisba)
 3. Alternatíva a saját gépedről: hozz létre egy `supabase/.env.local` fájlt (nem kerül a repóba):
    ```
    SUPABASE_DB_URL=postgresql://postgres:JELSZÓ@db.wnmvktajokjhufuzpamy.supabase.co:5432/postgres
@@ -67,6 +68,21 @@ Kulcsot nem kell készíteni, gép sem kell hozzá:
 3. A függvény az első híváskor magának készíti el a push kulcspárt, és elmenti a táblába.
 
 A felhasználók a **Beállítások → Értesítések** alatt kapcsolhatják be. Kikapcsolás: Admin → Feature flags → `push_notifications`.
+
+## 1d. AniZip szinkron (anime- és epizódadatok a saját adatbázisban)
+
+Nincs mindig futó szerver (az oldal Cloudflare-en van, a backend a Supabase), ezért a háttérfeladat így működik:
+**pg_cron percenként → `anizip-sync` Edge Function → adatbázis.** Az állapot az adatbázisban van (`sync_jobs`, `anizip_sync_items`), így újratelepítés vagy hiba után onnan folytatja, ahol abbahagyta, és a már kész címeket nem tölti le újra.
+
+1. Töltsd fel az `anizip-sync` függvényt (Edge Functions → Deploy a new function → Via Editor, név: `anizip-sync`, kód: `supabase/functions/anizip-sync/index.ts`, **Verify JWT kikapcsolva**).
+2. Futtasd az SQL-t: `supabase/setup/anivia_update_0008.sql` (vagy a migrációt). Titkos kulcs nem kell, a 0007-es `cron_secret`-et használja.
+3. Kész: a következő percben magától elindul a teljes import (~34 000 cím, percenként ~120 → kb. 4–5 óra). Követés: **Admin → AniZip szinkron**.
+
+- A címlista az AniDB↔AniList↔MAL összerendelés (Fribb anime-lists, erre épül az ani.zip is).
+- Udvarias az ani.zip felé: max. 3 párhuzamos kérés, legalább 250 ms a kérések között, 15 s időkorlát, újrapróbálás exponenciális várakozással, 429-nél a `Retry-After` betartása.
+- A teljes import után naponta egy növekményes szinkron fut (futó/közelgő sorozatok, új címek, a legrégebbi adatok egy része).
+- Kikapcsolás: Admin → Feature flags → `anizip_sync`. Szüneteltetés / folytatás / sikertelenek újrapróbálása: Admin → AniZip szinkron.
+- Az oldal az epizódadatokat már az adatbázisból olvassa (`anizip_for_anilist`), és csak a még nem importált címeknél kérdezi az ani.zip-et.
 
 ## 2. E-mail küldés — élesben kötelező
 

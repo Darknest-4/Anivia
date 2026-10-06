@@ -44,3 +44,4 @@ jobs:
           supabase functions deploy anilist-auth --project-ref "$PROJECT_REF" --no-verify-jwt
           supabase functions deploy anilist-proxy --project-ref "$PROJECT_REF" --no-verify-jwt
           supabase functions deploy send-push --project-ref "$PROJECT_REF" --no-verify-jwt
+          supabase functions deploy anizip-sync --project-ref "$PROJECT_REF" --no-verify-jwt
