@@ -36,8 +36,8 @@ export default function ResetPasswordPage() {
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
-    if (password.length < 8) return setError('Use at least 8 characters.')
-    if (password !== confirm) return setError('Passwords do not match.')
+    if (password.length < 8) return setError(t('Use at least 8 characters.'))
+    if (password !== confirm) return setError(t('Passwords do not match.'))
     setError(undefined)
     setLoading(true)
     try {
@@ -53,7 +53,7 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="animate-fade-up">
-      <AuthHeading title={t('Choose a new password')} description={t('For {p0}', { p0: auth.email ?? 'your account' })} />
+      <AuthHeading title={t('Choose a new password')} description={t('For {p0}', { p0: auth.email ?? t('your account') })} />
       <form onSubmit={submit} noValidate className="space-y-4">
         <Field label={t('New password')} error={error}>
           {(p) => (

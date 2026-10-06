@@ -1210,4 +1210,10 @@ export const hu: Record<string, string> = {
   "Masterpiece": "Mestermű",
   "Where to watch": "Hol nézhető",
   "Explore more from": "Fedezz fel még többet:",
+  "This link is incomplete. Open it straight from the email.": "Ez a link hiányos. Nyisd meg közvetlenül a levélből.",
+  "Email address updated": "E-mail cím frissítve",
+  "This link is invalid or has expired. Links work once and only for a limited time.": "Ez a link érvénytelen vagy lejárt. A linkek csak egyszer és korlátozott ideig működnek.",
+  "Confirming…": "Megerősítés…",
+  "Link not valid": "A link nem érvényes",
+  "your account": "a fiókod",
 }

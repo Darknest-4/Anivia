@@ -10,11 +10,11 @@
         <p style="margin:12px 0 0;color:#b4b4c0;font-size:15px;line-height:22px;">Már csak egy lépés: kattints az alábbi gombra, hogy megerősítsd az e-mail címed, és elkészüljön a fiókod.</p>
       </td></tr>
       <tr><td style="padding:24px 28px;">
-        <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#e8264f;color:#fff;text-decoration:none;font-weight:bold;font-size:15px;padding:12px 24px;border-radius:10px;">E-mail cím megerősítése</a>
+        <a href="https://anivia.animehub.hu/auth/confirm?token_hash={{ .TokenHash }}&amp;type=email" style="display:inline-block;background:#e8264f;color:#fff;text-decoration:none;font-weight:bold;font-size:15px;padding:12px 24px;border-radius:10px;">E-mail cím megerősítése</a>
       </td></tr>
       <tr><td style="padding:0 28px 28px;color:#7c7c88;font-size:12px;line-height:18px;">
         Ha nem te regisztráltál, nyugodtan hagyd figyelmen kívül ezt a levelet.<br><br>Ha a gomb nem működik, másold be ezt a címet a böngészőbe:<br>
-        <a href="{{ .ConfirmationURL }}" style="color:#ff6b88;word-break:break-all;">{{ .ConfirmationURL }}</a>
+        <a href="https://anivia.animehub.hu/auth/confirm?token_hash={{ .TokenHash }}&amp;type=email" style="color:#ff6b88;word-break:break-all;">https://anivia.animehub.hu/auth/confirm?token_hash={{ .TokenHash }}&amp;type=email</a>
       </td></tr>
     </table>
     <p style="color:#5c5c66;font-size:11px;margin:16px 0 0;">© ANIVIA · anivia.animehub.hu</p>
