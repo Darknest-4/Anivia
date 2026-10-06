@@ -89,7 +89,7 @@ export function UserMenu() {
                 close()
                 try {
                   await auth.signOut()
-                  toast({ title: 'Signed out', description: 'Your library stays on this device.', variant: 'info' })
+                  toast({ title: 'Signed out', description: 'Your data was removed from this device — it’s safe in your account.', variant: 'info' })
                   navigate('/')
                 } catch (e) {
                   toast({ title: 'Couldn’t sign out', description: (e as Error).message, variant: 'error' })

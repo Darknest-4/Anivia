@@ -175,7 +175,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const data = await run((c) => c.from('profiles').update(patch).eq('id', session.user.id).select().single<Profile>())
         setProfile(data as Profile)
       },
-      signOut: async (everywhere) => void (await run((c) => c.auth.signOut({ scope: everywhere ? 'global' : 'local' }))),
+      signOut: async (everywhere) => {
+        // Stop syncing before wiping this device, so the empty library is never pushed anywhere.
+        stopSync.current?.()
+        stopSync.current = null
+        const { clearAccountData, detachAniList } = await import('@/services/user/clearLocal')
+        detachAniList()
+        try {
+          await run((c) => c.auth.signOut({ scope: everywhere ? 'global' : 'local' }))
+        } finally {
+          clearAccountData()
+        }
+      },
     }
   }, [status, session, profile, syncStatus, run])
 

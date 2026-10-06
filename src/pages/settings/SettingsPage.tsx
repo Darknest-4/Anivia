@@ -19,7 +19,7 @@ import { usePreferences } from '@/hooks/useUserData'
 import { cn } from '@/lib/cn'
 import { useToast } from '@/providers/ToastProvider'
 import { storage } from '@/services/storage'
-import { favoritesStore, historyService, historyStore, preferencesStore, recentSearchesService, recentSearchesStore, watchlistStore } from '@/services/user'
+import { historyService, recentSearchesService } from '@/services/user'
 import type { Preferences, VideoQuality } from '@/types'
 
 type Section = 'appearance' | 'content' | 'playback' | 'performance' | 'notifications' | 'privacy' | 'language' | 'connections' | 'account'
@@ -69,8 +69,9 @@ export default function SettingsPage() {
   const resetLocal = async () => {
     // Sign out first so the cleared local library is never pushed over the cloud copy.
     if (auth.status === 'signed-in') await auth.signOut().catch(() => undefined)
+    const { clearAccountData } = await import('@/services/user/clearLocal')
+    clearAccountData()
     storage.clearAll()
-    ;[watchlistStore, historyStore, favoritesStore, recentSearchesStore, preferencesStore].forEach((s) => s.reset())
     setResetOpen(false)
     toast({ title: 'Local data cleared', description: 'Watchlist, history and preferences on this device were reset.' })
   }

@@ -1,9 +1,10 @@
-import { LogIn, LogOut, UserPlus } from 'lucide-react'
+import { LogIn, LogOut, ShieldCheck, UserPlus } from 'lucide-react'
 import { useEffect } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { ButtonLink, Drawer, Logo } from '@/components/ui'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { cn } from '@/lib/cn'
+import { usePlatform } from '@/providers/PlatformProvider'
 import { discoverNav, libraryNavWithUpgrade, primaryNav, type NavItem } from './navItems'
 import { ThemeSegmented } from './ThemeToggle'
 
@@ -35,7 +36,8 @@ function Section({ title, items }: { title: string; items: NavItem[] }) {
 }
 
 export function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { user, signedIn, isGuest, auth } = useCurrentUser()
+  const { user, signedIn, isGuest, auth, anilist, anilistOnly } = useCurrentUser()
+  const { isStaff } = usePlatform()
   const { pathname } = useLocation()
   useEffect(() => {
     onClose()
@@ -67,6 +69,15 @@ export function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => 
             <LogOut className="h-4 w-4" />
             Sign out ({user.displayName})
           </button>
+        ) : anilistOnly ? (
+          <button
+            type="button"
+            onClick={() => void anilist.disconnect().then(onClose)}
+            className="flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-line bg-surface-2 text-sm font-semibold text-fg-muted hover:text-fg"
+          >
+            <LogOut className="h-4 w-4" />
+            Disconnect AniList ({user.displayName})
+          </button>
         ) : undefined
       }
     >
@@ -76,6 +87,7 @@ export function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => 
       </div>
       <Section title="Discover" items={[...primaryNav, ...discoverNav]} />
       <Section title="Library" items={libraryNavWithUpgrade} />
+      {isStaff && <Section title="Staff" items={[{ to: '/admin', label: 'Admin dashboard', icon: ShieldCheck }]} />}
       <div className="px-6 py-4">
         <p className="eyebrow pb-2">Appearance</p>
         <ThemeSegmented />

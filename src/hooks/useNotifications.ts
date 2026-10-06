@@ -19,7 +19,7 @@ export interface AppNotification {
 
 const asArray = <T,>(v: T[]) => (Array.isArray(v) ? v : [])
 export const readNotificationsStore = createPersistentStore<string[]>('notifications-read', [], asArray)
-const notifiedStore = createPersistentStore<string[]>('notifications-pushed', [], asArray)
+export const notifiedStore = createPersistentStore<string[]>('notifications-pushed', [], asArray)
 
 const DAY = 86_400_000
 

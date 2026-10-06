@@ -140,7 +140,12 @@ export function AniListProvider({ children }: { children: ReactNode }) {
           }
           disconnectAniList()
           setLinked(false)
-          toast({ title: 'AniList disconnected', description: 'Your ANIVIA library is kept.', variant: 'info' })
+          if (!session) {
+            // AniList was the only sign-in on this device → treat it like signing out.
+            const { clearAccountData } = await import('@/services/user/clearLocal')
+            clearAccountData()
+            toast({ title: 'Signed out of AniList', description: 'Your data was removed from this device. It’s still on AniList.', variant: 'info' })
+          } else toast({ title: 'AniList disconnected', description: 'Your ANIVIA library is kept.', variant: 'info' })
         },
         syncNow,
       }}
