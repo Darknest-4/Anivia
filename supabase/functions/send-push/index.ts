@@ -96,8 +96,10 @@ Deno.serve(async (req) => {
   }
 
   if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405)
-  const secret = Deno.env.get('CRON_SECRET') ?? (await stored('cron_secret'))
-  if (!secret || req.headers.get('x-cron-secret') !== secret) return json({ error: 'Forbidden' }, 403)
+  // Accept the database-generated secret (pg_cron) and, if set, the CRON_SECRET function secret (GitHub Actions).
+  const given = req.headers.get('x-cron-secret')
+  const allowed = [Deno.env.get('CRON_SECRET'), await stored('cron_secret')].filter(Boolean)
+  if (!given || !allowed.includes(given)) return json({ error: 'Forbidden' }, 403)
   const keys = await vapidKeys()
   if (!keys) return json({ error: 'VAPID keys unavailable — run migration 0007' }, 500)
   webpush.setVapidDetails(Deno.env.get('VAPID_SUBJECT') ?? 'mailto:admin@animehub.hu', keys.publicKey, keys.privateKey)

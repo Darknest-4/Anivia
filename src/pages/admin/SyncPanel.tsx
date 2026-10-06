@@ -40,6 +40,22 @@ export interface SyncStatus {
   per_minute: number
   eta_minutes: number | null
   failed_items: { key: string; attempts: number; last_error: string | null; synced_at: string | null }[]
+  worker_calls?: { created: string; status_code: number | null; content: string; error_msg: string | null }[] | null
+  cron_runs?: { start_time: string; status: string; message: string }[] | null
+  schedule_exists?: boolean
+}
+
+/** Plain-language reason for the worker's last answer. */
+function diagnose(d: SyncStatus): string | null {
+  const last = d.worker_calls?.[0]
+  if (d.schedule_exists === false) return t('The schedule (pg_cron) is missing — run the 0008 SQL again.')
+  if (!last) return d.job?.status === 'PENDING' ? t('No answer from the worker yet. Check that the anizip-sync function is deployed (with Verify JWT off).') : null
+  if (/Requested function was not found/i.test(last.content) || last.status_code === 404) return t('The anizip-sync Edge Function is not deployed (404).')
+  if (last.status_code === 401) return t('Verify JWT is still on for anizip-sync — turn it off.')
+  if (last.status_code === 403) return t('The worker rejected the call (secret mismatch). Deploy the latest anizip-sync code.')
+  if (last.error_msg) return t('The call did not reach the worker: {p0}', { p0: last.error_msg })
+  if ((last.status_code ?? 0) >= 500) return t('The worker reported an error — see below.')
+  return null
 }
 
 const STATUS_VARIANT: Record<JobStatus, 'accent' | 'success' | 'warning' | 'danger' | 'default'> = {
@@ -172,6 +188,26 @@ export function SyncPanel() {
         <Stat icon={<CheckCircle2 />} label={t('Imported / updated')} value={job ? `${formatNumber(job.imported)} / ${formatNumber(job.updated)}` : '—'} hint={job ? t('{p0} unchanged', { p0: formatNumber(job.unchanged) }) : undefined} />
         <Stat icon={<AlertTriangle />} label={t('Skipped / failed')} value={`${formatNumber(d.items.skipped)} / ${formatNumber(d.items.failed)}`} hint={job ? t('{p0} retries in this run', { p0: formatNumber(job.retry_count) }) : undefined} />
       </div>
+
+      {(diagnose(d) || (d.worker_calls?.length ?? 0) > 0) && (
+        <Panel title={t('Worker diagnostics')}>
+          {diagnose(d) && <p className="mb-3 rounded-lg border border-warning/30 bg-warning/10 px-3 py-2 text-sm text-warning">{diagnose(d)}</p>}
+          <ul className="space-y-1.5 text-xs">
+            {(d.worker_calls ?? []).map((c, i) => (
+              <li key={i} className="flex flex-wrap gap-x-3 rounded-lg bg-surface-2 px-3 py-2">
+                <code className={(c.status_code ?? 0) >= 400 || c.error_msg ? 'font-semibold text-danger' : 'font-semibold text-success'}>{c.status_code ?? '—'}</code>
+                <span className="min-w-0 flex-1 break-all text-fg-muted">{c.error_msg || c.content}</span>
+                <span className="text-fg-subtle">{formatRelative(c.created)}</span>
+              </li>
+            ))}
+            {(d.cron_runs ?? []).slice(0, 1).map((c, i) => (
+              <li key={`c${i}`} className="text-fg-subtle">
+                {t('Scheduler: {p0} ({p1})', { p0: c.status, p1: formatRelative(c.start_time) })}
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      )}
 
       {(job?.errors?.length ?? 0) > 0 && (
         <Panel title={t('Recent errors')}>

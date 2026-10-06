@@ -61,6 +61,8 @@ export interface Deps {
   sleep?: (ms: number) => Promise<void>
   log?: (event: string, data?: Record<string, unknown>) => void
   config?: Partial<SyncConfig>
+  /** Called right after the lease decision (the HTTP handler answers with it). */
+  onBegin?: (job: SyncJob | null) => void
 }
 
 export interface SyncJob {
@@ -426,6 +428,7 @@ export async function runTick(deps: Deps): Promise<TickSummary> {
   const summary: TickSummary = { state: 'idle', fetched: 0, imported: 0, updated: 0, unchanged: 0, skipped: 0, failed: 0, retries: 0, episodes: 0 }
 
   const job = await rpc<SyncJob | null>('anizip_tick_begin', { p_owner: owner, p_lease_seconds: cfg.leaseSeconds, p_incremental_hours: cfg.incrementalHours })
+  deps.onBegin?.(job)
   if (!job) return summary
   summary.jobId = job.id
   summary.phase = job.phase
@@ -590,11 +593,16 @@ const json = (body: unknown, status = 200) => new Response(JSON.stringify(body),
 
 if (typeof Deno !== 'undefined' && typeof Deno.serve === 'function') {
   Deno.serve(async (req) => {
-    if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405)
+    // Every answer is tagged so the admin panel can show the worker's last answers (net._http_response).
+    const reply = (body: Record<string, unknown>, status = 200) => json({ worker: 'anizip-sync', ...body }, status)
+    if (req.method !== 'POST') return reply({ error: 'Method not allowed' }, 405)
     const url = Deno!.env.get('SUPABASE_URL')!
     const key = serverKey()
-    const secret = Deno!.env.get('CRON_SECRET') ?? (await storedSecret(url, key))
-    if (!secret || req.headers.get('x-cron-secret') !== secret) return json({ error: 'Forbidden' }, 403)
+    if (!key) return reply({ error: 'No server key (SUPABASE_SECRET_KEYS / SUPABASE_SERVICE_ROLE_KEY) in the function environment' }, 500)
+    // Accept the database-generated secret (pg_cron) and, if set, the CRON_SECRET function secret.
+    const given = req.headers.get('x-cron-secret')
+    const allowed = [Deno!.env.get('CRON_SECRET'), await storedSecret(url, key).catch(() => null)].filter(Boolean)
+    if (!given || !allowed.includes(given)) return reply({ error: 'Forbidden (x-cron-secret does not match app_secrets.cron_secret)' }, 403)
 
     const env = (k: string) => Deno!.env.get(k)
     const config: Partial<SyncConfig> = {}
@@ -602,15 +610,26 @@ if (typeof Deno !== 'undefined' && typeof Deno.serve === 'function') {
     if (env('ANIZIP_SEED_URL')) config.seedUrl = env('ANIZIP_SEED_URL')
     if (env('ANIZIP_MAX_ITEMS_PER_TICK')) config.maxItemsPerTick = Number(env('ANIZIP_MAX_ITEMS_PER_TICK'))
 
-    const work = runTick({ rpc: createRestRpc(url, key), fetch, owner: crypto.randomUUID(), config }).catch((e) => {
-      console.error('[ANIZIP SYNC] tick crashed', (e as Error).message)
-      return null
+    // Wait only for the lease decision, answer with it, and keep working in the background.
+    let begun!: (v: Record<string, unknown>) => void
+    const first = new Promise<Record<string, unknown>>((r) => (begun = r))
+    const work = runTick({
+      rpc: createRestRpc(url, key),
+      fetch,
+      owner: crypto.randomUUID(),
+      config,
+      onBegin: (job) => begun(job ? { job: job.id, type: job.job_type, phase: job.phase } : { idle: true }),
     })
-    // Answer pg_net right away; the tick keeps running in the background.
-    if (typeof EdgeRuntime !== 'undefined' && EdgeRuntime?.waitUntil) {
-      EdgeRuntime.waitUntil(work)
-      return json({ accepted: true }, 202)
-    }
-    return json(await work)
+      .then((s) => (begun({ summary: s }), s))
+      .catch((e) => {
+        const error = (e as Error).message
+        console.error('[ANIZIP SYNC] tick crashed', error)
+        begun({ error })
+        return null
+      })
+    const head = await Promise.race([first, new Promise<Record<string, unknown>>((r) => setTimeout(() => r({ pending: true }), 4000))])
+    if (typeof EdgeRuntime !== 'undefined' && EdgeRuntime?.waitUntil) EdgeRuntime.waitUntil(work)
+    else await work
+    return reply({ accepted: !head.error, ...head }, head.error ? 500 : 202)
   })
 }

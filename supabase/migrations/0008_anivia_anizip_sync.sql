@@ -440,9 +440,23 @@ grant execute on function public.anizip_for_anilist(int) to anon, authenticated;
 -- ═══════════════════════════ Admin (existing permission system) ═══════════════════════════
 create or replace function public.admin_anizip_sync_status()
 returns json language plpgsql stable security definer set search_path = public as $$
-declare v_job public.sync_jobs; v_full_done boolean; v_rate numeric; v_pending int;
+declare v_job public.sync_jobs; v_full_done boolean; v_rate numeric; v_pending int; v_calls json; v_cron json;
 begin
   if not public.has_permission('cache.manage') then raise exception 'Not allowed'; end if;
+  -- Diagnostics: the worker's last HTTP answers (pg_net) and the scheduler's last runs (pg_cron). Best effort.
+  begin
+    execute $q$select coalesce(json_agg(x), '[]'::json) from (
+      select created, status_code, left(coalesce(content::text, ''), 300) as content, error_msg from net._http_response
+      where content::text like '%anizip-sync%' or content::text like '%Requested function was not found%' or (error_msg is not null and created > now() - interval '1 hour')
+      order by created desc limit 5) x$q$ into v_calls;
+  exception when others then v_calls := null;
+  end;
+  begin
+    execute $q$select coalesce(json_agg(x), '[]'::json) from (
+      select d.start_time, d.status, left(coalesce(d.return_message, ''), 200) as message from cron.job_run_details d join cron.job j on j.jobid = d.jobid
+      where j.jobname = 'anivia-anizip-sync' order by d.start_time desc limit 3) x$q$ into v_cron;
+  exception when others then v_cron := null;
+  end;
   select * into v_job from sync_jobs where job_type like 'anizip%' order by id desc limit 1;
   select exists (select 1 from sync_jobs where job_type = 'anizip_full' and status = 'COMPLETED') into v_full_done;
   select count(*) into v_pending from anizip_sync_items where status = 'pending';
@@ -462,6 +476,9 @@ begin
     'episodes', (select count(*) from anizip_episodes),
     'per_minute', round(v_rate, 1),
     'eta_minutes', case when v_rate > 0 and v_pending > 0 then ceil(v_pending / v_rate) else null end,
+    'worker_calls', v_calls,
+    'cron_runs', v_cron,
+    'schedule_exists', (select to_regclass('cron.job') is not null),
     'failed_items', coalesce((select json_agg(f) from (select key, attempts, last_error, synced_at from anizip_sync_items where status = 'failed' order by synced_at desc nulls last limit 20) f), '[]'::json)
   );
 end;

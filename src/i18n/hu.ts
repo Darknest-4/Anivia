@@ -1278,4 +1278,13 @@ export const hu: Record<string, string> = {
   "{p0} attempts": "{p0} próbálkozás",
   "Runs in the background on Supabase (pg_cron → anizip-sync Edge Function, every minute). Progress is saved after every batch, so redeploys never restart it. After the first full import an incremental sync runs daily (airing titles, new titles, oldest data).": "A háttérben fut a Supabase-en (pg_cron → anizip-sync Edge Function, percenként). Az előrehaladás minden csomag után mentődik, így újratelepítéskor sem indul elölről. Az első teljes import után naponta fut egy növekményes szinkron (futó sorozatok, új címek, legrégebbi adatok).",
   "Last update {p0}": "Utolsó frissítés: {p0}",
+  "The schedule (pg_cron) is missing — run the 0008 SQL again.": "Hiányzik az időzítés (pg_cron) — futtasd újra a 0008-as SQL-t.",
+  "No answer from the worker yet. Check that the anizip-sync function is deployed (with Verify JWT off).": "Még nem válaszolt a worker. Ellenőrizd, hogy fel van-e töltve az anizip-sync függvény (Verify JWT kikapcsolva).",
+  "The anizip-sync Edge Function is not deployed (404).": "Az anizip-sync Edge Function nincs feltöltve (404).",
+  "Verify JWT is still on for anizip-sync — turn it off.": "Az anizip-sync függvénynél még be van kapcsolva a Verify JWT — kapcsold ki.",
+  "The worker rejected the call (secret mismatch). Deploy the latest anizip-sync code.": "A worker elutasította a hívást (nem egyezik a titkos kulcs). Töltsd fel a legújabb anizip-sync kódot.",
+  "The call did not reach the worker: {p0}": "A hívás nem jutott el a workerig: {p0}",
+  "The worker reported an error — see below.": "A worker hibát jelzett — lásd lent.",
+  "Worker diagnostics": "Worker diagnosztika",
+  "Scheduler: {p0} ({p1})": "Időzítő: {p0} ({p1})",
 }
