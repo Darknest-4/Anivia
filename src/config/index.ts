@@ -27,6 +27,11 @@ export const config = {
   anilistDbProxy:
     (env.VITE_ANILIST_DB_PROXY as string | undefined) ??
     `${(env.VITE_SUPABASE_URL as string | undefined) ?? 'https://wnmvktajokjhufuzpamy.supabase.co'}/functions/v1/anilist-proxy`,
+  /**
+   * Covers & banners from the R2 bucket, served by the Worker (worker/media.ts) at `/media/:anilistId/cover|banner`.
+   * Missing files fall back to AniList's CDN. Set VITE_MEDIA_BASE='' to disable.
+   */
+  mediaBase: (env.VITE_MEDIA_BASE as string | undefined) ?? (env.PROD ? '/media' : ''),
   jikanUrl: (env.VITE_JIKAN_URL as string | undefined) || 'https://api.jikan.moe/v4',
   aniZipUrl: (env.VITE_ANIZIP_URL as string | undefined) || 'https://api.ani.zip',
   videoProvider: ((env.VITE_VIDEO_PROVIDER as string | undefined) ?? 'none') as 'none' | 'api',

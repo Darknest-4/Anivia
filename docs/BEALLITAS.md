@@ -97,6 +97,15 @@ Amelyiket nem kapcsolod be, arra kattintva barátságos hibaüzenet jelenik meg.
   `VITE_SUPPORT_EMAIL`, `VITE_SOCIAL_DISCORD`, `VITE_SOCIAL_X`, `VITE_SOCIAL_INSTAGRAM`, `VITE_SOCIAL_WEBSITE`, `VITE_CF_ANALYTICS_TOKEN`, `VITE_ENABLE_PRICING`.
 - **Web Analytics** (ingyenes, süti nélküli): Cloudflare → Analytics & Logs → Web Analytics → add hozzá az oldalt, a kapott tokent tedd a `VITE_CF_ANALYTICS_TOKEN`-be.
 
+## 6b. Képek az R2-ből (borítók és bannerek)
+
+A `yume-media` R2 bucket a `wrangler.jsonc`-ben `MEDIA` néven a Workerhez van kötve — kulcs nem kell. A Worker a `/media/<anilistId>/cover` és `/media/<anilistId>/banner` címen szolgálja ki a képeket:
+- mappa: `<anilistId>/…/<bármi>.jpg|png|webp`;
+- ha a fájl neve/útvonala tartalmazza a „cover”/„poster” vagy „banner” szót, az dönt; különben a kép alakja: álló → borító, nagyon széles (≥ 2,6:1) → banner. A 16:9-es háttérképeket és a logókat figyelmen kívül hagyja;
+- ha egy animéhez nincs kép az R2-ben, automatikusan az AniList képe jelenik meg.
+
+Ellenőrzés: `https://anivia.animehub.hu/media/21/cover` → a válasz `x-anivia-media` fejléce mutatja, melyik fájlt választotta. Kikapcsolás: `VITE_MEDIA_BASE=` (üres) build változó.
+
 ## 7. GitHub Actions (CI)
 
 Minden feltöltésnél automatikusan lefut: típusellenőrzés, egységtesztek, build és a Worker ellenőrzése (`.github/workflows/ci.yml`). Ha piros, a GitHub „Actions” fülén látod, mi romlott el.

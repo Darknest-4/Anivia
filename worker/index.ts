@@ -4,10 +4,14 @@
  * - /api/anilist        → edge-cached proxy for the AniList GraphQL API (shared by all visitors).
  * - /api/anilist/health → lets the app detect the proxy.
  * - /anime/:id          → injects Open Graph / Twitter tags so shared links show the title and poster.
+ * - /media/:id/cover|banner → covers and banners from the R2 bucket (see worker/media.ts).
  */
+import { serveMedia, type R2Bucket } from './media'
 
 interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> }
+  /** R2 bucket with covers/banners (wrangler.jsonc → r2_buckets). Optional. */
+  MEDIA?: R2Bucket
 }
 
 interface Ctx {
@@ -151,6 +155,8 @@ export default {
     const url = new URL(request.url)
     if (url.pathname === '/api/anilist/health') return health(ctx, url.origin)
     if (url.pathname === '/api/anilist') return proxyAniList(request, ctx, url.origin)
+    const media = /^\/media\/(\d+)\/(cover|banner)\/?$/.exec(url.pathname)
+    if (media && (request.method === 'GET' || request.method === 'HEAD')) return serveMedia(request, env.MEDIA, ctx, media[1], media[2] as 'cover' | 'banner')
     const detail = /^\/anime\/(\d+)\/?$/.exec(url.pathname)
     if (detail && request.method === 'GET') return withMeta(request, env, ctx, detail[1], url.origin)
     return env.ASSETS.fetch(request)
