@@ -12,6 +12,7 @@ Ez a lista végigvezet mindenen, amit **a Supabase és a Cloudflare felületén 
    - `supabase/migrations/0004_anivia_oauth_flags.sql` (kapcsolók a Google / Discord / GitHub belépőgombokhoz)
    - `supabase/migrations/0005_anivia_profile_images.sql` (profilkép anime-karakterből és profilbanner — a nyilvános profilon is látszik)
    - `supabase/migrations/0006_anivia_community.sql` (követés + hírfolyam, értékelések, hozzászólások, saját listák, közösségi pontszám, hibanapló, push-feliratkozások)
+   - `supabase/migrations/0007_anivia_push_auto.sql` (push-értesítés automatikus kulcsokkal és időzítéssel)
 3. Alternatíva a saját gépedről: hozz létre egy `supabase/.env.local` fájlt (nem kerül a repóba):
    ```
    SUPABASE_DB_URL=postgresql://postgres:JELSZÓ@db.wnmvktajokjhufuzpamy.supabase.co:5432/postgres
@@ -57,14 +58,15 @@ A beérkezett üzeneteket és hibajelentéseket az **Admin dashboard → Inbox**
 
 ## 1c. Push-értesítés (új epizód akkor is, ha az oldal zárva van) — opcionális
 
-1. Kulcspár készítése a saját gépeden: `npx web-push generate-vapid-keys`
-2. Supabase → **Edge Functions → Secrets** (vagy `npx supabase secrets set ...`):
-   - `VAPID_PUBLIC_KEY` = a kapott *Public Key*
-   - `VAPID_PRIVATE_KEY` = a kapott *Private Key* (**soha ne tedd a repóba**)
-   - `VAPID_SUBJECT` = `mailto:te@example.com`
-   - `CRON_SECRET` = egy hosszú, véletlen szöveg (pl. `openssl rand -hex 32`)
-3. GitHub → repó → **Settings → Secrets and variables → Actions** → *New repository secret*: `CRON_SECRET` (ugyanaz az érték). A `.github/workflows/push-cron.yml` félóránként meghívja a `send-push` függvényt.
-4. Admin → Feature flags: `push_notifications` bekapcsolva. A felhasználók a **Beállítások → Értesítések** alatt kapcsolhatják be.
+Kulcsot nem kell készíteni, gép sem kell hozzá:
+1. Töltsd fel a `send-push` függvényt (lásd fent, *Verify JWT* kikapcsolva).
+2. SQL Editorban futtasd a `supabase/migrations/0007_anivia_push_auto.sql` fájlt. Ez:
+   - létrehoz egy csak a szerver által olvasható titok-táblát (`app_secrets`),
+   - készít egy véletlen cron-jelszót,
+   - beállítja, hogy a Supabase félóránként magától elindítsa a küldést (pg_cron).
+3. A függvény az első híváskor magának készíti el a push kulcspárt, és elmenti a táblába.
+
+A felhasználók a **Beállítások → Értesítések** alatt kapcsolhatják be. Kikapcsolás: Admin → Feature flags → `push_notifications`.
 
 ## 2. E-mail küldés — élesben kötelező
 

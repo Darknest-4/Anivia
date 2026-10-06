@@ -1,7 +1,8 @@
 name: Push notifications
 
 # Every 30 minutes, asks the send-push Edge Function to notify people about episodes that just aired.
-# Needs the repository secret CRON_SECRET (the same value as the CRON_SECRET Supabase function secret).
+# Optional: migration 0007 already schedules this inside Supabase (pg_cron). This workflow only runs
+# if the repository secret CRON_SECRET is set (same value as the CRON_SECRET function secret).
 on:
   schedule:
     - cron: '*/30 * * * *'

@@ -5,9 +5,10 @@
 //                           who has the title as Watching / Plan to watch and a push subscription.
 //                           Call it every ~30 minutes (GitHub Actions workflow "push-cron").
 //
-// Secrets (Supabase → Edge Functions → Secrets): VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY,
-// VAPID_SUBJECT (mailto:you@example.com), CRON_SECRET. Generate VAPID keys with
-//   npx web-push generate-vapid-keys
+// No manual keys needed: on first use the function generates a VAPID key pair and keeps it in the
+// server-only `app_secrets` table (migration 0007), which also holds the cron secret and schedules
+// this function with pg_cron. Optional overrides (Edge Function secrets): VAPID_PUBLIC_KEY,
+// VAPID_PRIVATE_KEY, VAPID_SUBJECT, CRON_SECRET.
 // Deploy: supabase functions deploy send-push --no-verify-jwt
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import webpush from 'npm:web-push@3.6.7'
@@ -55,20 +56,51 @@ async function airedSince(seconds: number): Promise<Airing[]> {
   return out
 }
 
+const db = createClient(Deno.env.get('SUPABASE_URL')!, serverKey(), { auth: { persistSession: false } })
+
+async function stored(name: string): Promise<string | null> {
+  const { data } = await db.from('app_secrets').select('value').eq('name', name).maybeSingle()
+  return (data?.value as string | undefined) ?? null
+}
+
+/** VAPID keys: function secrets if set, otherwise a pair generated once and kept in app_secrets. */
+async function vapidKeys(): Promise<{ publicKey: string; privateKey: string } | null> {
+  const envPublic = Deno.env.get('VAPID_PUBLIC_KEY')
+  const envPrivate = Deno.env.get('VAPID_PRIVATE_KEY')
+  if (envPublic && envPrivate) return { publicKey: envPublic, privateKey: envPrivate }
+  let publicKey = await stored('vapid_public')
+  let privateKey = await stored('vapid_private')
+  if (!publicKey || !privateKey) {
+    const keys = webpush.generateVAPIDKeys()
+    // ignoreDuplicates: if two requests race, the first pair wins and both re-read it below.
+    const { error } = await db.from('app_secrets').upsert(
+      [
+        { name: 'vapid_public', value: keys.publicKey },
+        { name: 'vapid_private', value: keys.privateKey },
+      ],
+      { onConflict: 'name', ignoreDuplicates: true },
+    )
+    if (error) return null // migration 0007 not run yet
+    publicKey = await stored('vapid_public')
+    privateKey = await stored('vapid_private')
+  }
+  return publicKey && privateKey ? { publicKey, privateKey } : null
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
-  const publicKey = Deno.env.get('VAPID_PUBLIC_KEY') ?? ''
   const url = new URL(req.url)
-  if (req.method === 'GET' && url.searchParams.has('vapid')) return json({ publicKey })
+  if (req.method === 'GET' && url.searchParams.has('vapid')) {
+    const keys = await vapidKeys()
+    return json({ publicKey: keys?.publicKey ?? '' })
+  }
 
   if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405)
-  const secret = Deno.env.get('CRON_SECRET')
+  const secret = Deno.env.get('CRON_SECRET') ?? (await stored('cron_secret'))
   if (!secret || req.headers.get('x-cron-secret') !== secret) return json({ error: 'Forbidden' }, 403)
-  const privateKey = Deno.env.get('VAPID_PRIVATE_KEY')
-  if (!publicKey || !privateKey) return json({ error: 'VAPID keys are not configured' }, 500)
-  webpush.setVapidDetails(Deno.env.get('VAPID_SUBJECT') ?? 'mailto:admin@animehub.hu', publicKey, privateKey)
-
-  const db = createClient(Deno.env.get('SUPABASE_URL')!, serverKey(), { auth: { persistSession: false } })
+  const keys = await vapidKeys()
+  if (!keys) return json({ error: 'VAPID keys unavailable — run migration 0007' }, 500)
+  webpush.setVapidDetails(Deno.env.get('VAPID_SUBJECT') ?? 'mailto:admin@animehub.hu', keys.publicKey, keys.privateKey)
   const { data: flag } = await db.from('feature_flags').select('enabled').eq('key', 'push_notifications').maybeSingle()
   if (flag && !flag.enabled) return json({ skipped: 'push_notifications flag is off' })
 
