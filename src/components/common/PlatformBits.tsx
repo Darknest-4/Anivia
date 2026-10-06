@@ -47,7 +47,7 @@ export function ConsentBanner() {
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-fg">{t('Help us improve ANIVIA?')}</p>
           <p className="mt-1 text-xs text-fg-muted">
-            We’d like to count page views and time spent on pages — anonymously, stored on our own server, no ads or third-party trackers.{' '}
+            {t('We’d like to count page views and time spent on pages — anonymously, stored on our own server, no ads or third-party trackers.')}{' '}
             <Link to="/privacy" className="text-accent-soft hover:underline">
               {t('Privacy policy')}
             </Link>

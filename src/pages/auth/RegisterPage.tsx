@@ -2,7 +2,7 @@ import { t } from '@/i18n'
 import { MailCheck } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
-import { AuthHeading, isEmail, PasswordInput, SocialButtons, StrengthMeter } from '@/components/auth/AuthBits'
+import { AuthHeading, isEmail, PasswordInput, ResendEmailButton, SocialButtons, StrengthMeter } from '@/components/auth/AuthBits'
 import { AniListButton } from '@/components/auth/AniListButton'
 import { Button, Checkbox, Field, Input } from '@/components/ui'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
@@ -63,9 +63,8 @@ export default function RegisterPage() {
           <MailCheck className="h-8 w-8" />
         </span>
         <h1 className="mt-6 text-2xl font-bold text-fg">{t('Confirm your email')}</h1>
-        <p className="mt-2 text-sm text-fg-muted">
-          We sent a confirmation link to <span className="font-semibold text-fg">{sentTo}</span>. Click it to activate your account.
-        </p>
+        <p className="mt-2 text-sm text-fg-muted">{t('We sent a confirmation link to {p0}. Click it to activate your account.', { p0: sentTo })}</p>
+        <ResendEmailButton className="mt-6" onResend={() => auth.resendConfirmation(sentTo)} />
         <Link to="/login" className="mt-6 inline-block text-sm font-semibold text-accent-soft hover:underline">
           {t('Back to sign in')}
         </Link>
@@ -117,11 +116,11 @@ export default function RegisterPage() {
             onChange={setTerms}
             label={
               <>
-                I agree to the{' '}
+                {t('I agree to the')}{' '}
                 <Link to="/terms" className="font-semibold text-accent-soft hover:underline">
                   {t('Terms of Service')}
                 </Link>{' '}
-                and{' '}
+                {t('and')}{' '}
                 <Link to="/privacy" className="font-semibold text-accent-soft hover:underline">
                   {t('Privacy Policy')}
                 </Link>
@@ -136,7 +135,7 @@ export default function RegisterPage() {
         </Button>
       </form>
       <p className="mt-6 text-center text-sm text-fg-muted">
-        Already have an account?{' '}
+        {t('Already have an account?')}{' '}
         <Link to="/login" className="font-semibold text-accent-soft hover:underline">
           {t('Sign in')}
         </Link>

@@ -1,6 +1,6 @@
 import { t } from '@/i18n'
 import { Eye, EyeOff, GitBranch, Loader2, MessageCircle } from 'lucide-react'
-import { forwardRef, useState, type InputHTMLAttributes } from 'react'
+import { forwardRef, useEffect, useState, type InputHTMLAttributes } from 'react'
 import { Input } from '@/components/ui'
 import { cn } from '@/lib/cn'
 import { useAuth, type OAuthProvider } from '@/providers/AuthProvider'
@@ -92,7 +92,7 @@ export function passwordStrength(pw: string) {
 
 export function StrengthMeter({ password }: { password: string }) {
   const score = passwordStrength(password)
-  const labels = ['Too short', 'Weak', 'Fair', 'Good', 'Strong']
+  const labels = [t('Too short'), t('Weak'), t('Fair'), t('Good'), t('Strong')]
   const colors = ['bg-danger', 'bg-danger', 'bg-warning', 'bg-info', 'bg-success']
   if (!password) return null
   return (
@@ -102,9 +102,47 @@ export function StrengthMeter({ password }: { password: string }) {
           <span key={i} className={cn('h-1 flex-1 rounded-full', i < score ? colors[score] : 'bg-surface-3')} />
         ))}
       </div>
-      <p className="mt-1 text-xs text-fg-subtle">Password strength: {labels[score]}</p>
+      <p className="mt-1 text-xs text-fg-subtle">{t('Password strength: {p0}', { p0: labels[score] })}</p>
     </div>
   )
 }
 
 export const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)
+
+/** "Didn't get the email?" — resends with a 60 s cooldown (Supabase rate-limits auth emails). */
+export function ResendEmailButton({ onResend, className }: { onResend: () => Promise<void>; className?: string }) {
+  const toast = useToast()
+  const [wait, setWait] = useState(60)
+  const [busy, setBusy] = useState(false)
+  useEffect(() => {
+    if (wait <= 0) return
+    const id = window.setTimeout(() => setWait((w) => w - 1), 1000)
+    return () => window.clearTimeout(id)
+  }, [wait])
+  return (
+    <div className={cn('text-sm text-fg-muted', className)}>
+      <p>{t('Didn’t get the email? Check your spam folder, or send it again.')}</p>
+      <button
+        type="button"
+        disabled={busy || wait > 0}
+        onClick={async () => {
+          setBusy(true)
+          try {
+            await onResend()
+            toast({ title: t('Email sent again'), description: t('It can take a minute to arrive.') })
+            setWait(60)
+          } catch (e) {
+            toast({ title: t('Couldn’t send the email'), description: (e as Error).message, variant: 'error' })
+            setWait(30)
+          } finally {
+            setBusy(false)
+          }
+        }}
+        className="mt-2 inline-flex items-center gap-1.5 font-semibold text-accent-soft hover:underline disabled:cursor-not-allowed disabled:text-fg-subtle disabled:no-underline"
+      >
+        {busy && <Loader2 className="h-4 w-4 animate-spin" />}
+        {wait > 0 ? t('Send again in {p0}s', { p0: wait }) : t('Send the email again')}
+      </button>
+    </div>
+  )
+}

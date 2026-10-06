@@ -34,6 +34,8 @@ interface AuthContextValue {
   signUp: (email: string, password: string, displayName: string) => Promise<{ needsConfirmation: boolean }>
   signInWithProvider: (provider: OAuthProvider) => Promise<void>
   sendPasswordReset: (email: string) => Promise<void>
+  /** Sends the sign-up confirmation email again. */
+  resendConfirmation: (email: string) => Promise<void>
   updatePassword: (password: string) => Promise<void>
   updateEmail: (email: string) => Promise<void>
   updateProfile: (patch: Partial<Pick<Profile, 'username' | 'display_name' | 'bio' | 'avatar_hue' | 'is_public' | 'show_history' | 'avatar_url' | 'banner_url'>>) => Promise<void>
@@ -55,15 +57,15 @@ export const getSupabase = () => {
 /** Turns Supabase error messages into friendly copy. */
 function friendly(err: unknown): Error {
   const msg = err instanceof Error ? err.message : String(err)
-  if (/invalid login credentials/i.test(msg)) return new Error('Incorrect email or password.')
-  if (/email not confirmed/i.test(msg)) return new Error('Please confirm your email address first — check your inbox.')
-  if (/already registered|already exists/i.test(msg)) return new Error('An account with this email already exists.')
-  if (/rate limit|too many/i.test(msg)) return new Error('Too many attempts. Please wait a minute and try again.')
-  if (/provider is not enabled|unsupported provider/i.test(msg)) return new Error('This sign-in method is not enabled yet.')
-  if (/duplicate key.*username/i.test(msg)) return new Error('That username is already taken.')
+  if (/invalid login credentials/i.test(msg)) return new Error(t('Incorrect email or password.'))
+  if (/email not confirmed/i.test(msg)) return Object.assign(new Error(t('Please confirm your email address first — check your inbox.')), { code: 'email_not_confirmed' })
+  if (/already registered|already exists/i.test(msg)) return new Error(t('An account with this email already exists.'))
+  if (/rate limit|too many|security purposes/i.test(msg)) return new Error(t('Too many attempts. Please wait a minute and try again.'))
+  if (/provider is not enabled|unsupported provider/i.test(msg)) return new Error(t('This sign-in method is not enabled yet.'))
+  if (/duplicate key.*username/i.test(msg)) return new Error(t('That username is already taken.'))
   if (/banner_url.*(column|schema cache)|column.*banner_url/i.test(msg)) return new Error('Profile banners need the latest database update (supabase/migrations/0005_anivia_profile_images.sql).')
   if (/profiles_(avatar|banner)_url_allowed/i.test(msg)) return new Error('Only images from AniList or MyAnimeList can be used.')
-  if (/failed to fetch|network/i.test(msg)) return new Error('Can’t reach the account server. Check your connection.')
+  if (/failed to fetch|network/i.test(msg)) return new Error(t('Can’t reach the account server. Check your connection.'))
   return new Error(msg)
 }
 
@@ -183,6 +185,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       signInWithProvider: async (provider) =>
         void (await run((c) => c.auth.signInWithOAuth({ provider, options: { redirectTo: redirect('/') } }))),
+      resendConfirmation: async (e) => void (await run((c) => c.auth.resend({ type: 'signup', email: e, options: { emailRedirectTo: redirect('/') } }))),
       sendPasswordReset: async (e) => void (await run((c) => c.auth.resetPasswordForEmail(e, { redirectTo: redirect('/reset-password') }))),
       updatePassword: async (password) => void (await run((c) => c.auth.updateUser({ password }))),
       updateEmail: async (e) => void (await run((c) => c.auth.updateUser({ email: e }, { emailRedirectTo: redirect('/settings?tab=account') }))),

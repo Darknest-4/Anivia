@@ -2,7 +2,7 @@ import { t } from '@/i18n'
 import { ArrowLeft, MailCheck } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { AuthHeading, isEmail } from '@/components/auth/AuthBits'
+import { AuthHeading, isEmail, ResendEmailButton } from '@/components/auth/AuthBits'
 import { Button, Field, Input } from '@/components/ui'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useAuth } from '@/providers/AuthProvider'
@@ -37,9 +37,8 @@ export default function ForgotPasswordPage() {
           <MailCheck className="h-8 w-8" />
         </span>
         <h1 className="mt-6 text-2xl font-bold text-fg">{t('Check your inbox')}</h1>
-        <p className="mt-2 text-sm text-fg-muted">
-          If an account exists for <span className="font-semibold text-fg">{email}</span>, a reset link is on its way.
-        </p>
+        <p className="mt-2 text-sm text-fg-muted">{t('If an account exists for {p0}, a reset link is on its way.', { p0: email })}</p>
+        <ResendEmailButton className="mt-6" onResend={() => auth.sendPasswordReset(email.trim())} />
         <Button variant="secondary" className="mt-6" onClick={() => setSent(false)}>
           {t('Use a different email')}
         </Button>

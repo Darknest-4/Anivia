@@ -1,7 +1,7 @@
 import { t } from '@/i18n'
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
-import { AuthHeading, isEmail, PasswordInput, SocialButtons } from '@/components/auth/AuthBits'
+import { AuthHeading, isEmail, PasswordInput, ResendEmailButton, SocialButtons } from '@/components/auth/AuthBits'
 import { AniListButton } from '@/components/auth/AniListButton'
 import { DemoNotice } from '@/components/common/DemoNotice'
 import { Button, Field, Input } from '@/components/ui'
@@ -22,6 +22,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState<{ email?: string; password?: string; form?: string }>({})
+  const [unconfirmed, setUnconfirmed] = useState(false)
   const [loading, setLoading] = useState(false)
 
   if (auth.status === 'signed-in') return <Navigate to={next} replace />
@@ -41,6 +42,7 @@ export default function LoginPage() {
       navigate(next, { replace: true })
     } catch (err) {
       setErrors({ form: (err as Error).message })
+      setUnconfirmed((err as { code?: string }).code === 'email_not_confirmed')
     } finally {
       setLoading(false)
     }
@@ -57,6 +59,7 @@ export default function LoginPage() {
             {errors.form}
           </p>
         )}
+        {unconfirmed && <ResendEmailButton onResend={() => auth.resendConfirmation(email.trim())} className="rounded-lg border border-line bg-surface-2 px-3 py-2.5" />}
         <Field label={t('Email')} error={errors.email}>
           {(p) => <Input {...p} type="email" autoComplete="email" placeholder={t('you@example.com')} value={email} onChange={(e) => setEmail(e.target.value)} />}
         </Field>
@@ -76,7 +79,7 @@ export default function LoginPage() {
         </Button>
       </form>
       <p className="mt-6 text-center text-sm text-fg-muted">
-        New to ANIVIA?{' '}
+        {t('New to ANIVIA?')}{' '}
         <Link to={`/register${next !== '/' ? `?redirect=${encodeURIComponent(next)}` : ''}`} className="font-semibold text-accent-soft hover:underline">
           {t('Create an account')}
         </Link>
