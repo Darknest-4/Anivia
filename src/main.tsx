@@ -6,6 +6,9 @@ import { AppProviders } from '@/providers/AppProviders'
 import { router } from '@/routes'
 import { preloadCommonRoutes } from '@/routes/preload'
 import '@/styles/index.css'
+import { installErrorReporter } from '@/services/platform/errors'
+
+installErrorReporter()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

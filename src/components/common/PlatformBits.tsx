@@ -7,6 +7,7 @@ import { useStore } from '@/hooks/useUserData'
 import { useAuth } from '@/providers/AuthProvider'
 import { useFlag, usePlatform } from '@/providers/PlatformProvider'
 import { analyticsAllowed, animeViews, consentStore, setAnalyticsUser, stopAnalytics, trackPageview } from '@/services/platform/analytics'
+import { setErrorReporterUser } from '@/services/platform/errors'
 import { createPersistentStore } from '@/services/storage'
 
 /** Sends page views (and time on page) to the database after consent. */
@@ -16,7 +17,10 @@ export function AnalyticsTracker() {
   const consent = useStore(consentStore)
   const enabled = useFlag('analytics')
 
-  useEffect(() => setAnalyticsUser(session?.access_token ?? null), [session?.access_token])
+  useEffect(() => {
+    setAnalyticsUser(session?.access_token ?? null)
+    setErrorReporterUser(session?.access_token ?? null)
+  }, [session?.access_token])
   useEffect(() => {
     if (!enabled || consent !== 'granted') return
     // Let the page set its <title> first.

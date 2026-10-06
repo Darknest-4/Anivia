@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Activity, Clock, Database, Eye, Flag, Inbox, Search, ShieldCheck, Trash2, Users } from 'lucide-react'
+import { Activity, Bug, CheckCircle2, Clock, Database, Eye, Flag, Inbox, Search, ShieldCheck, Trash2, Users } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { Link, Navigate, useSearchParams } from 'react-router-dom'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -11,7 +11,7 @@ import { usePlatform, type Permission, type Role } from '@/providers/PlatformPro
 import { useToast } from '@/providers/ToastProvider'
 import type { FeatureFlag } from '@/services/platform/flags'
 
-type Tab = 'overview' | 'flags' | 'users' | 'inbox' | 'data'
+type Tab = 'overview' | 'errors' | 'flags' | 'users' | 'inbox' | 'data'
 
 async function rpc<T>(fn: string, args: Record<string, unknown> = {}): Promise<T> {
   const client = await getSupabase()
@@ -39,6 +39,7 @@ export default function AdminPage() {
 
   const items: { value: Tab; label: string; perm: Permission }[] = [
     { value: 'overview', label: 'Analytics', perm: 'analytics.view' },
+    { value: 'errors', label: 'Errors', perm: 'analytics.view' },
     { value: 'flags', label: 'Feature flags', perm: 'flags.manage' },
     { value: 'users', label: 'Users & roles', perm: 'users.manage' },
     { value: 'inbox', label: 'Inbox', perm: 'reports.manage' },
@@ -53,6 +54,7 @@ export default function AdminPage() {
       <Tabs items={visible} value={active} onChange={(t) => setParams(t === 'overview' ? {} : { tab: t }, { replace: true })} label="Admin sections" idPrefix="admin" />
       <div className="mt-6">
         {active === 'overview' && <Overview />}
+        {active === 'errors' && <ErrorsPanel />}
         {active === 'flags' && <Flags />}
         {active === 'users' && <UsersPanel />}
         {active === 'inbox' && <InboxPanel />}
@@ -557,6 +559,101 @@ function DataPanel() {
         Anime data is fetched through the <code>anilist-proxy</code> Edge Function, cached in <code>api_cache</code> and every title is stored in{' '}
         <code>anime_catalog</code>. Episode titles and artwork come from ani.zip. See <Link to="/status" className="text-accent-soft hover:underline">/status</Link> for live checks.
       </p>
+    </div>
+  )
+}
+
+/* ─────────────────────────────── Errors ─────────────────────────────── */
+
+interface ErrorRow {
+  id: number
+  message: string
+  stack: string | null
+  url: string | null
+  user_agent: string | null
+  release: string | null
+  count: number
+  first_seen: string
+  last_seen: string
+  resolved: boolean
+}
+
+function ErrorsPanel() {
+  const client = useQueryClient()
+  const [showResolved, setShowResolved] = useState(false)
+  const [open, setOpen] = useState<number | null>(null)
+  const q = useQuery({
+    queryKey: ['admin', 'errors', showResolved],
+    queryFn: async () => {
+      const c = await getSupabase()
+      let req = c.from('error_logs').select('*').order('last_seen', { ascending: false }).limit(100)
+      if (!showResolved) req = req.eq('resolved', false)
+      const { data, error } = await req
+      if (error) throw new Error(/does not exist|schema cache/.test(error.message) ? 'Run supabase/migrations/0006_anivia_community.sql first.' : error.message)
+      return data as ErrorRow[]
+    },
+    refetchInterval: 60_000,
+  })
+  const act = useMutation({
+    mutationFn: async (v: { id: number; op: 'resolve' | 'delete' }) => {
+      const c = await getSupabase()
+      const { error } = v.op === 'resolve' ? await c.from('error_logs').update({ resolved: true }).eq('id', v.id) : await c.from('error_logs').delete().eq('id', v.id)
+      if (error) throw new Error(error.message)
+    },
+    onSuccess: () => client.invalidateQueries({ queryKey: ['admin', 'errors'] }),
+  })
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-fg-muted">Errors that happened in visitors’ browsers. Identical errors are grouped and counted.</p>
+        <Switch label="Show resolved" checked={showResolved} onChange={setShowResolved} />
+      </div>
+      {q.isError ? (
+        <ErrorState title="Couldn’t load errors" description={(q.error as Error).message} onRetry={() => q.refetch()} />
+      ) : !q.data ? (
+        <Skeleton className="h-40 rounded-2xl" />
+      ) : q.data.length === 0 ? (
+        <EmptyState icon={<CheckCircle2 />} title="No errors" description="Nothing has gone wrong in anyone’s browser. 🎉" />
+      ) : (
+        <ul className="space-y-3">
+          {q.data.map((e) => (
+            <li key={e.id} className="rounded-2xl border border-line bg-surface p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <button type="button" onClick={() => setOpen(open === e.id ? null : e.id)} className="min-w-0 flex-1 text-left">
+                  <p className="flex items-start gap-2 break-words font-mono text-sm text-fg">
+                    <Bug className="mt-0.5 h-4 w-4 shrink-0 text-danger" />
+                    {e.message}
+                  </p>
+                  <p className="mt-1 text-xs text-fg-subtle">
+                    {e.count}× · last {formatRelative(e.last_seen)} · first {formatRelative(e.first_seen)} · {e.url}
+                  </p>
+                </button>
+                <div className="flex gap-1">
+                  {!e.resolved && (
+                    <Button size="sm" variant="secondary" onClick={() => act.mutate({ id: e.id, op: 'resolve' })}>
+                      Resolve
+                    </Button>
+                  )}
+                  <Button size="icon-sm" variant="ghost" aria-label="Delete" onClick={() => act.mutate({ id: e.id, op: 'delete' })}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              {open === e.id && (
+                <div className="mt-3 space-y-2 text-xs text-fg-muted">
+                  <p>
+                    <strong className="text-fg">Browser:</strong> {e.user_agent}
+                  </p>
+                  <p>
+                    <strong className="text-fg">Release:</strong> {e.release}
+                  </p>
+                  {e.stack && <pre className="max-h-64 overflow-auto rounded-lg bg-surface-2 p-3 font-mono text-2xs leading-relaxed">{e.stack}</pre>}
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }

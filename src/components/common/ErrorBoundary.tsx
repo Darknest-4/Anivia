@@ -1,3 +1,4 @@
+import { reportError } from '@/services/platform/errors'
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 import { ErrorState } from '@/components/ui'
 
@@ -23,6 +24,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
+    reportError(error, info.componentStack?.split('\n').filter(Boolean)[0]?.trim() ?? 'render')
     if (import.meta.env.DEV) console.error('ANIVIA render error', error, info)
   }
 

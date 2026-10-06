@@ -1,5 +1,5 @@
 /* ANIVIA service worker — offline app shell + image cache. Data caching is handled by the app. */
-const VERSION = 'anivia-v1'
+const VERSION = 'anivia-v2'
 const SHELL = `${VERSION}-shell`
 const ASSETS = `${VERSION}-assets`
 const IMAGES = `${VERSION}-images`
@@ -79,4 +79,39 @@ self.addEventListener('fetch', (event) => {
       }),
     )
   }
+})
+
+/* ---------- Push notifications (new episodes) ---------- */
+self.addEventListener('push', (event) => {
+  let data = {}
+  try {
+    data = event.data ? event.data.json() : {}
+  } catch {
+    data = { title: 'ANIVIA', body: event.data ? event.data.text() : '' }
+  }
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'ANIVIA', {
+      body: data.body || '',
+      icon: data.icon || '/icon-192.png',
+      badge: '/icon-192.png',
+      tag: data.tag,
+      data: { url: data.url || '/' },
+    }),
+  )
+})
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+  const url = (event.notification.data && event.notification.data.url) || '/'
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((wins) => {
+      for (const w of wins) {
+        if ('focus' in w && new URL(w.url).origin === self.location.origin) {
+          w.navigate(url)
+          return w.focus()
+        }
+      }
+      return self.clients.openWindow(url)
+    }),
+  )
 })

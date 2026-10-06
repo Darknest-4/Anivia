@@ -1,0 +1,19 @@
+name: Push notifications
+
+# Every 30 minutes, asks the send-push Edge Function to notify people about episodes that just aired.
+# Needs the repository secret CRON_SECRET (the same value as the CRON_SECRET Supabase function secret).
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger send-push
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then echo "CRON_SECRET secret not set — skipping."; exit 0; fi
+          curl -fsS -X POST "https://wnmvktajokjhufuzpamy.supabase.co/functions/v1/send-push" -H "x-cron-secret: $CRON_SECRET" -H "content-type: application/json" -d '{}'

@@ -20,8 +20,13 @@ interface ImportMetaEnv {
   readonly VITE_VIDEO_PROVIDER?: string
   readonly VITE_MOCK_LATENCY?: string
   readonly VITE_SITE_URL?: string
+  readonly VITE_RELEASE?: string
+  readonly VITE_VAPID_PUBLIC_KEY?: string
 }
 
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+/** Build timestamp (vite.config.ts → define). */
+declare const __BUILD_TIME__: string
