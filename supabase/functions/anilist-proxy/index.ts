@@ -10,8 +10,19 @@
 // Deploy: supabase functions deploy anilist-proxy --no-verify-jwt
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
+/** Server key: the new `SUPABASE_SECRET_KEYS` ("default" entry), falling back to the legacy service role key. */
+function serverKey(): string {
+  try {
+    const keys = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS') ?? '{}') as Record<string, string>
+    if (keys.default) return keys.default
+  } catch {
+    /* not set or not JSON */
+  }
+  return Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+}
+
 const ANILIST = 'https://graphql.anilist.co'
-const db = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, {
+const db = createClient(Deno.env.get('SUPABASE_URL')!, serverKey(), {
   auth: { persistSession: false, autoRefreshToken: false },
 })
 

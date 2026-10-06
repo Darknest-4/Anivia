@@ -13,6 +13,17 @@
 // Deploy: supabase functions deploy anilist-auth --no-verify-jwt
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
+/** Server key: the new `SUPABASE_SECRET_KEYS` ("default" entry), falling back to the legacy service role key. */
+function serverKey(): string {
+  try {
+    const keys = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS') ?? '{}') as Record<string, string>
+    if (keys.default) return keys.default
+  } catch {
+    /* not set or not JSON */
+  }
+  return Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+}
+
 const ALLOWED_ORIGINS = (Deno.env.get('ALLOWED_ORIGINS') ?? 'https://anivia.animehub.hu,http://localhost:5173,http://localhost:4173').split(',')
 const EMAIL_DOMAIN = Deno.env.get('ANILIST_EMAIL_DOMAIN') ?? 'anilist.anivia.animehub.hu'
 
@@ -59,7 +70,7 @@ Deno.serve(async (req) => {
   const viewer = await verifyAniList(token)
   if (!viewer) return json(req, { error: 'AniList rejected this token — please try again.' }, 401)
 
-  const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, {
+  const admin = createClient(Deno.env.get('SUPABASE_URL')!, serverKey(), {
     auth: { persistSession: false, autoRefreshToken: false },
   })
 

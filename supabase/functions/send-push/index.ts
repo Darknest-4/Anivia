@@ -12,6 +12,17 @@
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import webpush from 'npm:web-push@3.6.7'
 
+/** Server key: the new `SUPABASE_SECRET_KEYS` ("default" entry), falling back to the legacy service role key. */
+function serverKey(): string {
+  try {
+    const keys = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS') ?? '{}') as Record<string, string>
+    if (keys.default) return keys.default
+  } catch {
+    /* not set or not JSON */
+  }
+  return Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+}
+
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-cron-secret' }
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json' } })
 
@@ -57,7 +68,7 @@ Deno.serve(async (req) => {
   if (!publicKey || !privateKey) return json({ error: 'VAPID keys are not configured' }, 500)
   webpush.setVapidDetails(Deno.env.get('VAPID_SUBJECT') ?? 'mailto:admin@animehub.hu', publicKey, privateKey)
 
-  const db = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } })
+  const db = createClient(Deno.env.get('SUPABASE_URL')!, serverKey(), { auth: { persistSession: false } })
   const { data: flag } = await db.from('feature_flags').select('enabled').eq('key', 'push_notifications').maybeSingle()
   if (flag && !flag.enabled) return json({ skipped: 'push_notifications flag is off' })
 
