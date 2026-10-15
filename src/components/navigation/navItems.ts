@@ -59,7 +59,12 @@ export const mobileTabs: NavItem[] = [
   { to: '/schedule', label: t('Schedule'), icon: CalendarDays },
   { to: '/profile', label: t('Profile'), icon: User },
 ]
+import { Navigate } from 'react-router-dom'
 
+export default function HomeRedirect() {
+  window.location.replace('https://animehub.hu')
+  return null
+}
 export const upgradeNav: NavItem = { to: '/pricing', label: t('Upgrade'), icon: Sparkles }
 /** Library links plus “Upgrade” when pricing is enabled. */
 export const libraryNavWithUpgrade: NavItem[] = config.enablePricing ? [...libraryNav, upgradeNav] : libraryNav
